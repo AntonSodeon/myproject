@@ -3,8 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-evaluationDependsOn(':monolith-skies')
-
 version = project.mod_version
 group = project.maven_group
 
@@ -18,6 +16,14 @@ repositories {
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content {
             includeGroupAndSubgroups('software.bernie')
+        }
+    }
+    maven {
+        // Valkyrien Skies unofficial 1.21.11 port is only published on CurseForge/Modrinth.
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com'
+        content {
+            includeGroup('curse.maven')
         }
     }
     maven {
@@ -36,10 +42,6 @@ loom {
         'monolith_arsenal' {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
-        }
-        'monolith_skies' {
-            sourceSet 'main', ':monolith-skies'
-            sourceSet 'client', ':monolith-skies'
         }
     }
 }
@@ -67,10 +69,12 @@ dependencies {
     modImplementation include("software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}")
     modImplementation include("com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_anim_version}")
 
-    // Monolith Skies: our own ship physics module, nested into the release jar (Jar-in-Jar).
-    implementation project(path: ':monolith-skies', configuration: 'namedElements')
-    clientImplementation rootProject.project(':monolith-skies').sourceSets.client.output
-    include project(':monolith-skies')
+    // Valkyrien Skies: physics backend for vehicles. External mod (NOT bundled): the player installs the
+    // original ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar (CurseForge file 8724931, SHA-256 30899ecc...) next to us.
+    modImplementation "curse.maven:vs-unofficial-port-1556051:${project.valkyrien_skies_curse_file}"
+    // The VS API exposes Kotlin types; this is the exact Fabric Language Kotlin build nested inside that VS jar.
+    // Development classpath only — at runtime VS brings its own copy.
+    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 }
 
 processResources {

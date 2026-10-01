@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import ru.monolith.arsenal.client.TestWeaponPose;
 import ru.monolith.arsenal.registry.EntityRegistry;
 import ru.monolith.arsenal.registry.ItemRegistry;
-import ru.monolith.skies.ship.ShipEntity;
+
 
 /**
  * Drives a real client through the manual checklist: weapon pose (first/third person, re-enabled after slot

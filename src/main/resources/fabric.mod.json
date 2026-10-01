@@ -18,6 +18,6 @@
     "fabric-api": ">=0.141.6",
     "geckolib": ">=5.4.5",
     "player_animation_library": ">=1.1.7",
-    "monolith_skies": ">=0.1.0"
+    "valkyrienskies": ">=2.4.205 <2.5"
   }
 }
