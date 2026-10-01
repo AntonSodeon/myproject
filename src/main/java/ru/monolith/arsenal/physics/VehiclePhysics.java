@@ -2,10 +2,10 @@ package ru.monolith.arsenal.physics;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import ru.monolith.arsenal.MonolithArsenal;
@@ -29,14 +29,8 @@ public final class VehiclePhysics {
         }
         MonolithArsenal.LOGGER.info("Vehicle physics backend: {}", backend.describe());
 
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            ScheduledForces.tick(server);
-            backend.publishQueuedForces();
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            ScheduledForces.clear();
-            backend.clear();
-        });
+        ServerTickEvents.END_SERVER_TICK.register(server -> backend.tick(server));
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> backend.clear());
     }
 
     public static VehiclePhysicsBackend backend() {
@@ -70,8 +64,13 @@ public final class VehiclePhysics {
         }
 
         @Override
-        public OptionalLong createTestBody(ServerWorld world, BlockPos origin) {
-            return OptionalLong.empty();
+        public BodyCreation createTestBody(ServerWorld world, BlockPos origin) {
+            return BodyCreation.failed(this.describe());
+        }
+
+        @Override
+        public Optional<BodyCreation> creation(long id) {
+            return Optional.empty();
         }
 
         @Override
@@ -80,7 +79,7 @@ public final class VehiclePhysics {
         }
 
         @Override
-        public void publishQueuedForces() {
+        public void tick(MinecraftServer server) {
         }
 
         @Override
