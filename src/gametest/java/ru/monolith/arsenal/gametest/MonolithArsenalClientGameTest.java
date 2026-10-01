@@ -191,7 +191,7 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 30", rest.x, rest.y + 2.0, rest.z));
         context.waitTicks(40);
         double startX = context.computeOnClient(client -> client.player.getX());
-        server.runOnServer(s -> body(s, id).applyForce(new Vec3d(mass * 4.0, 0.0, 0.0), 1.0));
+        server.runOnServer(s -> body(s, id).applyForce(new Vec3d(mass * 10.0, 0.0, 0.0), 1.0));
         context.waitTicks(50);
         double carried = context.computeOnClient(client -> client.player.getX()) - startX;
         double bodyDx = server.computeOnServer(s -> body(s, id).position().x) - rest.x;
