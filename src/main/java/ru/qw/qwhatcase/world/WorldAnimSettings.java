@@ -17,7 +17,13 @@ public record WorldAnimSettings(
         SoundSpec winSound, SoundSpec duplicateSound,
         ParticleSpec startParticles, ParticleSpec spinParticles, ParticleSpec resultParticles, int maxParticlesPerTick,
         java.util.List<String> resultLines, java.util.List<String> duplicateLines,
-        float resultLabelScale, double resultLabelOffset, String resultLabelBackground, boolean resultLabelShadow) {
+        float resultLabelScale, double resultLabelOffset, String resultLabelBackground, boolean resultLabelShadow,
+        String direction, String centerMarkerRight) {
+
+    /** Вертикальная лента: модели едут сверху вниз через центр. */
+    public boolean vertical() {
+        return !"HORIZONTAL".equals(direction);
+    }
 
     public int spinTicks() {
         return (int) Math.max(20, Math.round(spinMs / 50.0));

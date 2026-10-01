@@ -29,13 +29,27 @@ class WorldConfigTest {
         assertEquals("minecraft:block.note_block.bell", b.slowdownSound().sound());
         WorldAnimSettings p = premium.worldAnimation();
         assertEquals(7000, p.spinMs(), "переопределено в кейсе");
-        assertEquals(7, p.visibleModels());
+        assertEquals(0.6, p.spacing(), 1e-9);
+        assertTrue(b.vertical(), "по умолчанию вертикальная лента");
+        assertEquals(1.9, b.height(), 1e-9);
+        assertEquals("&e◀", b.centerMarkerRight());
         assertEquals(60, p.resultParticles().count(), "частично переопределённая секция");
         assertEquals("DUST", p.resultParticles().type());
         assertEquals(3000, p.resultMs(), "остальное — из общего раздела");
         assertEquals(List.of("{case}", "&7ПКМ — открыть кейс"), basic.label().lines());
         assertEquals(3, premium.label().lines().size());
         assertEquals("CENTER", basic.label().billboard());
+    }
+
+    @Test
+    void horizontalModeKeepsHorizontalDefaults() {
+        WorldAnimSettings h = WorldConfig.animation(TestCatalogs.yaml("direction: horizontal"), null, new ArrayList<>(), "w");
+        assertFalse(h.vertical());
+        assertEquals(0.9, h.height(), 1e-9);
+        assertEquals(0.7, h.spacing(), 1e-9);
+        List<String> problems = new ArrayList<>();
+        assertTrue(WorldConfig.animation(TestCatalogs.yaml("direction: diagonal"), null, problems, "w").vertical());
+        assertEquals(1, problems.size());
     }
 
     @Test
@@ -48,7 +62,7 @@ class WorldConfigTest {
                 """);
         WorldAnimSettings s = WorldConfig.animation(global, null, problems, "world-animation");
         assertEquals(5, s.visibleModels(), "чётное число исправлено на нечётное");
-        assertEquals(0.7, s.spacing(), 1e-9);
+        assertEquals(0.55, s.spacing(), 1e-9);
         assertEquals(0.3f, s.tickSound().volume());
         assertEquals("minecraft:block.note_block.hat", s.tickSound().sound());
         assertEquals(2, problems.size(), problems.toString());

@@ -84,7 +84,7 @@ cases:
     # Переопределение внешней анимации только для этого кейса (остальное — из config.yml → world-animation).
     world-animation:
       spin-duration-ms: 7000
-      visible-models: 7
+      spacing: 0.6
       winner-scale: 1.4
       particles:
         result: {enabled: true, type: DUST, count: 60, offset-x: 0.6, offset-y: 0.6, offset-z: 0.6, size: 1.6}

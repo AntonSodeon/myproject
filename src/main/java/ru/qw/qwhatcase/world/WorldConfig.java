@@ -84,18 +84,24 @@ public final class WorldConfig {
             visible++;
         }
         String transform = c.str("model-transform", "HEAD").toUpperCase(Locale.ROOT);
+        String direction = c.str("direction", "VERTICAL").toUpperCase(Locale.ROOT);
+        if (!direction.equals("VERTICAL") && !direction.equals("HORIZONTAL")) {
+            problems.add(where + ".direction: ожидается VERTICAL или HORIZONTAL — использовано VERTICAL");
+            direction = "VERTICAL";
+        }
+        boolean vertical = direction.equals("VERTICAL");
         return new WorldAnimSettings(
                 c.bool("enabled", true),
                 (long) c.dbl("spin-duration-ms", 6000, 1000, 60000),
                 (long) c.dbl("result-duration-ms", 3000, 500, 60000),
                 visible, c.integer("scroll-items", 30, 3, 500),
-                c.dbl("height", 0.9, -2, 10), c.dbl("spacing", 0.7, 0.1, 5),
+                c.dbl("height", vertical ? 1.9 : 0.9, -2, 10), c.dbl("spacing", vertical ? 0.55 : 0.7, 0.1, 5),
                 (float) c.dbl("model-scale", 0.6, 0.05, 5), (float) c.dbl("center-scale", 0.8, 0.05, 5),
                 (float) c.dbl("winner-scale", 1.2, 0.05, 8), c.dbl("winner-rise", 0.3, -2, 5),
                 c.dbl("rotation-speed", 120, 0, 2000), c.dbl("deceleration-power", 3.0, 1.0, 8.0),
                 c.dbl("view-range", 48, 4, 256),
                 transform, (float) c.dbl("model-yaw-offset", 0, -360, 360),
-                c.bool("glow-center", true), c.str("center-marker", "&e▼"), c.dbl("slowdown-at", 0.75, 0, 1),
+                c.bool("glow-center", true), c.str("center-marker", vertical ? "&e▶" : "&e▼"), c.dbl("slowdown-at", 0.75, 0, 1),
                 c.sound("sounds.start", "minecraft:custom.mystery_crate.open", 1f, 1f),
                 c.sound("sounds.tick", "minecraft:custom.mystery_crate.scroll", 0.6f, 0.9f),
                 (float) c.dbl("sounds.tick.pitch-end", 1.4, 0.5, 2.0),
@@ -110,7 +116,8 @@ public final class WorldConfig {
                 c.lines("result-label.duplicate-lines", List.of("&fВыпала: {hat}", "&eУже есть в коллекции",
                         "&7Компенсация: &e{tokens} жетонов")),
                 (float) c.dbl("result-label.scale", 0.9, 0.1, 5), c.dbl("result-label.offset-y", 0.75, -3, 5),
-                c.str("result-label.background", "#80000000"), c.bool("result-label.shadow", true));
+                c.str("result-label.background", "#80000000"), c.bool("result-label.shadow", true),
+                direction, c.str("center-marker-right", vertical ? "&e◀" : ""));
     }
 
     public static LabelSettings label(ConfigurationSection global, ConfigurationSection override,

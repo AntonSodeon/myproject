@@ -60,10 +60,12 @@ public final class WorldAnimation {
     private Chunk ticketChunk;
     private Location center;
     private Vector axis;
+    /** Горизонтальное направление «вправо» для зрителя (для боковых меток центра). */
+    private Vector side;
     private float yaw;
     private ItemDisplay[] pool = new ItemDisplay[0];
     private int[] assigned = new int[0];
-    private TextDisplay marker;
+    private final List<TextDisplay> markers = new ArrayList<>();
     private TextDisplay resultLabel;
     private BukkitTask task;
     private Phase phase = Phase.SPIN;
@@ -111,7 +113,9 @@ public final class WorldAnimation {
             facing = new Vector(0, 0, 1);
         }
         facing.normalize();
-        axis = new Vector(facing.getZ(), 0, -facing.getX());
+        side = new Vector(facing.getZ(), 0, -facing.getX());
+        // Вертикальная лента: ось вверх, модели движутся сверху вниз. Горизонтальная: ось вправо от зрителя.
+        axis = s.vertical() ? new Vector(0, 1, 0) : side.clone();
         yaw = (float) Math.toDegrees(Math.atan2(-facing.getX(), facing.getZ())) + s.modelYawOffset();
 
         buildReel();
@@ -122,7 +126,14 @@ public final class WorldAnimation {
             cleanup();
             return false;
         }
-        plugin.labels().raise(point, plugin.catalog().caseDef(point.caseId()).map(d -> d.label().raise()).orElse(0.9));
+        double raise = plugin.catalog().caseDef(point.caseId()).map(d -> d.label().raise()).orElse(0.9);
+        if (s.vertical()) {
+            // Название поднимается над верхом полосы, чтобы не перекрывать модели.
+            double labelHeight = plugin.catalog().caseDef(point.caseId()).map(d -> d.label().height()).orElse(0.45);
+            double stripTop = s.height() + ((s.visibleModels() - 1) / 2 + 1) * s.spacing() + 0.35;
+            raise = Math.max(raise, stripTop - labelHeight);
+        }
+        plugin.labels().raise(point, raise);
         sound(s.startSound(), center, 1f);
         particles(s.startParticles(), new Location(world, point.x() + 0.5, point.y() + 0.5, point.z() + 0.5), null);
         update(0);
@@ -166,19 +177,30 @@ public final class WorldAnimation {
             });
             assigned[i] = -1;
         }
-        if (s.centerMarker() != null && !s.centerMarker().isBlank()) {
-            Location m = center.clone().add(0, Math.max(0.45, s.centerScale() * 0.75), 0);
-            marker = world.spawn(m, TextDisplay.class, td -> {
-                WorldEntities.mark(td, WorldEntities.ANIMATION, point.key(), operation);
-                td.text(Text.chat(s.centerMarker()));
-                td.setBillboard(Display.Billboard.CENTER);
-                td.setDefaultBackground(false);
-                td.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-                td.setShadowed(true);
-                td.setViewRange((float) (s.viewRange() / 64.0));
-                td.setBrightness(new Display.Brightness(15, 15));
-            });
+        if (s.vertical()) {
+            // Метки центра по бокам полосы: ▶ слева и ◀ справа от зрителя.
+            double gap = Math.max(0.45, s.centerScale() * 0.6 + 0.2);
+            spawnMarker(center.clone().add(side.clone().multiply(-gap)).add(0, -0.12, 0), s.centerMarker());
+            spawnMarker(center.clone().add(side.clone().multiply(gap)).add(0, -0.12, 0), s.centerMarkerRight());
+        } else {
+            spawnMarker(center.clone().add(0, Math.max(0.45, s.centerScale() * 0.75), 0), s.centerMarker());
         }
+    }
+
+    private void spawnMarker(Location at, String text) {
+        if (text == null || text.isBlank()) {
+            return;
+        }
+        markers.add(world.spawn(at, TextDisplay.class, td -> {
+            WorldEntities.mark(td, WorldEntities.ANIMATION, point.key(), operation);
+            td.text(Text.chat(text));
+            td.setBillboard(Display.Billboard.CENTER);
+            td.setDefaultBackground(false);
+            td.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+            td.setShadowed(true);
+            td.setViewRange((float) (s.viewRange() / 64.0));
+            td.setBrightness(new Display.Brightness(15, 15));
+        }));
     }
 
     // ------------------------------------------------------------------ кадр
@@ -305,10 +327,12 @@ public final class WorldAnimation {
                 d.setGlowing(false);
             }
         }
-        if (marker != null) {
-            marker.remove();
-            marker = null;
+        for (TextDisplay m : markers) {
+            if (m.isValid()) {
+                m.remove();
+            }
         }
+        markers.clear();
         Location up = center.clone().add(0, s.winnerRise(), 0);
         up.setYaw(yaw);
         w.setTeleportDuration(8);
@@ -486,10 +510,14 @@ public final class WorldAnimation {
                 d.remove();
             }
         }
-        for (Entity e : new Entity[]{marker, resultLabel}) {
-            if (e != null && e.isValid()) {
-                e.remove();
+        for (TextDisplay m : markers) {
+            if (m.isValid()) {
+                m.remove();
             }
+        }
+        markers.clear();
+        if (resultLabel != null && resultLabel.isValid()) {
+            resultLabel.remove();
         }
         // Страховка: всё, что помечено ID этой операции, в чанке точки.
         if (ticketChunk != null && ticketChunk.isLoaded()) {

@@ -59,7 +59,16 @@ const near = (d, pos, r = 3.5) => Math.abs(d.x - (pos.x + 0.5)) < r && Math.abs(
   await sleep(700);
   check('3. menu closed after save', !t1.currentWindow || !/Содержимое/.test(title(t1.currentWindow)));
   const spin = await displays();
-  check('3. animation runs above the RIGHT block (A)', spin.length === 7 && spin.every(d => near(d, A)) && spin.every(d => Math.abs(d.y - (A.y + 1.9)) < 0.05), spin.map(d => [d.x, d.y, d.z]));
+  const cy = A.y + 1 + 1.9;
+  check('3. animation runs above the RIGHT block (A)', spin.length === 7 && spin.every(d => near(d, A)), spin.map(d => [d.x, d.y, d.z]));
+  check('3. VERTICAL strip: one column over the block, models stacked along Y',
+    spin.every(d => Math.abs(d.x - (A.x + 0.5)) < 0.01 && Math.abs(d.z - (A.z + 0.5)) < 0.01)
+    && spin.every(d => d.y > cy - 1.7 && d.y < cy + 1.7) && Math.max(...spin.map(d => d.y)) - Math.min(...spin.map(d => d.y)) > 1.5,
+    spin.map(d => +d.y.toFixed(2)).sort((a, b) => a - b));
+  await sleep(300);
+  const later = await displays();
+  const movedDown = later.filter(d => near(d, A)).some(d => spin.some(o => o.cmd === d.cmd && d.y < o.y - 0.2));
+  check('3. models move top → bottom', movedDown);
   check('6. exactly 1 key spent', keyOf('Tester1') === keys0 - 1, [keys0, keyOf('Tester1')]);
   check('7. triple click → one opening', openingsOf('Tester1').length === 1);
   const op1 = openingsOf('Tester1')[0];
@@ -77,13 +86,14 @@ const near = (d, pos, r = 3.5) => Math.abs(d.x - (pos.x + 0.5)) < r && Math.abs(
   while (Date.now() - t1start < 6900) await sleep(50);
   const resA = (await displays()).filter(d => near(d, A));
   const winner = resA.sort((a, b) => b.scale - a.scale)[0];
-  check('5. final model = saved reward, enlarged', winner && winner.cmd === hatCmd(op1[1]) && winner.scale > 1.0
+  check('5. final model = saved reward, enlarged, in the centre', winner && winner.cmd === hatCmd(op1[1]) && winner.scale > 1.0
+    && Math.abs(winner.y - (cy + 0.3)) < 0.05
     && resA.filter(d => d !== winner).every(d => d.scale < 0.05), { winner, saved: op1[1], cmd: hatCmd(op1[1]) });
   out = await cmd(`data get entity @e[type=text_display,tag=qwhatcase_anim,limit=1,sort=nearest,x=${A.x},y=${A.y},z=${A.z}] text`);
   check('5. result caption shows hat & rarity', /Вы получили|Выпала/.test(out) && /Редкость|Уже есть/.test(out), out.slice(0, 200));
   check('5. player got chat result', t1.chatLog.some(m => /Вы получили:|Выпала:/.test(m)), t1.chatLog.slice(-4));
   out = await cmd(`data get entity @e[tag=qwhatcase_label,limit=1,sort=nearest,x=${A.x},y=${A.y},z=${A.z}] Pos`);
-  check('label raised during animation', /-57\.6/.test(out), out.trim().split('\n').pop());
+  check('label raised above the vertical strip during animation', /-55\.1/.test(out), out.trim().split('\n').pop());
   // 13. всё убрано
   while (Date.now() - t1start < 10200) await sleep(50);
   const st = await status();
