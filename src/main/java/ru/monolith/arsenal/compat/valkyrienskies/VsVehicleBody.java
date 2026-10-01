@@ -113,8 +113,8 @@ final class VsVehicleBody implements VehicleBody {
 
     @Override
     public String diagnostics() {
-        return String.format(java.util.Locale.ROOT, "voxelChunks(loaded/ticking/total)=%s physicsSteps=%d staticSteps=%d sleeping=%s lastDt=%.5f tickingStreak=%d held=%d queued=%d simulated=%s",
-                this.backend.voxelChunksOf(this.ship), this.control.physicsSteps(), this.control.staticSteps(), this.control.lastSleeping(), this.control.lastDelta(),
+        return String.format(java.util.Locale.ROOT, "voxelChunks(loaded/ticking/total)=%s centreTicking=%s physicsSteps=%d staticSteps=%d sleeping=%s lastDt=%.5f readyStreak=%d held=%d queued=%d simulated=%s",
+                this.backend.voxelChunksOf(this.ship), this.backend.centreTicking(this.ship), this.control.physicsSteps(), this.control.staticSteps(), this.control.lastSleeping(), this.control.lastDelta(),
                 this.backend.tickingStreak(this.ship.getId()), this.backend.heldCount(this.ship.getId()),
                 this.control.queuedCommands(), this.isSimulated());
     }

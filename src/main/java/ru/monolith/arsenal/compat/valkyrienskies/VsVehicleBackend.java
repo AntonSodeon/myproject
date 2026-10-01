@@ -34,7 +34,7 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
 
     /** Commands held on the server thread while their ship is not being simulated, by ship id. */
     private final Map<Long, java.util.ArrayDeque<PhysicsCommand>> held = new java.util.HashMap<>();
-    /** Consecutive server ticks each tracked ship has had all of its shipyard chunks loaded. */
+    /** Consecutive server ticks each tracked ship has been simulatable (shipyard chunks loaded, position ticking). */
     private final Map<Long, Integer> tickingStreak = new java.util.HashMap<>();
 
     private MinecraftServer lastServer;
@@ -156,7 +156,8 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
 
     /**
      * True if VS is simulating the ship now. This VS port keeps ships without nearby players (and without
-     * keep-active) in memory but holds them still, ignoring forces, while their shipyard chunks are not loaded.
+     * keep-active) in memory but holds them still, ignoring forces, while their shipyard chunks are not loaded or
+     * the world chunk at their position is not entity-ticking.
      * That state is not exposed through the VS API, so it is derived from those chunks, with a short streak to
      * cover VS resuming a tick later.
      */
@@ -253,8 +254,9 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
             }
             seen.add(ship.getId());
             ServerWorld world = worldOf(server, ship);
-            boolean ready = world != null && allVoxelChunksLoaded(world, ship);
-            this.tickingStreak.put(ship.getId(), ready ? this.tickingStreak.getOrDefault(ship.getId(), 0) + 1 : 0);
+            boolean ready = world != null && allVoxelChunksLoaded(world, ship) && centreChunkTicking(world, ship);
+            int streak = ready ? this.tickingStreak.getOrDefault(ship.getId(), 0) + 1 : 0;
+            this.tickingStreak.put(ship.getId(), streak);
             java.util.ArrayDeque<PhysicsCommand> waiting = this.held.get(ship.getId());
             if (waiting != null && this.isSimulated(ship, control)) {
                 PhysicsCommand command;
@@ -279,6 +281,17 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
             }
         });
         return all[0];
+    }
+
+    /** VS also stops simulating a ship whose world position is no longer in an entity-ticking chunk. */
+    private static boolean centreChunkTicking(ServerWorld world, LoadedServerShip ship) {
+        var p = ship.getTransform().getPositionInWorld();
+        return world.shouldTickEntityAt(BlockPos.ofFloored(p.x(), p.y(), p.z()));
+    }
+
+    String centreTicking(LoadedServerShip ship) {
+        ServerWorld world = this.lastServer == null ? null : worldOf(this.lastServer, ship);
+        return world == null ? "?" : String.valueOf(centreChunkTicking(world, ship));
     }
 
     private static ServerWorld worldOf(MinecraftServer server, LoadedServerShip ship) {

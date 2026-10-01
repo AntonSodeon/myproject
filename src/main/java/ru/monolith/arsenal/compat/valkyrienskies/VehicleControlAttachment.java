@@ -127,11 +127,12 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
         this.lastStatic = ship.isStatic();
         this.lastSleeping = ship.isSleeping();
         if (this.lastStatic) {
-            // VS silently drops forces on static ships (PhysShipImpl.canApplyWrenches), e.g. while the ship is frozen
-            // without nearby players. Keep commands queued until it is dynamic again instead of losing them.
+            // VS silently drops forces on static ships (PhysShipImpl.canApplyWrenches). Keep commands queued until
+            // the ship is dynamic again instead of losing them.
             this.staticSteps.incrementAndGet();
             return;
         }
+
         if (delta <= 0.0) {
             return;
         }

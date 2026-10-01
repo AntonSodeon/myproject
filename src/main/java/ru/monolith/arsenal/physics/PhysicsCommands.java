@@ -40,6 +40,23 @@ public final class PhysicsCommands {
                         .then(withId("status", PhysicsCommands::status))
                         .then(withId("info", PhysicsCommands::info))
                         .then(withId("remove", PhysicsCommands::remove))
+                        .then(CommandManager.literal("create_plain_vs")
+                                .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                                        .then(CommandManager.argument("marker", com.mojang.brigadier.arguments.BoolArgumentType.bool())
+                                                .then(CommandManager.argument("attachment", com.mojang.brigadier.arguments.BoolArgumentType.bool())
+                                                        .executes(context -> {
+                                                            long id = ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.createPlainVsShip(
+                                                                    context.getSource().getWorld(), BlockPosArgumentType.getLoadedBlockPos(context, "pos"),
+                                                                    com.mojang.brigadier.arguments.BoolArgumentType.getBool(context, "marker"),
+                                                                    com.mojang.brigadier.arguments.BoolArgumentType.getBool(context, "attachment"));
+                                                            context.getSource().sendFeedback(() -> Text.literal("Plain VS ship id=" + id), false);
+                                                            return 1;
+                                                        })))))
+                        .then(withId("vs_position", (context, id) -> {
+                            String pos = ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(context.getSource().getWorld(), id);
+                            context.getSource().sendFeedback(() -> Text.literal("VS ship " + id + " at " + pos), false);
+                            return 1;
+                        }))
                         .then(vectorCommand("impulse", false, (body, v, s) -> body.applyImpulse(v)))
                         .then(vectorCommand("angular_impulse", false, (body, v, s) -> body.applyAngularImpulse(v)))
                         .then(vectorCommand("force", true, VehicleBody::applyForce))
