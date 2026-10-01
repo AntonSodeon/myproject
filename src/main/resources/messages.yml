@@ -1,0 +1,294 @@
+# Файл локализации QWHatCase. Все тексты для игроков находятся здесь.
+# Цвета: &a, &l и т. д., RGB: &#FF55AA. Подстановки в фигурных скобках: {hat}, {case}, {keys} ...
+prefix: '&#F5A623&lШляпы &8» &r'
+
+error:
+  no-permission: '&cНедостаточно прав.'
+  players-only: '&cКоманда доступна только игроку.'
+  database: '&cОшибка сохранения данных. Ничего не списано и не выдано. Попробуйте позже или сообщите администратору.'
+  profile-loading: '&eВаши данные ещё загружаются, повторите через секунду.'
+  unknown-player: '&cИгрок &f{player}&c не найден (он должен хотя бы раз зайти на сервер).'
+  bad-amount: '&cНекорректное количество: &f{value}'
+
+usage:
+  hats:
+    - '&6/hats &7— главное меню'
+    - '&6/hats collection &7— моя коллекция'
+    - '&6/hats equip <id> &7— надеть открытую шляпку'
+    - '&6/hats unequip &7— снять шляпку'
+    - '&6/hats shop &7— каталог за жетоны'
+    - '&6/hats pack &7— повторно загрузить ресурс-пак'
+  cases:
+    - '&6/cases &7— список кейсов'
+    - '&6/cases view <id> &7— содержимое кейса'
+    - '&6/cases open <id> [fast] &7— открыть кейс (fast — без анимации)'
+    - '&6/cases keys &7— мои ключи'
+  equip: '&eИспользование: &f/hats equip <id>'
+  open: '&eИспользование: &f/cases open <id> [fast]'
+  key: '&eИспользование: &f/hatcases key <give|take|set> <игрок> <кейс> <кол-во>'
+  hat: '&eИспользование: &f/hatcases hat <give|revoke> <игрок> <шляпа>'
+  tokens: '&eИспользование: &f/hatcases tokens <give|take> <игрок> <кол-во>'
+  point: '&eИспользование: &f/hatcases point <add <кейс>|remove|list>'
+  inspect: '&eИспользование: &f/hatcases inspect <игрок>'
+  history: '&eИспользование: &f/hatcases history <игрок> [страница] &7или &f/hatcases history op <ID операции>'
+  simulate: '&eИспользование: &f/hatcases simulate <кейс> [розыгрышей]'
+  admin:
+    - '&6&lQWHatCase — администрирование'
+    - '&6/hatcases key give|take|set <игрок> <кейс> <кол-во>'
+    - '&6/hatcases hat give|revoke <игрок> <шляпа>'
+    - '&6/hatcases tokens give|take <игрок> <кол-во>'
+    - '&6/hatcases point add <кейс> &7| &6remove &7| &6list'
+    - '&6/hatcases inspect <игрок> &7— коллекция и балансы'
+    - '&6/hatcases history <игрок> [стр.] &7— история открытий'
+    - '&6/hatcases simulate <кейс> [N] &7— проверка вероятностей'
+    - '&6/hatcases reload &7— проверить и применить конфигурацию'
+    - '&6/hatcases migrate &7[confirm] — перенос из старого плагина'
+
+hat:
+  equipped: '&aШляпка {hat}&a надета.'
+  already-worn: '&eШляпка {hat}&e уже надета.'
+  not-owned: '&cШляпки {hat}&c нет в вашей коллекции.'
+  unknown: '&cШляпка &f{hat}&c не найдена.'
+  locked: '&7Эта шляпка ещё не получена. Её можно выиграть в кейсе или купить за жетоны.'
+  helmet-occupied: '&cНа вас надет шлем. Снимите его, чтобы надеть шляпку {hat}&c.'
+  inventory-full: '&cНа вас надет шлем, а в инвентаре нет места, чтобы его переложить. Освободите слот.'
+  helmet-cursed: '&cНа шлеме проклятие несъёмности — шляпку надеть нельзя.'
+  unequipped: '&aШляпка снята. Она осталась в коллекции.'
+  nothing-to-unequip: '&7На вас нет шляпки.'
+  slot-locked: '&eСлот головы занят шляпкой. Снимите её: &f/hats unequip'
+  helmet-blocks-restore: '&eШляпка {hat}&e не надета: слот занят шлемом. Снимите шлем и наденьте её в &f/hats&e.'
+  received: '&aВ вашу коллекцию добавлена шляпка {hat}&a! Откройте &f/hats'
+
+keys:
+  received: '&aВы получили &f{amount}&a ключ(ей) для кейса {case}&a. Всего: &f{balance}'
+
+tokens:
+  received: '&aВы получили &f{amount}&a жетонов. Баланс: &f{balance}'
+
+cases:
+  unknown: '&cКейс &f{case}&c не найден.'
+  disabled: '&cЭтот кейс сейчас недоступен.'
+  no-case-permission: '&cУ вас нет доступа к кейсу {case}&c.'
+  not-enough-keys: '&cНе хватает ключей: нужно &f{cost}&c, у вас &f{keys}&c.'
+  already-opening: '&eДождитесь окончания текущего открытия.'
+  keys-header: '&6Ваши ключи:'
+  keys-line: '&8 • &r{case}&7: &f{keys} &8(за открытие: {cost})'
+  buy-keys-link: '&aНажмите здесь, чтобы купить ключи.'
+
+open:
+  win: '&fВы открыли {case}&f и получили {hat}&f! &8({rarity}&8, шанс {chance})'
+  new: '&a✔ Новая шляпка добавлена в коллекцию. &7Надеть: &f/hats'
+  duplicate: '&e✦ Уже есть в коллекции: &f+{tokens} &eжетонов. Баланс: &f{balance}'
+  pending-header: '&6Результаты открытий, которые вы не успели увидеть ({count}):'
+  pending-new: '&8 • &7{date} &r{case}&7 → {hat} &a(новая)'
+  pending-duplicate: '&8 • &7{date} &r{case}&7 → {hat} &e(дубликат, +{tokens} жетонов)'
+
+shop:
+  bought: '&aВы купили {hat}&a за &f{price}&a жетонов. Баланс: &f{balance}'
+  already-owned: '&eЭта шляпка уже есть в вашей коллекции.'
+  not-enough: '&cНе хватает жетонов: нужно &f{price}&c, у вас &f{balance}&c.'
+  not-for-sale: '&cЭта шляпка не продаётся.'
+  in-progress: '&eПокупка уже обрабатывается.'
+
+pack:
+  loaded: '&aРесурс-пак загружен — модели шляпок доступны.'
+  declined: '&cВы отказались от ресурс-пака. Без него шляпки отображаются как обычные предметы, а открытие кейсов недоступно.'
+  failed: '&cНе удалось загрузить ресурс-пак.'
+  required-for-cases: '&cДля открытия кейсов нужен ресурс-пак сервера.'
+  retry-button: '&a&n[Нажмите, чтобы загрузить ресурс-пак снова]'
+  retry-hover: 'Выполнить /hats pack'
+  sent: '&7Запрос на загрузку ресурс-пака отправлен.'
+  server-mode: '&7Ресурс-пак выдаёт сервер. Перезайдите и примите его, либо включите «Пакеты ресурсов сервера» в настройках сервера в списке серверов.'
+  not-configured: '&7Ресурс-пак для шляпок не настроен.'
+  state:
+    loaded: '&aзагружен'
+    pending: '&eожидается'
+    declined: '&cотклонён'
+    failed: '&cошибка загрузки'
+    not-tracked: '&7не проверяется'
+
+point:
+  added: '&aБлок &f{block} &7({world} {x} {y} {z})&a привязан к кейсу &f{case}&a.'
+  removed: '&aПривязка блока &7({world} {x} {y} {z})&a удалена.'
+  not-found: '&cЭтот блок не привязан к кейсу.'
+  no-target: '&cСмотрите на блок (до 6 блоков).'
+  list-header: '&6Точки кейсов ({count}):'
+  list-line: '&8 • &f{world} {x} {y} {z} &7→ &e{case}'
+  break-denied: '&cЭтот блок нельзя разрушить.'
+  break-admin: '&cБлок привязан к кейсу. Сначала удалите привязку: &f/hatcases point remove'
+
+admin:
+  keys-given: '&aВыдано &f{amount}&a ключ(ей) {case}&a игроку &f{player}&a. Баланс: &f{balance}'
+  keys-taken: '&aСписано &f{taken}&a из &f{amount}&a ключ(ей) {case}&a у &f{player}&a. Баланс: &f{balance}'
+  keys-set: '&aКлючи {case}&a игрока &f{player}&a установлены: &f{balance}'
+  hat-given: '&aШляпка {hat}&a добавлена в коллекцию &f{player}&a.'
+  hat-already: '&eУ игрока &f{player}&e уже есть {hat}&e.'
+  hat-revoked: '&aШляпка {hat}&a убрана из коллекции &f{player}&a.'
+  hat-missing: '&eУ игрока &f{player}&e нет шляпки {hat}&e.'
+  tokens-given: '&aВыдано &f{amount}&a жетонов игроку &f{player}&a. Баланс: &f{balance}'
+  tokens-taken: '&aСписано &f{taken}&a из &f{amount}&a жетонов у &f{player}&a. Баланс: &f{balance}'
+  inspect:
+    - '&6&lИгрок &f{player} &8({uuid})'
+    - '&7Жетоны: &f{tokens}'
+    - '&7Шляпок: &f{owned}&7/&f{total} &8| &7надета: &f{selected}'
+    - '&7Ключи:'
+  inspect-key: '&8 • &r{case} &8({id})&7: &f{keys}'
+  inspect-hats: '&7Коллекция: &f{hats}'
+  history-header: '&6История открытий &f{player}&6: {count} (стр. {page}/{pages})'
+  history-line: '&8 • &7{date} &8#{operation} &e{case} &7→ {hat} &7| ключей: &f{keys} &7| {outcome} &7| жетонов: &f{tokens} &7| показан: {shown}'
+  history-full: "&7{date}\n&7Операция: &f{operation}\n&7Игрок: &f{player}\n&7Кейс: &f{case}&7, ключей: &f{keys}\n&7Награда: {hat}&7 — {outcome}&7, жетонов: &f{tokens}&7 (баланс после: &f{balance}&7)\n&7Итог показан игроку: {shown}"
+  history-not-found: '&cОперация не найдена.'
+  outcome-new: '&aновая'
+  outcome-duplicate: '&eдубликат'
+  shown-yes: '&aда'
+  shown-no: '&cнет'
+  audit-header: '&6Последние действия:'
+  audit-line: '&8 • &7{date} &f{actor} &e{action} &7{details}'
+  reloaded: '&aКонфигурация применена: шляпок &f{hats}&a, кейсов &f{cases}&a (включено &f{enabled}&a), замечаний: &f{problems}'
+  reload-failed: '&cКонфигурация содержит ошибку и НЕ применена (оставлена прежняя): &f{error}'
+  simulate-start: '&7Моделирую &f{rolls}&7 открытий кейса {case}&7...'
+  simulate-ok: '&aРаспределение соответствует настройкам: χ²={chi}, степеней свободы {df}, z={z}, макс. отклонение {dev} п.п. ({rolls} розыгрышей)'
+  simulate-warn: '&cВНИМАНИЕ: z={z} (χ²={chi}, df={df}), макс. отклонение {dev} п.п. Повторите с большим числом розыгрышей.'
+  simulate-line: '&8 • &r{hat}&7: ожидалось &f{expected}&7, получено &f{actual} &8({count})'
+
+migrate:
+  no-source: '&cФайлы старого плагина не найдены: &f{paths}'
+  preview-start: '&7Читаю данные старого плагина (без записи)...'
+  preview-result: '&6Предпросмотр: &fигроков {players}&7, записей шляп &f{hats}&7, сопоставлено &f{mapped}&7, неизвестных &f{unknown}&7, уже перенесено &f{present}&7, будет добавлено &f{add}&7, замечаний &f{problems}&7. Отчёт: &f{report}'
+  problem-line: '&8 - &e{problem}'
+  confirm-hint: '&eДля переноса в течение 5 минут выполните &f/hatcases migrate confirm&e. Старые файлы не изменяются.'
+  preview-first: '&cСначала выполните предпросмотр: &f/hatcases migrate'
+  done: '&aМиграция выполнена: игроков &f{players}&a, записей &f{hats}&a, добавлено &f{added}&a, неизвестных &f{unknown}&a. Резервная копия: &f{backup}&a, отчёт: &f{report}'
+  failed: '&cМиграция не выполнена, изменения откатаны: &f{error}'
+  items-converted: '&7Старые предметы шляпок ({count}) заменены записями в коллекции: &f/hats'
+
+menu:
+  common:
+    back-name: '&eНазад'
+    back-lore: ['&7Вернуться к списку кейсов']
+    back-main-lore: ['&7Вернуться в главное меню']
+    prev-name: '&eПредыдущая страница'
+    next-name: '&aСледующая страница'
+    page-lore: ['&7Страница &f{page}&7 из &f{pages}']
+    no-pack-name: '&eРесурс-пак не загружен'
+    no-pack-lore:
+      - '&7Модели шляпок отображаются'
+      - '&7как обычные предметы.'
+      - '&7Загрузить: &f/hats pack'
+  main:
+    title: '&8Шляпки'
+    stats-name: '&6{player}'
+    stats-lore:
+      - '&7Открыто шляпок: &f{owned}&7/&f{total}'
+      - '&7Жетоны: &e{tokens}'
+    cases-name: '&6&lКейсы'
+    cases-lore: ['&7Открывайте кейсы и выигрывайте', '&7новые шляпки', '', '&eНажмите, чтобы открыть']
+    collection-name: '&a&lМои шляпки'
+    collection-lore: ['&7Открыто: &f{owned}&7/&f{total}', '&7Надеть, сменить или снять', '', '&eНажмите, чтобы открыть']
+    shop-name: '&b&lКаталог за жетоны'
+    shop-lore: ['&7Баланс: &e{tokens} жетонов', '&7Жетоны дают за повторные шляпки', '', '&eНажмите, чтобы открыть']
+    unequip-name: '&c&lСнять шляпку'
+    unequip-lore: ['&7Шляпка останется в коллекции']
+    pack-name: '&d&lРесурс-пак'
+    pack-lore: ['&7Состояние: {state}', '', '&eНажмите, чтобы загрузить снова']
+  cases:
+    title: '&8Кейсы'
+    icon-lore:
+      - ''
+      - '&7Ваши ключи: &f{keys}'
+      - '&7Стоимость открытия: &f{cost} ключ(а)'
+      - '&7Наград: &f{rewards}'
+      - ''
+      - '&b▶ Нажмите, чтобы посмотреть содержимое'
+    open-name: '&a&l▶ Открыть'
+    open-lore: ['&7Стоимость: &f{cost}&7, у вас: &f{keys}', '&8Shift+клик — без анимации']
+    open-no-keys-lore: ['&cНе хватает ключей', '&7Нужно: &f{cost}&7, у вас: &f{keys}']
+    empty-name: '&cКейсов пока нет'
+    empty-lore: []
+    buy-keys-name: '&6Купить ключи'
+    buy-keys-lore: ['&7Откроется ссылка на магазин']
+  content:
+    title: '&8Содержимое: {case}'
+    reward-lore:
+      - ''
+      - '&7Редкость: {rarity}'
+      - '&7Категория: {category}'
+      - '&7Шанс: &f{chance}'
+      - '&7В коллекции: {owned}'
+      - '&7За повтор: &e{compensation} жетонов'
+    owned-yes: '&aесть'
+    owned-no: '&cнет'
+    info-lore:
+      - ''
+      - '&7Ваши ключи: &f{keys}'
+      - '&7Стоимость: &f{cost}'
+      - '&7Наград: &f{rewards}'
+    open-name: '&a&l▶ ОТКРЫТЬ'
+    open-lore: ['&7Будет списано ключей: &f{cost}', '&7У вас: &f{keys}', '&8Shift+клик — без анимации']
+    open-denied-lore: ['{reason}']
+    disabled-name: '&cКейс недоступен'
+    disabled-lore: []
+  roll:
+    title: '&8Открытие: {case}'
+    pointer: '&a▼ Ваша награда ▼'
+  result:
+    title: '&8Ваша награда'
+    new-lore:
+      - '&7Редкость: {rarity}'
+      - '&7Шанс: &f{chance}'
+      - ''
+      - '&a&lНОВАЯ! &7Добавлена в коллекцию'
+    duplicate-lore:
+      - '&7Редкость: {rarity}'
+      - '&7Шанс: &f{chance}'
+      - ''
+      - '&eУже есть в коллекции'
+      - '&7Начислено: &e+{tokens} жетонов'
+      - '&7Баланс: &e{balance}'
+    collection-name: '&aВ коллекцию'
+    collection-lore: ['&7Надеть новую шляпку']
+    again-name: '&6Открыть ещё'
+    again-lore: ['&7Ключей: &f{keys}&7, нужно: &f{cost}']
+    again-no-keys-lore: ['&cНе хватает ключей', '&7Ключей: &f{keys}&7, нужно: &f{cost}']
+    back-lore: ['&7К содержимому кейса']
+  collection:
+    title: '&8Мои шляпки'
+    owned-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&eНажмите, чтобы надеть']
+    worn-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&a&l✔ НАДЕТА']
+    locked-name: '&8🔒 {hat}'
+    locked-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '', '&cЗакрыта — ещё не получена']
+    filter-all: '&fвсе'
+    rarity-name: '&dРедкость: {rarity}'
+    category-name: '&bКатегория: {category}'
+    filter-lore: ['&7ЛКМ — следующая, ПКМ — предыдущая']
+    mode-name: '&eПоказ: {mode}'
+    mode-owned: '&aполученные'
+    mode-all: '&fвсе'
+    mode-lore: ['&7Открыто: &f{owned}&7/&f{total}', '&7Нажмите, чтобы переключить']
+    sort-name: '&6Сортировка: {sort}'
+    sort-lore: ['&7Нажмите, чтобы сменить']
+    sort-by-name: '&fпо названию'
+    sort-by-rarity: '&fпо редкости'
+    sort-by-date: '&fпо дате получения'
+    unequip-name: '&cСнять шляпку'
+    unequip-lore: ['&7Шляпка останется в коллекции']
+    shop-name: '&bКаталог за жетоны'
+    shop-lore: ['&7Баланс: &e{tokens}']
+    empty-name: '&7Здесь пока пусто'
+    empty-lore: ['&7Откройте кейс или смените фильтр']
+  shop:
+    title: '&8Каталог за жетоны'
+    buy-lore: ['', '&7Редкость: {rarity}', '&7Цена: &e{price} жетонов', '', '&aНажмите, чтобы купить']
+    expensive-lore: ['', '&7Редкость: {rarity}', '&7Цена: &e{price} жетонов', '', '&cНе хватает жетонов (у вас {tokens})']
+    owned-lore: ['', '&7Редкость: {rarity}', '&aУже есть в коллекции']
+    balance-name: '&eЖетоны: {tokens}'
+    balance-lore: ['&7Жетоны начисляются за повторные шляпки из кейсов']
+    empty-name: '&7Каталог пуст'
+    empty-lore: []
+  confirm:
+    title: '&8Подтверждение покупки'
+    hat-lore: ['&7Цена: &e{price}', '&7Баланс: &e{tokens} &7→ &e{after}']
+    yes-name: '&a&lКупить'
+    yes-lore: ['&7Списать &e{price}&7 жетонов']
+    no-name: '&cОтмена'
+    no-lore: []

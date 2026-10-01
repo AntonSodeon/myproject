@@ -1,0 +1,134 @@
+# Кейсы. Ключ секции — постоянный ID кейса (a-z, 0-9, _ и -).
+#
+#   enabled        false — кейс скрыт и не открывается
+#   name / description
+#   icon           material, item-model (необязательно), custom-model-data (необязательно)
+#   key            тип ключа (по умолчанию = ID кейса). Ключи хранятся отдельно для каждого типа.
+#   key-cost       сколько ключей списывается за одно открытие
+#   permission     дополнительное право для открытия ('' — достаточно qwhatcase.open)
+#   animation      enabled (false = режим без анимации), duration-ms, steps, sounds, tick-sound,
+#                  finish-sound, duplicate-sound, frame, pointer
+#   win-message    сообщение о выигрыше ('' — стандартное из messages.yml).
+#                  Подстановки: {player} {case} {hat} {rarity} {chance} {tokens} {balance} {keys} {operation}
+#   broadcast      объявление всем при выигрыше редкости не ниже min-rarity
+#   duplicate      правила компенсации за дубликат: жетоны = компенсация шляпы × multiplier + bonus
+#   rewards        список наград. Каждая строка:
+#                    - hat: <id>       weight: <вес>     — конкретная шляпа
+#                    - pool: {rarity: <id>, category: <id>}  weight: <вес КАЖДОЙ шляпы>
+#                  Вероятность = вес / сумма всех весов × 100%. Скрытых поправок нет.
+#                  Одна и та же шляпа в нескольких строках — веса складываются.
+#
+# Ошибка в кейсе отключает только этот кейс (сообщение в консоли и в /hatcases reload).
+
+cases:
+  basic:
+    enabled: true
+    name: '&a&lОбычный кейс'
+    description:
+      - '&7Обычные, необычные и редкие шляпки.'
+    icon:
+      material: CHEST
+    key: basic
+    key-cost: 1
+    permission: ''
+    animation:
+      enabled: true
+      duration-ms: 5000
+      steps: 45
+      sounds: true
+      tick-sound: 'minecraft:ui.button.click'
+      finish-sound: 'minecraft:entity.player.levelup'
+      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      frame: BLACK_STAINED_GLASS_PANE
+      pointer: LIME_STAINED_GLASS_PANE
+    win-message: ''
+    broadcast:
+      enabled: true
+      min-rarity: rare
+      message: '&6🎩 &f{player} &7открыл {case} &7и получил {hat}&7! &8({chance})'
+    duplicate:
+      multiplier: 1.0
+      bonus: 0
+    rewards:
+      - pool: {rarity: common}
+        weight: 10
+      - pool: {rarity: uncommon}
+        weight: 4
+      - pool: {rarity: rare}
+        weight: 1
+
+  premium:
+    enabled: true
+    name: '&6&lПремиум-кейс'
+    description:
+      - '&7Редкие, эпические и легендарные шляпки.'
+    icon:
+      material: ENDER_CHEST
+    key: premium
+    key-cost: 1
+    permission: ''
+    animation:
+      enabled: true
+      duration-ms: 6000
+      steps: 50
+      sounds: true
+      tick-sound: 'minecraft:block.note_block.hat'
+      finish-sound: 'minecraft:entity.player.levelup'
+      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      frame: PURPLE_STAINED_GLASS_PANE
+      pointer: YELLOW_STAINED_GLASS_PANE
+    win-message: ''
+    broadcast:
+      enabled: true
+      min-rarity: epic
+      message: '&6&l✦ &f{player} &7выбил {hat} &7из {case}&7! &8({chance})'
+    duplicate:
+      multiplier: 1.5
+      bonus: 0
+    rewards:
+      - pool: {rarity: rare}
+        weight: 10
+      - pool: {rarity: epic}
+        weight: 4
+      - pool: {rarity: legendary}
+        weight: 1
+
+  winter:
+    enabled: true
+    name: '&b&lЗимний кейс'
+    description:
+      - '&7Только зимние шляпки.'
+      - '&7Открытие стоит 2 обычных ключа.'
+    icon:
+      material: BLUE_SHULKER_BOX
+    # Пример общего ключа: кейс использует ключи обычного кейса.
+    key: basic
+    key-cost: 2
+    permission: ''
+    animation:
+      enabled: true
+      duration-ms: 5000
+      steps: 45
+      sounds: true
+      tick-sound: 'minecraft:block.amethyst_block.chime'
+      finish-sound: 'minecraft:entity.player.levelup'
+      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      frame: LIGHT_BLUE_STAINED_GLASS_PANE
+      pointer: WHITE_STAINED_GLASS_PANE
+    win-message: '&bЗимний кейс подарил вам {hat}&b! &8({rarity}&8, шанс {chance})'
+    broadcast:
+      enabled: false
+    duplicate:
+      multiplier: 1.0
+      bonus: 5
+    rewards:
+      - pool: {rarity: common, category: winter}
+        weight: 8
+      - pool: {rarity: uncommon, category: winter}
+        weight: 4
+      - pool: {rarity: rare, category: winter}
+        weight: 2
+      - pool: {rarity: epic, category: winter}
+        weight: 1
+      - hat: ice_crown_shiny
+        weight: 0.5

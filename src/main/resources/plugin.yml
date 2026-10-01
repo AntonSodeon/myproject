@@ -1,0 +1,76 @@
+name: QWHatCase
+version: '${version}'
+main: ru.qw.qwhatcase.QWHatCasePlugin
+api-version: '1.21.11'
+description: Кейсы с косметическими шляпками (замена PTrap)
+authors: [QW]
+softdepend: [PTrap]
+commands:
+  hats:
+    description: Шляпки — главное меню, коллекция, надевание
+    usage: /hats [collection|equip <id>|unequip|shop|pack]
+    aliases: [hat]
+  cases:
+    description: Кейсы со шляпками
+    usage: /cases [view <id>|open <id> [fast]|keys]
+    aliases: [case]
+  hatcases:
+    description: Администрирование QWHatCase
+    usage: /hatcases help
+    aliases: [qwhatcase, qwhc]
+permissions:
+  qwhatcase.player:
+    description: Все права обычного игрока
+    default: true
+    children:
+      qwhatcase.menu: true
+      qwhatcase.cases: true
+      qwhatcase.open: true
+      qwhatcase.equip: true
+      qwhatcase.shop: true
+  qwhatcase.menu:
+    description: Главное меню, коллекция, каталог, ресурс-пак (/hats)
+    default: true
+  qwhatcase.cases:
+    description: Список и содержимое кейсов, баланс ключей (/cases)
+    default: true
+  qwhatcase.open:
+    description: Открытие кейсов
+    default: true
+  qwhatcase.equip:
+    description: Надевание и снятие шляпок
+    default: true
+  qwhatcase.shop:
+    description: Покупка шляпок за жетоны
+    default: true
+  qwhatcase.admin:
+    description: Все административные права
+    default: op
+    children:
+      qwhatcase.admin.keys: true
+      qwhatcase.admin.hats: true
+      qwhatcase.admin.tokens: true
+      qwhatcase.admin.points: true
+      qwhatcase.admin.inspect: true
+      qwhatcase.admin.history: true
+      qwhatcase.admin.reload: true
+      qwhatcase.admin.migrate: true
+      qwhatcase.admin.simulate: true
+  qwhatcase.admin.keys:
+    default: op
+  qwhatcase.admin.hats:
+    default: op
+  qwhatcase.admin.tokens:
+    default: op
+  qwhatcase.admin.points:
+    default: op
+  qwhatcase.admin.inspect:
+    default: op
+  qwhatcase.admin.history:
+    default: op
+  qwhatcase.admin.reload:
+    default: op
+  qwhatcase.admin.migrate:
+    default: op
+  qwhatcase.admin.simulate:
+    default: op

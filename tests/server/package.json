@@ -1,0 +1,9 @@
+{
+  "name": "qwhatcase-server-tests",
+  "private": true,
+  "description": "Сценарии проверки QWHatCase на живом сервере Paper 1.21.11 двумя клиентами (mineflayer)",
+  "dependencies": {
+    "mineflayer": "4.39.0",
+    "minecraft-data": "^3.0.0"
+  }
+}

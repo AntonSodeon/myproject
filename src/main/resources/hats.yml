@@ -1,0 +1,2439 @@
+# Каталог шляп QWHatCase.
+# Сгенерирован tools/generate_catalog.py из ресурс-пака (assets/minecraft/items/carved_pumpkin.json).
+# Ключ секции = постоянный ID шляпы. Его НЕЛЬЗЯ менять после запуска: по нему хранятся коллекции.
+# Название (name), описание (lore), редкость и категорию можно менять свободно.
+#
+# Поля шляпы:
+#   name               отображаемое название (&-цвета, &#RRGGBB)
+#   lore               описание (список строк)
+#   rarity             ID редкости из config.yml -> rarities
+#   category           ID категории из блока categories ниже
+#   custom-model-data  номер модели в ресурс-паке (range_dispatch custom_model_data)
+#   model              путь к модели в паке (справочно; плагин его не использует)
+#   material/item-model  базовый предмет и item_model (по умолчанию из defaults)
+#   available          false = шляпа не выпадает из кейсов и не продаётся, но остаётся у владельцев
+#   compensation       жетоны за дубликат (если не задано — берётся из редкости)
+#   legacy-ids         идентификаторы из старого плагина PTrap (для миграции)
+
+defaults:
+  # Базовый предмет. PAPER не является блоком и не даёт защиты от эндерменов (в отличие от CARVED_PUMPKIN).
+  material: PAPER
+  # Определение предмета в паке, в котором лежит range_dispatch по custom_model_data.
+  item-model: minecraft:carved_pumpkin
+  lore:
+    - '&7Кастомная шляпа'
+
+categories:
+  winter:
+    name: '&bЗима'
+    icon: SNOWBALL
+  valentine:
+    name: '&dДень святого Валентина'
+    icon: POPPY
+  sculk:
+    name: '&3Скалк и Хранитель'
+    icon: SCULK
+  ocean:
+    name: '&9Океан'
+    icon: PRISMARINE_SHARD
+  nether:
+    name: '&cНезер'
+    icon: NETHERRACK
+  end:
+    name: '&5Энд'
+    icon: END_STONE
+  ancient:
+    name: '&6Античность'
+    icon: GOLD_INGOT
+  halloween:
+    name: '&6Хэллоуин'
+    icon: JACK_O_LANTERN
+  food:
+    name: '&eЕда'
+    icon: COOKIE
+  tech:
+    name: '&7Техника'
+    icon: REDSTONE
+  animals:
+    name: '&aЖивотные'
+    icon: BONE
+  misc:
+    name: '&fРазное'
+    icon: PAPER
+
+hats:
+  halo_shiny:
+    name: 'Нимб &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: ancient
+    custom-model-data: 90
+    model: 'civilization:item/wearable/halo/shiny'
+    legacy-ids: [hat_90]
+  chainsaw_head_shiny:
+    name: 'Голова-бензопила &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 91
+    model: 'civilization:item/wearable/chainsaw_head/shiny'
+    legacy-ids: [hat_91]
+  propeller_hat_shiny:
+    name: 'Кепка с пропеллером &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 92
+    model: 'civilization:item/wearable/propeller_hat/shiny'
+    legacy-ids: [hat_92]
+  spartan_helmet_shiny:
+    name: 'Спартанский шлем &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 93
+    model: 'civilization:item/wearable/spartan_helmet/shiny'
+    legacy-ids: [hat_93]
+  gingerbread_mask:
+    name: 'Пряничная маска'
+    rarity: common
+    category: winter
+    custom-model-data: 94
+    model: 'civilization:item/wearable/gingerbread_mask/normal'
+    legacy-ids: [hat_94]
+  krampus_head:
+    name: 'Голова Крампуса'
+    rarity: uncommon
+    category: winter
+    custom-model-data: 95
+    model: 'civilization:item/wearable/krampus_head/normal'
+    legacy-ids: [hat_95]
+  cyberpunk_hat_shiny:
+    name: 'Киберпанк-шляпа &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 96
+    model: 'civilization:item/wearable/cyberpunk_hat/shiny'
+    legacy-ids: [hat_96]
+  reindeer_antlers:
+    name: 'Оленьи рога'
+    rarity: common
+    category: winter
+    custom-model-data: 97
+    model: 'civilization:item/wearable/reindeer_antlers/normal'
+    legacy-ids: [hat_97]
+  santa_hat:
+    name: 'Шапка Санты'
+    rarity: common
+    category: winter
+    custom-model-data: 98
+    model: 'civilization:item/wearable/santa_hat/normal'
+    legacy-ids: [hat_98]
+  snowman_head:
+    name: 'Голова снеговика'
+    rarity: common
+    category: winter
+    custom-model-data: 99
+    model: 'civilization:item/wearable/snowman_head/normal'
+    legacy-ids: [hat_99]
+  jester_hat:
+    name: 'Колпак шута'
+    rarity: common
+    category: winter
+    custom-model-data: 100
+    model: 'civilization:item/wearable/jester_hat/normal'
+    legacy-ids: [hat_100]
+  elf_hat:
+    name: 'Шапка эльфа'
+    rarity: common
+    category: winter
+    custom-model-data: 101
+    model: 'civilization:item/wearable/elf_hat/normal'
+    legacy-ids: [hat_101]
+  frostbite_helmet:
+    name: 'Морозный шлем'
+    rarity: uncommon
+    category: winter
+    custom-model-data: 102
+    model: 'civilization:item/wearable/frostbite_helmet/normal'
+    legacy-ids: [hat_102]
+  frostbite_helmet_shiny:
+    name: 'Морозный шлем &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: winter
+    custom-model-data: 103
+    model: 'civilization:item/wearable/frostbite_helmet/shiny'
+    legacy-ids: [hat_103]
+  jester_hat_shiny:
+    name: 'Колпак шута &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 104
+    model: 'civilization:item/wearable/jester_hat/shiny'
+    legacy-ids: [hat_104]
+  alien_head_muncher:
+    name: 'Пришелец-обжора'
+    rarity: uncommon
+    category: tech
+    custom-model-data: 105
+    model: 'civilization:item/wearable/alien_head_muncher/normal'
+    legacy-ids: [hat_105]
+  alien_head_muncher_shiny:
+    name: 'Пришелец-обжора &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 106
+    model: 'civilization:item/wearable/alien_head_muncher/shiny'
+    legacy-ids: [hat_106]
+  drink_hat_number_1:
+    name: 'Шляпа с напитками'
+    rarity: common
+    category: food
+    custom-model-data: 107
+    model: 'civilization:item/wearable/drink_hat_number_1/normal'
+    legacy-ids: [hat_107]
+  drink_hat_number_1_shiny:
+    name: 'Шляпа с напитками &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 108
+    model: 'civilization:item/wearable/drink_hat_number_1/shiny'
+    legacy-ids: [hat_108]
+  taco_hat:
+    name: 'Шляпа-тако'
+    rarity: common
+    category: food
+    custom-model-data: 109
+    model: 'civilization:item/wearable/taco_hat/normal'
+    legacy-ids: [hat_109]
+  taco_hat_shiny:
+    name: 'Шляпа-тако &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 110
+    model: 'civilization:item/wearable/taco_hat/shiny'
+    legacy-ids: [hat_110]
+  top_hat:
+    name: 'Цилиндр'
+    rarity: common
+    category: misc
+    custom-model-data: 111
+    model: 'civilization:item/wearable/top_hat/normal'
+    legacy-ids: [hat_111]
+  top_hat_shiny:
+    name: 'Цилиндр &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 112
+    model: 'civilization:item/wearable/top_hat/shiny'
+    legacy-ids: [hat_112]
+  pufferfish_hat:
+    name: 'Шляпа-иглобрюх'
+    rarity: common
+    category: ocean
+    custom-model-data: 113
+    model: 'civilization:item/wearable/pufferfish_hat/normal'
+    legacy-ids: [hat_113]
+  cupid_arrow_headband:
+    name: 'Ободок со стрелой Купидона'
+    rarity: common
+    category: valentine
+    custom-model-data: 114
+    model: 'civilization:item/wearable/cupid_arrow_headband/normal'
+    legacy-ids: [hat_114]
+  cupid_arrow_headband_shiny:
+    name: 'Ободок со стрелой Купидона &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 115
+    model: 'civilization:item/wearable/cupid_arrow_headband/shiny'
+    legacy-ids: [hat_115]
+  flamingo_hat:
+    name: 'Шляпа-фламинго'
+    rarity: common
+    category: animals
+    custom-model-data: 116
+    model: 'civilization:item/wearable/flamingo_hat/normal'
+    legacy-ids: [hat_116]
+  flamingo_hat_shiny:
+    name: 'Шляпа-фламинго &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: animals
+    custom-model-data: 117
+    model: 'civilization:item/wearable/flamingo_hat/shiny'
+    legacy-ids: [hat_117]
+  flower_crown:
+    name: 'Венок из цветов'
+    rarity: common
+    category: valentine
+    custom-model-data: 118
+    model: 'civilization:item/wearable/flower_crown/normal'
+    legacy-ids: [hat_118]
+  flower_crown_shiny:
+    name: 'Венок из цветов &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 119
+    model: 'civilization:item/wearable/flower_crown/shiny'
+    legacy-ids: [hat_119]
+  heart_glasses:
+    name: 'Очки-сердечки'
+    rarity: common
+    category: valentine
+    custom-model-data: 120
+    model: 'civilization:item/wearable/heart_glasses/normal'
+    legacy-ids: [hat_120]
+  heart_glasses_shiny:
+    name: 'Очки-сердечки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 121
+    model: 'civilization:item/wearable/heart_glasses/shiny'
+    legacy-ids: [hat_121]
+  heart_headband:
+    name: 'Ободок с сердечками'
+    rarity: common
+    category: valentine
+    custom-model-data: 122
+    model: 'civilization:item/wearable/heart_headband/normal'
+    legacy-ids: [hat_122]
+  heart_headband_shiny:
+    name: 'Ободок с сердечками &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 123
+    model: 'civilization:item/wearable/heart_headband/shiny'
+    legacy-ids: [hat_123]
+  valentines_bear_hat:
+    name: 'Валентиновый мишка'
+    rarity: common
+    category: valentine
+    custom-model-data: 124
+    model: 'civilization:item/wearable/valentines_bear_hat/normal'
+    legacy-ids: [hat_124]
+  valentines_bear_hat_shiny:
+    name: 'Валентиновый мишка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 125
+    model: 'civilization:item/wearable/valentines_bear_hat/shiny'
+    legacy-ids: [hat_125]
+  pufferfish_hat_shiny:
+    name: 'Шляпа-иглобрюх &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 126
+    model: 'civilization:item/wearable/pufferfish_hat/shiny'
+    legacy-ids: [hat_126]
+  sunflower_hat:
+    name: 'Шляпа-подсолнух'
+    rarity: common
+    category: misc
+    custom-model-data: 127
+    model: 'civilization:item/wearable/sunflower_hat/normal'
+    legacy-ids: [hat_127]
+  sunflower_hat_shiny:
+    name: 'Шляпа-подсолнух &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 128
+    model: 'civilization:item/wearable/sunflower_hat/shiny'
+    legacy-ids: [hat_128]
+  cat_ears:
+    name: 'Кошачьи ушки'
+    rarity: common
+    category: animals
+    custom-model-data: 129
+    model: 'civilization:item/wearable/cat_ears/normal'
+    legacy-ids: [hat_129]
+  cat_ears_shiny:
+    name: 'Кошачьи ушки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: animals
+    custom-model-data: 130
+    model: 'civilization:item/wearable/cat_ears/shiny'
+    legacy-ids: [hat_130]
+  valentines_knight:
+    name: 'Рыцарь Валентина'
+    rarity: uncommon
+    category: valentine
+    custom-model-data: 131
+    model: 'civilization:item/wearable/valentines_knight/normal'
+    legacy-ids: [hat_131]
+  valentines_knight_shiny:
+    name: 'Рыцарь Валентина &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: valentine
+    custom-model-data: 132
+    model: 'civilization:item/wearable/valentines_knight/shiny'
+    legacy-ids: [hat_132]
+  valentines_warrior:
+    name: 'Воин Валентина'
+    rarity: uncommon
+    category: valentine
+    custom-model-data: 133
+    model: 'civilization:item/wearable/valentines_warrior/normal'
+    legacy-ids: [hat_133]
+  valentines_warrior_shiny:
+    name: 'Воин Валентина &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: valentine
+    custom-model-data: 134
+    model: 'civilization:item/wearable/valentines_warrior/shiny'
+    legacy-ids: [hat_134]
+  sculk_monster_mouth:
+    name: 'Пасть скалк-монстра'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 135
+    model: 'civilization:item/wearable/sculk_monster_mouth/normal'
+    legacy-ids: [hat_135]
+  sculk_monster_mouth_shiny:
+    name: 'Пасть скалк-монстра &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 136
+    model: 'civilization:item/wearable/sculk_monster_mouth/shiny'
+    legacy-ids: [hat_136]
+  sculk_creeper_hat:
+    name: 'Скалк-крипер'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 137
+    model: 'civilization:item/wearable/sculk_creeper_hat/normal'
+    legacy-ids: [hat_137]
+  sculk_creeper_hat_shiny:
+    name: 'Скалк-крипер &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 138
+    model: 'civilization:item/wearable/sculk_creeper_hat/shiny'
+    legacy-ids: [hat_138]
+  warden_horns:
+    name: 'Рога Хранителя'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 139
+    model: 'civilization:item/wearable/warden_horns/normal'
+    legacy-ids: [hat_139]
+  warden_horns_shiny:
+    name: 'Рога Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 140
+    model: 'civilization:item/wearable/warden_horns/shiny'
+    legacy-ids: [hat_140]
+  baby_warden_hat:
+    name: 'Маленький Хранитель'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 141
+    model: 'civilization:item/wearable/baby_warden_hat/normal'
+    legacy-ids: [hat_141]
+  baby_warden_hat_shiny:
+    name: 'Маленький Хранитель &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 142
+    model: 'civilization:item/wearable/baby_warden_hat/shiny'
+    legacy-ids: [hat_142]
+  giant_warden_head:
+    name: 'Голова гигантского Хранителя'
+    rarity: rare
+    category: sculk
+    custom-model-data: 143
+    model: 'civilization:item/wearable/giant_warden_head/normal'
+    legacy-ids: [hat_143]
+  giant_warden_head_shiny:
+    name: 'Голова гигантского Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: sculk
+    custom-model-data: 144
+    model: 'civilization:item/wearable/giant_warden_head/shiny'
+    legacy-ids: [hat_144]
+  warden_bucket_hat:
+    name: 'Панама Хранителя'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 145
+    model: 'civilization:item/wearable/warden_bucket_hat/normal'
+    legacy-ids: [hat_145]
+  warden_bucket_hat_shiny:
+    name: 'Панама Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 146
+    model: 'civilization:item/wearable/warden_bucket_hat/shiny'
+    legacy-ids: [hat_146]
+  warden_crown:
+    name: 'Корона Хранителя'
+    rarity: rare
+    category: sculk
+    custom-model-data: 147
+    model: 'civilization:item/wearable/warden_crown/normal'
+    legacy-ids: [hat_147]
+  warden_crown_shiny:
+    name: 'Корона Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: sculk
+    custom-model-data: 148
+    model: 'civilization:item/wearable/warden_crown/shiny'
+    legacy-ids: [hat_148]
+  warden_knight_helmet:
+    name: 'Шлем рыцаря Хранителя'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 149
+    model: 'civilization:item/wearable/warden_knight_helmet/normal'
+    legacy-ids: [hat_149]
+  warden_knight_helmet_shiny:
+    name: 'Шлем рыцаря Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 150
+    model: 'civilization:item/wearable/warden_knight_helmet/shiny'
+    legacy-ids: [hat_150]
+  warden_warriors_helmet:
+    name: 'Шлем воина Хранителя'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 151
+    model: 'civilization:item/wearable/warden_warriors_helmet/normal'
+    legacy-ids: [hat_151]
+  warden_warriors_helmet_shiny:
+    name: 'Шлем воина Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 152
+    model: 'civilization:item/wearable/warden_warriors_helmet/shiny'
+    legacy-ids: [hat_152]
+  warden_wizard_hat:
+    name: 'Шляпа мага Хранителя'
+    rarity: uncommon
+    category: sculk
+    custom-model-data: 153
+    model: 'civilization:item/wearable/warden_wizard_hat/normal'
+    legacy-ids: [hat_153]
+  warden_wizard_hat_shiny:
+    name: 'Шляпа мага Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: sculk
+    custom-model-data: 154
+    model: 'civilization:item/wearable/warden_wizard_hat/shiny'
+    legacy-ids: [hat_154]
+  warden_sculk_crown:
+    name: 'Скалк-корона Хранителя'
+    rarity: rare
+    category: sculk
+    custom-model-data: 155
+    model: 'civilization:item/wearable/warden_sculk_crown/normal'
+    legacy-ids: [hat_155]
+  warden_sculk_crown_shiny:
+    name: 'Скалк-корона Хранителя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: sculk
+    custom-model-data: 156
+    model: 'civilization:item/wearable/warden_sculk_crown/shiny'
+    legacy-ids: [hat_156]
+  clam_crown:
+    name: 'Корона-ракушка'
+    rarity: uncommon
+    category: ocean
+    custom-model-data: 157
+    model: 'civilization:item/wearable/clam_crown/normal'
+    legacy-ids: [hat_157]
+  clam_crown_shiny:
+    name: 'Корона-ракушка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ocean
+    custom-model-data: 158
+    model: 'civilization:item/wearable/clam_crown/shiny'
+    legacy-ids: [hat_158]
+  serpant_helmet:
+    name: 'Шлем морского змея'
+    rarity: uncommon
+    category: ocean
+    custom-model-data: 159
+    model: 'civilization:item/wearable/serpant_helmet/normal'
+    legacy-ids: [hat_159]
+  serpant_helmet_shiny:
+    name: 'Шлем морского змея &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ocean
+    custom-model-data: 160
+    model: 'civilization:item/wearable/serpant_helmet/shiny'
+    legacy-ids: [hat_160]
+  scuba_helmet:
+    name: 'Шлем аквалангиста'
+    rarity: common
+    category: ocean
+    custom-model-data: 161
+    model: 'civilization:item/wearable/scuba_helmet/normal'
+    legacy-ids: [hat_161]
+  scuba_helmet_shiny:
+    name: 'Шлем аквалангиста &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 162
+    model: 'civilization:item/wearable/scuba_helmet/shiny'
+    legacy-ids: [hat_162]
+  octopus_hat:
+    name: 'Шляпа-осьминог'
+    rarity: common
+    category: ocean
+    custom-model-data: 163
+    model: 'civilization:item/wearable/octopus_hat/normal'
+    legacy-ids: [hat_163]
+  octopus_hat_shiny:
+    name: 'Шляпа-осьминог &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 164
+    model: 'civilization:item/wearable/octopus_hat/shiny'
+    legacy-ids: [hat_164]
+  hotdog_hat:
+    name: 'Шляпа-хот-дог'
+    rarity: common
+    category: food
+    custom-model-data: 165
+    model: 'civilization:item/wearable/hotdog_hat/normal'
+    legacy-ids: [hat_165]
+  hotdog_hat_shiny:
+    name: 'Шляпа-хот-дог &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 166
+    model: 'civilization:item/wearable/hotdog_hat/shiny'
+    legacy-ids: [hat_166]
+  tv_head:
+    name: 'Голова-телевизор'
+    rarity: common
+    category: tech
+    custom-model-data: 167
+    model: 'civilization:item/wearable/tv_head/normal'
+    legacy-ids: [hat_167]
+  tv_head_shiny:
+    name: 'Голова-телевизор &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 168
+    model: 'civilization:item/wearable/tv_head/shiny'
+    legacy-ids: [hat_168]
+  graduation_cap:
+    name: 'Шапочка выпускника'
+    rarity: common
+    category: misc
+    custom-model-data: 169
+    model: 'civilization:item/wearable/graduation_cap/normal'
+    legacy-ids: [hat_169]
+  graduation_cap_shiny:
+    name: 'Шапочка выпускника &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 170
+    model: 'civilization:item/wearable/graduation_cap/shiny'
+    legacy-ids: [hat_170]
+  kitty_headset:
+    name: 'Наушники с ушками'
+    rarity: common
+    category: tech
+    custom-model-data: 171
+    model: 'civilization:item/wearable/kitty_headset/normal'
+    legacy-ids: [hat_171]
+  kitty_headset_shiny:
+    name: 'Наушники с ушками &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 172
+    model: 'civilization:item/wearable/kitty_headset/shiny'
+    legacy-ids: [hat_172]
+  plunger_hat:
+    name: 'Шляпа-вантуз'
+    rarity: common
+    category: misc
+    custom-model-data: 173
+    model: 'civilization:item/wearable/plunger_hat/normal'
+    legacy-ids: [hat_173]
+  plunger_hat_shiny:
+    name: 'Шляпа-вантуз &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 174
+    model: 'civilization:item/wearable/plunger_hat/shiny'
+    legacy-ids: [hat_174]
+  axolotl_cap:
+    name: 'Кепка-аксолотль'
+    rarity: common
+    category: ocean
+    custom-model-data: 175
+    model: 'civilization:item/wearable/axolotl_cap/normal'
+    legacy-ids: [hat_175]
+  axolotl_cap_shiny:
+    name: 'Кепка-аксолотль &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 176
+    model: 'civilization:item/wearable/axolotl_cap/shiny'
+    legacy-ids: [hat_176]
+  box_hat:
+    name: 'Шляпа-коробка'
+    rarity: common
+    category: misc
+    custom-model-data: 177
+    model: 'civilization:item/wearable/box_hat/normal'
+    legacy-ids: [hat_177]
+  box_hat_shiny:
+    name: 'Шляпа-коробка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 178
+    model: 'civilization:item/wearable/box_hat/shiny'
+    legacy-ids: [hat_178]
+  qa_wrench_hat:
+    name: 'Шляпа с гаечным ключом'
+    rarity: common
+    category: tech
+    custom-model-data: 179
+    model: 'civilization:item/wearable/qa_wrench_hat/normal'
+    legacy-ids: [hat_179]
+  qa_wrench_hat_shiny:
+    name: 'Шляпа с гаечным ключом &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 180
+    model: 'civilization:item/wearable/qa_wrench_hat/shiny'
+    legacy-ids: [hat_180]
+  shark_fin:
+    name: 'Акулий плавник'
+    rarity: common
+    category: ocean
+    custom-model-data: 181
+    model: 'civilization:item/wearable/shark_fin/normal'
+    legacy-ids: [hat_181]
+  shark_fin_shiny:
+    name: 'Акулий плавник &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 182
+    model: 'civilization:item/wearable/shark_fin/shiny'
+    legacy-ids: [hat_182]
+  translator_globe:
+    name: 'Глобус-переводчик'
+    rarity: common
+    category: tech
+    custom-model-data: 183
+    model: 'civilization:item/wearable/translator_globe/normal'
+    legacy-ids: [hat_183]
+  translator_globe_shiny:
+    name: 'Глобус-переводчик &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 184
+    model: 'civilization:item/wearable/translator_globe/shiny'
+    legacy-ids: [hat_184]
+  ram_horns:
+    name: 'Бараньи рога'
+    rarity: common
+    category: animals
+    custom-model-data: 185
+    model: 'civilization:item/wearable/ram_horns/normal'
+    legacy-ids: [hat_185]
+  ram_horns_shiny:
+    name: 'Бараньи рога &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: animals
+    custom-model-data: 186
+    model: 'civilization:item/wearable/ram_horns/shiny'
+    legacy-ids: [hat_186]
+  dragon_skull:
+    name: 'Драконий череп'
+    rarity: rare
+    category: animals
+    custom-model-data: 187
+    model: 'civilization:item/tools/dragon_skull'
+    legacy-ids: [hat_187]
+  banana_hat:
+    name: 'Шляпа-банан'
+    rarity: common
+    category: food
+    custom-model-data: 188
+    model: 'civilization:item/wearable/banana_hat/normal'
+    legacy-ids: [hat_188]
+  banana_hat_shiny:
+    name: 'Шляпа-банан &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 189
+    model: 'civilization:item/wearable/banana_hat/shiny'
+    legacy-ids: [hat_189]
+  guardian_hat:
+    name: 'Шляпа-страж'
+    rarity: uncommon
+    category: ocean
+    custom-model-data: 190
+    model: 'civilization:item/wearable/guardian_hat/normal'
+    legacy-ids: [hat_190]
+  guardian_hat_shiny:
+    name: 'Шляпа-страж &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ocean
+    custom-model-data: 191
+    model: 'civilization:item/wearable/guardian_hat/shiny'
+    legacy-ids: [hat_191]
+  jellyfish_hat:
+    name: 'Шляпа-медуза'
+    rarity: common
+    category: ocean
+    custom-model-data: 192
+    model: 'civilization:item/wearable/jellyfish_hat/normal'
+    legacy-ids: [hat_192]
+  jellyfish_hat_shiny:
+    name: 'Шляпа-медуза &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 193
+    model: 'civilization:item/wearable/jellyfish_hat/shiny'
+    legacy-ids: [hat_193]
+  valkyrie_helmet:
+    name: 'Шлем валькирии'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 194
+    model: 'civilization:item/wearable/valkyrie_helmet/normal'
+    legacy-ids: [hat_194]
+  valkyrie_helmet_shiny:
+    name: 'Шлем валькирии &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 195
+    model: 'civilization:item/wearable/valkyrie_helmet/shiny'
+    legacy-ids: [hat_195]
+  nemo:
+    name: 'Рыбка-клоун'
+    rarity: common
+    category: ocean
+    custom-model-data: 196
+    model: 'civilization:item/wearable/nemo/normal'
+    legacy-ids: [hat_196]
+  nemo_shiny:
+    name: 'Рыбка-клоун &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 197
+    model: 'civilization:item/wearable/nemo/shiny'
+    legacy-ids: [hat_197]
+  angler_hat:
+    name: 'Шляпа удильщика'
+    rarity: common
+    category: ocean
+    custom-model-data: 198
+    model: 'civilization:item/wearable/angler_hat/normal'
+    legacy-ids: [hat_198]
+  angler_hat_shiny:
+    name: 'Шляпа удильщика &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 199
+    model: 'civilization:item/wearable/angler_hat/shiny'
+    legacy-ids: [hat_199]
+  fisherman_hat:
+    name: 'Шляпа рыбака'
+    rarity: common
+    category: ocean
+    custom-model-data: 200
+    model: 'civilization:item/wearable/fisherman_hat/normal'
+    legacy-ids: [hat_200]
+  fisherman_hat_shiny:
+    name: 'Шляпа рыбака &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 201
+    model: 'civilization:item/wearable/fisherman_hat/shiny'
+    legacy-ids: [hat_201]
+  piglin_hat:
+    name: 'Шляпа пиглина'
+    rarity: common
+    category: nether
+    custom-model-data: 202
+    model: 'civilization:item/wearable/piglin_hat/normal'
+    legacy-ids: [hat_202]
+  piglin_hat_shiny:
+    name: 'Шляпа пиглина &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: nether
+    custom-model-data: 203
+    model: 'civilization:item/wearable/piglin_hat/shiny'
+    legacy-ids: [hat_203]
+  red_devil_horns:
+    name: 'Красные рожки'
+    rarity: common
+    category: nether
+    custom-model-data: 204
+    model: 'civilization:item/wearable/red_devil_horns/normal'
+    legacy-ids: [hat_204]
+  red_devil_horns_shiny:
+    name: 'Красные рожки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: nether
+    custom-model-data: 205
+    model: 'civilization:item/wearable/red_devil_horns/shiny'
+    legacy-ids: [hat_205]
+  flaming_spartan_helmet:
+    name: 'Пылающий спартанский шлем'
+    rarity: uncommon
+    category: nether
+    custom-model-data: 206
+    model: 'civilization:item/wearable/flaming_spartan_helmet/normal'
+    legacy-ids: [hat_206]
+  flaming_spartan_helmet_shiny:
+    name: 'Пылающий спартанский шлем &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: nether
+    custom-model-data: 207
+    model: 'civilization:item/wearable/flaming_spartan_helmet/shiny'
+    legacy-ids: [hat_207]
+  flaming_skull:
+    name: 'Пылающий череп'
+    rarity: rare
+    category: nether
+    custom-model-data: 208
+    model: 'civilization:item/wearable/flaming_skull/normal'
+    legacy-ids: [hat_208]
+  flaming_skull_shiny:
+    name: 'Пылающий череп &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: nether
+    custom-model-data: 209
+    model: 'civilization:item/wearable/flaming_skull/shiny'
+    legacy-ids: [hat_209]
+  lava_hound:
+    name: 'Лавовая гончая'
+    rarity: uncommon
+    category: nether
+    custom-model-data: 210
+    model: 'civilization:item/wearable/lava_hound/normal'
+    legacy-ids: [hat_210]
+  lava_hound_shiny:
+    name: 'Лавовая гончая &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: nether
+    custom-model-data: 211
+    model: 'civilization:item/wearable/lava_hound/shiny'
+    legacy-ids: [hat_211]
+  lava_witch_hat:
+    name: 'Шляпа лавовой ведьмы'
+    rarity: uncommon
+    category: nether
+    custom-model-data: 212
+    model: 'civilization:item/wearable/lava_witch_hat/normal'
+    legacy-ids: [hat_212]
+  lava_witch_hat_shiny:
+    name: 'Шляпа лавовой ведьмы &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: nether
+    custom-model-data: 213
+    model: 'civilization:item/wearable/lava_witch_hat/shiny'
+    legacy-ids: [hat_213]
+  magma_cowboy_hat:
+    name: 'Магмовая ковбойская шляпа'
+    rarity: uncommon
+    category: nether
+    custom-model-data: 214
+    model: 'civilization:item/wearable/magma_cowboy_hat/normal'
+    legacy-ids: [hat_214]
+  magma_cowboy_hat_shiny:
+    name: 'Магмовая ковбойская шляпа &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: nether
+    custom-model-data: 215
+    model: 'civilization:item/wearable/magma_cowboy_hat/shiny'
+    legacy-ids: [hat_215]
+  nether_mushroom_hat:
+    name: 'Незерский гриб'
+    rarity: common
+    category: nether
+    custom-model-data: 216
+    model: 'civilization:item/wearable/nether_mushroom_hat/normal'
+    legacy-ids: [hat_216]
+  nether_mushroom_hat_shiny:
+    name: 'Незерский гриб &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: nether
+    custom-model-data: 217
+    model: 'civilization:item/wearable/nether_mushroom_hat/shiny'
+    legacy-ids: [hat_217]
+  gerald_hat:
+    name: 'Шляпа Джеральда'
+    rarity: common
+    category: misc
+    custom-model-data: 218
+    model: 'civilization:item/wearable/gerald_hat/normal'
+    legacy-ids: [hat_218]
+  gerald_hat_shiny:
+    name: 'Шляпа Джеральда &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 219
+    model: 'civilization:item/wearable/gerald_hat/shiny'
+    legacy-ids: [hat_219]
+  shulker_hat:
+    name: 'Шляпа-шалкер'
+    rarity: uncommon
+    category: end
+    custom-model-data: 220
+    model: 'civilization:item/wearable/shulker_hat/normal'
+    legacy-ids: [hat_220]
+  shulker_hat_shiny:
+    name: 'Шляпа-шалкер &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: end
+    custom-model-data: 221
+    model: 'civilization:item/wearable/shulker_hat/shiny'
+    legacy-ids: [hat_221]
+  turkey_hat:
+    name: 'Шляпа-индейка'
+    rarity: common
+    category: food
+    custom-model-data: 222
+    model: 'civilization:item/wearable/turkey_hat/normal'
+    legacy-ids: [hat_222]
+  turkey_hat_shiny:
+    name: 'Шляпа-индейка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 223
+    model: 'civilization:item/wearable/turkey_hat/shiny'
+    legacy-ids: [hat_223]
+  brain_jar:
+    name: 'Мозг в банке'
+    rarity: uncommon
+    category: tech
+    custom-model-data: 224
+    model: 'civilization:item/wearable/brain_jar/normal'
+    legacy-ids: [hat_224]
+  brain_jar_shiny:
+    name: 'Мозг в банке &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 225
+    model: 'civilization:item/wearable/brain_jar/shiny'
+    legacy-ids: [hat_225]
+  breather_mask:
+    name: 'Дыхательная маска'
+    rarity: common
+    category: tech
+    custom-model-data: 226
+    model: 'civilization:item/wearable/breather_mask/normal'
+    legacy-ids: [hat_226]
+  breather_mask_shiny:
+    name: 'Дыхательная маска &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 227
+    model: 'civilization:item/wearable/breather_mask/shiny'
+    legacy-ids: [hat_227]
+  cookie_hat:
+    name: 'Шляпа-печенье'
+    rarity: common
+    category: food
+    custom-model-data: 228
+    model: 'civilization:item/wearable/cookie_hat/normal'
+    legacy-ids: [hat_228]
+  cookie_hat_shiny:
+    name: 'Шляпа-печенье &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 229
+    model: 'civilization:item/wearable/cookie_hat/shiny'
+    legacy-ids: [hat_229]
+  corrupted_enderman_skull:
+    name: 'Порченый череп эндермена'
+    rarity: uncommon
+    category: end
+    custom-model-data: 230
+    model: 'civilization:item/wearable/corrupted_enderman_skull/normal'
+    legacy-ids: [hat_230]
+  corrupted_enderman_skull_shiny:
+    name: 'Порченый череп эндермена &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: end
+    custom-model-data: 231
+    model: 'civilization:item/wearable/corrupted_enderman_skull/shiny'
+    legacy-ids: [hat_231]
+  ender_miner_hat:
+    name: 'Каска эндер-шахтёра'
+    rarity: common
+    category: end
+    custom-model-data: 232
+    model: 'civilization:item/wearable/ender_miner_hat/normal'
+    legacy-ids: [hat_232]
+  ender_miner_hat_shiny:
+    name: 'Каска эндер-шахтёра &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: end
+    custom-model-data: 233
+    model: 'civilization:item/wearable/ender_miner_hat/shiny'
+    legacy-ids: [hat_233]
+  enderman_top_hat:
+    name: 'Цилиндр эндермена'
+    rarity: uncommon
+    category: end
+    custom-model-data: 234
+    model: 'civilization:item/wearable/enderman_top_hat/normal'
+    legacy-ids: [hat_234]
+  enderman_top_hat_shiny:
+    name: 'Цилиндр эндермена &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: end
+    custom-model-data: 235
+    model: 'civilization:item/wearable/enderman_top_hat/shiny'
+    legacy-ids: [hat_235]
+  gas_mask:
+    name: 'Противогаз'
+    rarity: common
+    category: tech
+    custom-model-data: 236
+    model: 'civilization:item/wearable/gas_mask/normal'
+    legacy-ids: [hat_236]
+  gas_mask_shiny:
+    name: 'Противогаз &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 237
+    model: 'civilization:item/wearable/gas_mask/shiny'
+    legacy-ids: [hat_237]
+  night_vision_goggles:
+    name: 'Очки ночного видения'
+    rarity: common
+    category: tech
+    custom-model-data: 238
+    model: 'civilization:item/wearable/night_vision_goggles/normal'
+    legacy-ids: [hat_238]
+  night_vision_goggles_shiny:
+    name: 'Очки ночного видения &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 239
+    model: 'civilization:item/wearable/night_vision_goggles/shiny'
+    legacy-ids: [hat_239]
+  pylon_hat:
+    name: 'Шляпа-конус'
+    rarity: common
+    category: tech
+    custom-model-data: 240
+    model: 'civilization:item/wearable/pylon_hat/normal'
+    legacy-ids: [hat_240]
+  pylon_hat_shiny:
+    name: 'Шляпа-конус &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 241
+    model: 'civilization:item/wearable/pylon_hat/shiny'
+    legacy-ids: [hat_241]
+  sunflower_crown:
+    name: 'Корона из подсолнухов'
+    rarity: common
+    category: misc
+    custom-model-data: 242
+    model: 'civilization:item/wearable/sunflower_crown/normal'
+    legacy-ids: [hat_242]
+  sunflower_crown_shiny:
+    name: 'Корона из подсолнухов &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 243
+    model: 'civilization:item/wearable/sunflower_crown/shiny'
+    legacy-ids: [hat_243]
+  toothful_hat:
+    name: 'Зубастая шляпа'
+    rarity: common
+    category: animals
+    custom-model-data: 244
+    model: 'civilization:item/wearable/toothful_hat/normal'
+    legacy-ids: [hat_244]
+  toothful_hat_shiny:
+    name: 'Зубастая шляпа &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: animals
+    custom-model-data: 245
+    model: 'civilization:item/wearable/toothful_hat/shiny'
+    legacy-ids: [hat_245]
+  unicorn_hat:
+    name: 'Шляпа-единорог'
+    rarity: uncommon
+    category: animals
+    custom-model-data: 246
+    model: 'civilization:item/wearable/unicorn_hat/normal'
+    legacy-ids: [hat_246]
+  unicorn_hat_shiny:
+    name: 'Шляпа-единорог &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: animals
+    custom-model-data: 247
+    model: 'civilization:item/wearable/unicorn_hat/shiny'
+    legacy-ids: [hat_247]
+  cyber_dragon_hat:
+    name: 'Кибердракон'
+    rarity: rare
+    category: tech
+    custom-model-data: 248
+    model: 'civilization:item/wearable/cyber_dragon_hat/normal'
+    legacy-ids: [hat_248]
+  cyber_dragon_hat_shiny:
+    name: 'Кибердракон &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: tech
+    custom-model-data: 249
+    model: 'civilization:item/wearable/cyber_dragon_hat/shiny'
+    legacy-ids: [hat_249]
+  elite_warrior_helmet_1:
+    name: 'Шлем элитного воина I'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 250
+    model: 'civilization:item/wearable/elite_warrior_helmet/1'
+    legacy-ids: [hat_250]
+  elite_warrior_helmet_2:
+    name: 'Шлем элитного воина II'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 251
+    model: 'civilization:item/wearable/elite_warrior_helmet/2'
+    legacy-ids: [hat_251]
+  elite_warrior_helmet_3:
+    name: 'Шлем элитного воина III'
+    rarity: rare
+    category: ancient
+    custom-model-data: 252
+    model: 'civilization:item/wearable/elite_warrior_helmet/3'
+    legacy-ids: [hat_252]
+  elite_warrior_helmet_4:
+    name: 'Шлем элитного воина IV'
+    rarity: rare
+    category: ancient
+    custom-model-data: 253
+    model: 'civilization:item/wearable/elite_warrior_helmet/4'
+    legacy-ids: [hat_253]
+  elite_warrior_helmet_5:
+    name: 'Шлем элитного воина V'
+    rarity: epic
+    category: ancient
+    custom-model-data: 254
+    model: 'civilization:item/wearable/elite_warrior_helmet/5'
+    legacy-ids: [hat_254]
+  elite_warrior_helmet_6:
+    name: 'Шлем элитного воина VI'
+    rarity: legendary
+    category: ancient
+    custom-model-data: 255
+    model: 'civilization:item/wearable/elite_warrior_helmet/6'
+    legacy-ids: [hat_255]
+  crocodile_hat:
+    name: 'Шляпа-крокодил'
+    rarity: common
+    category: ocean
+    custom-model-data: 256
+    model: 'civilization:item/wearable/crocodile_hat/normal'
+    legacy-ids: [hat_256]
+  crocodile_hat_shiny:
+    name: 'Шляпа-крокодил &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 257
+    model: 'civilization:item/wearable/crocodile_hat/shiny'
+    legacy-ids: [hat_257]
+  football_helmet:
+    name: 'Шлем регбиста'
+    rarity: common
+    category: misc
+    custom-model-data: 258
+    model: 'civilization:item/wearable/football_helmet/normal'
+    legacy-ids: [hat_258]
+  football_helmet_shiny:
+    name: 'Шлем регбиста &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 259
+    model: 'civilization:item/wearable/football_helmet/shiny'
+    legacy-ids: [hat_259]
+  nemean_mane:
+    name: 'Грива Немейского льва'
+    rarity: rare
+    category: ancient
+    custom-model-data: 260
+    model: 'civilization:item/wearable/nemean_mane/normal'
+    legacy-ids: [hat_260]
+  nemean_mane_shiny:
+    name: 'Грива Немейского льва &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: ancient
+    custom-model-data: 261
+    model: 'civilization:item/wearable/nemean_mane/shiny'
+    legacy-ids: [hat_261]
+  toque:
+    name: 'Вязаная шапка'
+    rarity: common
+    category: winter
+    custom-model-data: 262
+    model: 'civilization:item/wearable/toque/normal'
+    legacy-ids: [hat_262]
+  toque_shiny:
+    name: 'Вязаная шапка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 263
+    model: 'civilization:item/wearable/toque/shiny'
+    legacy-ids: [hat_263]
+  artemis_crown:
+    name: 'Корона Артемиды'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 264
+    model: 'civilization:item/wearable/artemis_crown/normal'
+    legacy-ids: [hat_264]
+  artemis_crown_shiny:
+    name: 'Корона Артемиды &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 265
+    model: 'civilization:item/wearable/artemis_crown/shiny'
+    legacy-ids: [hat_265]
+  corinthian_helm:
+    name: 'Коринфский шлем'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 266
+    model: 'civilization:item/wearable/corinthian_helm/normal'
+    legacy-ids: [hat_266]
+  corinthian_helm_shiny:
+    name: 'Коринфский шлем &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 267
+    model: 'civilization:item/wearable/corinthian_helm/shiny'
+    legacy-ids: [hat_267]
+  golden_headpiece:
+    name: 'Золотой венец'
+    rarity: rare
+    category: ancient
+    custom-model-data: 268
+    model: 'civilization:item/wearable/golden_headpiece/normal'
+    legacy-ids: [hat_268]
+  golden_headpiece_shiny:
+    name: 'Золотой венец &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: ancient
+    custom-model-data: 269
+    model: 'civilization:item/wearable/golden_headpiece/shiny'
+    legacy-ids: [hat_269]
+  laurel_wreath:
+    name: 'Лавровый венок'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 270
+    model: 'civilization:item/wearable/laurel_wreath/normal'
+    legacy-ids: [hat_270]
+  laurel_wreath_shiny:
+    name: 'Лавровый венок &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 271
+    model: 'civilization:item/wearable/laurel_wreath/shiny'
+    legacy-ids: [hat_271]
+  zeus_bolt:
+    name: 'Молния Зевса'
+    rarity: rare
+    category: ancient
+    custom-model-data: 272
+    model: 'civilization:item/wearable/zeus_bolt/normal'
+    legacy-ids: [hat_272]
+  zeus_bolt_shiny:
+    name: 'Молния Зевса &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: ancient
+    custom-model-data: 273
+    model: 'civilization:item/wearable/zeus_bolt/shiny'
+    legacy-ids: [hat_273]
+  aviator_cap:
+    name: 'Шлем авиатора'
+    rarity: common
+    category: tech
+    custom-model-data: 274
+    model: 'civilization:item/wearable/aviator_cap/normal'
+    legacy-ids: [hat_274]
+  aviator_cap_shiny:
+    name: 'Шлем авиатора &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 275
+    model: 'civilization:item/wearable/aviator_cap/shiny'
+    legacy-ids: [hat_275]
+  dingle_mask:
+    name: 'Маска Дингла'
+    rarity: common
+    category: misc
+    custom-model-data: 276
+    model: 'civilization:item/wearable/dingle_mask/normal'
+    legacy-ids: [hat_276]
+  dingle_mask_shiny:
+    name: 'Маска Дингла &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 277
+    model: 'civilization:item/wearable/dingle_mask/shiny'
+    legacy-ids: [hat_277]
+  steampunk_hat:
+    name: 'Стимпанк-шляпа'
+    rarity: uncommon
+    category: tech
+    custom-model-data: 278
+    model: 'civilization:item/wearable/steampunk_hat/normal'
+    legacy-ids: [hat_278]
+  steampunk_hat_shiny:
+    name: 'Стимпанк-шляпа &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 279
+    model: 'civilization:item/wearable/steampunk_hat/shiny'
+    legacy-ids: [hat_279]
+  wolf_fur_hat:
+    name: 'Волчья шапка'
+    rarity: common
+    category: winter
+    custom-model-data: 280
+    model: 'civilization:item/wearable/wolf_fur_hat/normal'
+    legacy-ids: [hat_280]
+  wolf_fur_hat_shiny:
+    name: 'Волчья шапка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 281
+    model: 'civilization:item/wearable/wolf_fur_hat/shiny'
+    legacy-ids: [hat_281]
+  sailor_cap:
+    name: 'Бескозырка'
+    rarity: common
+    category: ocean
+    custom-model-data: 282
+    model: 'civilization:item/wearable/sailor_cap/normal'
+    legacy-ids: [hat_282]
+  sailor_cap_shiny:
+    name: 'Бескозырка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 283
+    model: 'civilization:item/wearable/sailor_cap/shiny'
+    legacy-ids: [hat_283]
+  rainbow_earmuffs:
+    name: 'Радужные наушники'
+    rarity: common
+    category: winter
+    custom-model-data: 284
+    model: 'civilization:item/wearable/rainbow_earmuffs/normal'
+    legacy-ids: [hat_284]
+  rainbow_earmuffs_shiny:
+    name: 'Радужные наушники &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 285
+    model: 'civilization:item/wearable/rainbow_earmuffs/shiny'
+    legacy-ids: [hat_285]
+  viking_beard:
+    name: 'Борода викинга'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 286
+    model: 'civilization:item/wearable/viking_beard/normal'
+    legacy-ids: [hat_286]
+  viking_beard_shiny:
+    name: 'Борода викинга &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 287
+    model: 'civilization:item/wearable/viking_beard/shiny'
+    legacy-ids: [hat_287]
+  medusa_hat:
+    name: 'Шляпа Медузы'
+    rarity: uncommon
+    category: ancient
+    custom-model-data: 288
+    model: 'civilization:item/wearable/medusa_hat/normal'
+    legacy-ids: [hat_288]
+  medusa_hat_shiny:
+    name: 'Шляпа Медузы &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: ancient
+    custom-model-data: 289
+    model: 'civilization:item/wearable/medusa_hat/shiny'
+    legacy-ids: [hat_289]
+  ash_hat:
+    name: 'Кепка тренера'
+    rarity: common
+    category: misc
+    custom-model-data: 290
+    model: 'civilization:item/wearable/ash_hat/normal'
+    legacy-ids: [hat_290]
+  ash_hat_shiny:
+    name: 'Кепка тренера &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 291
+    model: 'civilization:item/wearable/ash_hat/shiny'
+    legacy-ids: [hat_291]
+  cute_bow:
+    name: 'Милый бантик'
+    rarity: common
+    category: valentine
+    custom-model-data: 292
+    model: 'civilization:item/wearable/cute_bow/normal'
+    legacy-ids: [hat_292]
+  cute_bow_shiny:
+    name: 'Милый бантик &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 293
+    model: 'civilization:item/wearable/cute_bow/shiny'
+    legacy-ids: [hat_293]
+  twitch_cap:
+    name: 'Кепка стримера'
+    rarity: uncommon
+    category: misc
+    custom-model-data: 294
+    model: 'civilization:item/wearable/twitch_cap'
+    legacy-ids: [hat_294]
+  beanie:
+    name: 'Бини'
+    rarity: common
+    category: winter
+    custom-model-data: 295
+    model: 'civilization:item/wearable/beanie/normal'
+    legacy-ids: [hat_295]
+  beanie_shiny:
+    name: 'Бини &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 296
+    model: 'civilization:item/wearable/beanie/shiny'
+    legacy-ids: [hat_296]
+  egg_hat:
+    name: 'Шляпа-яйцо'
+    rarity: common
+    category: food
+    custom-model-data: 297
+    model: 'civilization:item/wearable/egg_hat/normal'
+    legacy-ids: [hat_297]
+  egg_hat_shiny:
+    name: 'Шляпа-яйцо &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 298
+    model: 'civilization:item/wearable/egg_hat/shiny'
+    legacy-ids: [hat_298]
+  hat_hat:
+    name: 'Шляпа на шляпе'
+    rarity: common
+    category: misc
+    custom-model-data: 299
+    model: 'civilization:item/wearable/hat_hat/normal'
+    legacy-ids: [hat_299]
+  hat_hat_shiny:
+    name: 'Шляпа на шляпе &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 300
+    model: 'civilization:item/wearable/hat_hat/shiny'
+    legacy-ids: [hat_300]
+  pine_cap:
+    name: 'Еловая шапка'
+    rarity: common
+    category: winter
+    custom-model-data: 301
+    model: 'civilization:item/wearable/pine_cap/normal'
+    legacy-ids: [hat_301]
+  pine_cap_shiny:
+    name: 'Еловая шапка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: winter
+    custom-model-data: 302
+    model: 'civilization:item/wearable/pine_cap/shiny'
+    legacy-ids: [hat_302]
+  pot_hat:
+    name: 'Кастрюля'
+    rarity: common
+    category: food
+    custom-model-data: 303
+    model: 'civilization:item/wearable/pot_hat/normal'
+    legacy-ids: [hat_303]
+  pot_hat_shiny:
+    name: 'Кастрюля &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 304
+    model: 'civilization:item/wearable/pot_hat/shiny'
+    legacy-ids: [hat_304]
+  straw_hat:
+    name: 'Соломенная шляпа'
+    rarity: common
+    category: misc
+    custom-model-data: 305
+    model: 'civilization:item/wearable/straw_hat/normal'
+    legacy-ids: [hat_305]
+  straw_hat_shiny:
+    name: 'Соломенная шляпа &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 306
+    model: 'civilization:item/wearable/straw_hat/shiny'
+    legacy-ids: [hat_306]
+  bat_hat:
+    name: 'Шляпа-летучая мышь'
+    rarity: common
+    category: halloween
+    custom-model-data: 307
+    model: 'civilization:item/wearable/bat_hat/normal'
+    legacy-ids: [hat_307]
+  bat_hat_shiny:
+    name: 'Шляпа-летучая мышь &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 308
+    model: 'civilization:item/wearable/bat_hat/shiny'
+    legacy-ids: [hat_308]
+  axe_hat:
+    name: 'Топор в голове'
+    rarity: common
+    category: halloween
+    custom-model-data: 309
+    model: 'civilization:item/wearable/axe_hat/normal'
+    legacy-ids: [hat_309]
+  axe_hat_shiny:
+    name: 'Топор в голове &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 310
+    model: 'civilization:item/wearable/axe_hat/shiny'
+    legacy-ids: [hat_310]
+  eyeball_hat:
+    name: 'Шляпа-глаз'
+    rarity: common
+    category: halloween
+    custom-model-data: 311
+    model: 'civilization:item/wearable/eyeball_hat/normal'
+    legacy-ids: [hat_311]
+  eyeball_hat_shiny:
+    name: 'Шляпа-глаз &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 312
+    model: 'civilization:item/wearable/eyeball_hat/shiny'
+    legacy-ids: [hat_312]
+  mummy_mask:
+    name: 'Маска мумии'
+    rarity: common
+    category: halloween
+    custom-model-data: 313
+    model: 'civilization:item/wearable/mummy_mask/normal'
+    legacy-ids: [hat_313]
+  mummy_mask_shiny:
+    name: 'Маска мумии &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 314
+    model: 'civilization:item/wearable/mummy_mask/shiny'
+    legacy-ids: [hat_314]
+  pumpkin_headband:
+    name: 'Тыквенный ободок'
+    rarity: common
+    category: halloween
+    custom-model-data: 315
+    model: 'civilization:item/wearable/pumpkin_headband/normal'
+    legacy-ids: [hat_315]
+  pumpkin_headband_shiny:
+    name: 'Тыквенный ободок &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 316
+    model: 'civilization:item/wearable/pumpkin_headband/shiny'
+    legacy-ids: [hat_316]
+  scream_mask:
+    name: 'Маска «Крик»'
+    rarity: common
+    category: halloween
+    custom-model-data: 317
+    model: 'civilization:item/wearable/scream_mask/normal'
+    legacy-ids: [hat_317]
+  scream_mask_shiny:
+    name: 'Маска «Крик» &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 318
+    model: 'civilization:item/wearable/scream_mask/shiny'
+    legacy-ids: [hat_318]
+  spider_hat:
+    name: 'Шляпа-паук'
+    rarity: common
+    category: halloween
+    custom-model-data: 319
+    model: 'civilization:item/wearable/spider_hat/normal'
+    legacy-ids: [hat_319]
+  spider_hat_shiny:
+    name: 'Шляпа-паук &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 320
+    model: 'civilization:item/wearable/spider_hat/shiny'
+    legacy-ids: [hat_320]
+  1year_cake_hat:
+    name: 'Праздничный торт'
+    rarity: common
+    category: misc
+    custom-model-data: 321
+    model: 'civilization:item/wearable/1year_cake_hat/normal'
+    legacy-ids: [hat_321]
+  1year_cake_hat_shiny:
+    name: 'Праздничный торт &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 322
+    model: 'civilization:item/wearable/1year_cake_hat/shiny'
+    legacy-ids: [hat_322]
+  bat_wings_hat:
+    name: 'Крылья летучей мыши'
+    rarity: common
+    category: halloween
+    custom-model-data: 323
+    model: 'civilization:item/wearable/bat_wings_hat/normal'
+    legacy-ids: [hat_323]
+  bat_wings_hat_shiny:
+    name: 'Крылья летучей мыши &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: halloween
+    custom-model-data: 324
+    model: 'civilization:item/wearable/bat_wings_hat/shiny'
+    legacy-ids: [hat_324]
+  camera_hat:
+    name: 'Шляпа-камера'
+    rarity: common
+    category: tech
+    custom-model-data: 325
+    model: 'civilization:item/wearable/camera_hat/normal'
+    legacy-ids: [hat_325]
+  camera_hat_shiny:
+    name: 'Шляпа-камера &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: tech
+    custom-model-data: 326
+    model: 'civilization:item/wearable/camera_hat/shiny'
+    legacy-ids: [hat_326]
+  vr_headset:
+    name: 'VR-шлем'
+    rarity: uncommon
+    category: tech
+    custom-model-data: 327
+    model: 'civilization:item/wearable/vr_headset/normal'
+    legacy-ids: [hat_327]
+  vr_headset_shiny:
+    name: 'VR-шлем &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 328
+    model: 'civilization:item/wearable/vr_headset/shiny'
+    legacy-ids: [hat_328]
+  snowstorm_helm:
+    name: 'Шлем снежной бури'
+    rarity: uncommon
+    category: winter
+    custom-model-data: 329
+    model: 'civilization:item/wearable/snowstorm_helm/normal'
+    legacy-ids: [hat_329]
+  snowstorm_helm_shiny:
+    name: 'Шлем снежной бури &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: winter
+    custom-model-data: 330
+    model: 'civilization:item/wearable/snowstorm_helm/shiny'
+    legacy-ids: [hat_330]
+  slime_control:
+    name: 'Слизневый контроль'
+    rarity: common
+    category: misc
+    custom-model-data: 331
+    model: 'civilization:item/wearable/slime_control/normal'
+    legacy-ids: [hat_331]
+  slime_control_shiny:
+    name: 'Слизневый контроль &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 332
+    model: 'civilization:item/wearable/slime_control/shiny'
+    legacy-ids: [hat_332]
+  silly_glasses:
+    name: 'Смешные очки'
+    rarity: common
+    category: misc
+    custom-model-data: 333
+    model: 'civilization:item/wearable/silly_glasses/normal'
+    legacy-ids: [hat_333]
+  silly_glasses_shiny:
+    name: 'Смешные очки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 334
+    model: 'civilization:item/wearable/silly_glasses/shiny'
+    legacy-ids: [hat_334]
+  pirate_polly:
+    name: 'Пиратский попугай'
+    rarity: common
+    category: ocean
+    custom-model-data: 335
+    model: 'civilization:item/wearable/pirate_polly/normal'
+    legacy-ids: [hat_335]
+  pirate_polly_shiny:
+    name: 'Пиратский попугай &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 336
+    model: 'civilization:item/wearable/pirate_polly/shiny'
+    legacy-ids: [hat_336]
+  piranha_troubles:
+    name: 'Пиранья на голове'
+    rarity: common
+    category: ocean
+    custom-model-data: 337
+    model: 'civilization:item/wearable/piranha_troubles/normal'
+    legacy-ids: [hat_337]
+  piranha_troubles_shiny:
+    name: 'Пиранья на голове &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 338
+    model: 'civilization:item/wearable/piranha_troubles/shiny'
+    legacy-ids: [hat_338]
+  idiot_sandwich:
+    name: 'Сэндвич'
+    rarity: common
+    category: food
+    custom-model-data: 339
+    model: 'civilization:item/wearable/idiot_sandwich/normal'
+    legacy-ids: [hat_339]
+  idiot_sandwich_shiny:
+    name: 'Сэндвич &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 340
+    model: 'civilization:item/wearable/idiot_sandwich/shiny'
+    legacy-ids: [hat_340]
+  ice_crown:
+    name: 'Ледяная корона'
+    rarity: rare
+    category: winter
+    custom-model-data: 341
+    model: 'civilization:item/wearable/ice_crown/normal'
+    legacy-ids: [hat_341]
+  ice_crown_shiny:
+    name: 'Ледяная корона &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: legendary
+    category: winter
+    custom-model-data: 342
+    model: 'civilization:item/wearable/ice_crown/shiny'
+    legacy-ids: [hat_342]
+  heart_eyes_emoji:
+    name: 'Влюблённый смайлик'
+    rarity: common
+    category: valentine
+    custom-model-data: 343
+    model: 'civilization:item/wearable/heart_eyes_emoji/normal'
+    legacy-ids: [hat_343]
+  heart_eyes_emoji_shiny:
+    name: 'Влюблённый смайлик &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: valentine
+    custom-model-data: 344
+    model: 'civilization:item/wearable/heart_eyes_emoji/shiny'
+    legacy-ids: [hat_344]
+  gnome_rider:
+    name: 'Гном-наездник'
+    rarity: uncommon
+    category: misc
+    custom-model-data: 345
+    model: 'civilization:item/wearable/gnome_rider/normal'
+    legacy-ids: [hat_345]
+  gnome_rider_shiny:
+    name: 'Гном-наездник &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: misc
+    custom-model-data: 346
+    model: 'civilization:item/wearable/gnome_rider/shiny'
+    legacy-ids: [hat_346]
+  cool_can:
+    name: 'Крутая банка'
+    rarity: common
+    category: food
+    custom-model-data: 347
+    model: 'civilization:item/wearable/cool_can/normal'
+    legacy-ids: [hat_347]
+  cool_can_shiny:
+    name: 'Крутая банка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 348
+    model: 'civilization:item/wearable/cool_can/shiny'
+    legacy-ids: [hat_348]
+  baby_skeleton_rider:
+    name: 'Скелетик-наездник'
+    rarity: uncommon
+    category: misc
+    custom-model-data: 349
+    model: 'civilization:item/wearable/baby_skeleton_rider/normal'
+    legacy-ids: [hat_349]
+  baby_skeleton_rider_shiny:
+    name: 'Скелетик-наездник &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: misc
+    custom-model-data: 350
+    model: 'civilization:item/wearable/baby_skeleton_rider/shiny'
+    legacy-ids: [hat_350]
+  balance_act:
+    name: 'Эквилибрист'
+    rarity: common
+    category: misc
+    custom-model-data: 351
+    model: 'civilization:item/wearable/balance_act/normal'
+    legacy-ids: [hat_351]
+  balance_act_shiny:
+    name: 'Эквилибрист &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 352
+    model: 'civilization:item/wearable/balance_act/shiny'
+    legacy-ids: [hat_352]
+  bee_goggles:
+    name: 'Пчелиные очки'
+    rarity: common
+    category: animals
+    custom-model-data: 353
+    model: 'civilization:item/wearable/bee_goggles/normal'
+    legacy-ids: [hat_353]
+  bee_goggles_shiny:
+    name: 'Пчелиные очки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: animals
+    custom-model-data: 354
+    model: 'civilization:item/wearable/bee_goggles/shiny'
+    legacy-ids: [hat_354]
+  brick_cap:
+    name: 'Кирпичная кепка'
+    rarity: common
+    category: misc
+    custom-model-data: 355
+    model: 'civilization:item/wearable/brick_cap/normal'
+    legacy-ids: [hat_355]
+  brick_cap_shiny:
+    name: 'Кирпичная кепка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 356
+    model: 'civilization:item/wearable/brick_cap/shiny'
+    legacy-ids: [hat_356]
+  booksmart_hat:
+    name: 'Шляпа книжного червя'
+    rarity: common
+    category: misc
+    custom-model-data: 357
+    model: 'civilization:item/wearable/booksmart_hat/normal'
+    legacy-ids: [hat_357]
+  booksmart_hat_shiny:
+    name: 'Шляпа книжного червя &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 358
+    model: 'civilization:item/wearable/booksmart_hat/shiny'
+    legacy-ids: [hat_358]
+  cactus_cap:
+    name: 'Кактусовая кепка'
+    rarity: common
+    category: misc
+    custom-model-data: 359
+    model: 'civilization:item/wearable/cactus_cap/normal'
+    legacy-ids: [hat_359]
+  cactus_cap_shiny:
+    name: 'Кактусовая кепка &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 360
+    model: 'civilization:item/wearable/cactus_cap/shiny'
+    legacy-ids: [hat_360]
+  cool_glasses:
+    name: 'Крутые очки'
+    rarity: common
+    category: misc
+    custom-model-data: 361
+    model: 'civilization:item/wearable/cool_glasses/normal'
+    legacy-ids: [hat_361]
+  cool_glasses_shiny:
+    name: 'Крутые очки &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: misc
+    custom-model-data: 362
+    model: 'civilization:item/wearable/cool_glasses/shiny'
+    legacy-ids: [hat_362]
+  cornucopia_hat:
+    name: 'Рог изобилия'
+    rarity: common
+    category: food
+    custom-model-data: 363
+    model: 'civilization:item/wearable/cornucopia_hat/normal'
+    legacy-ids: [hat_363]
+  cornucopia_hat_shiny:
+    name: 'Рог изобилия &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: food
+    custom-model-data: 364
+    model: 'civilization:item/wearable/cornucopia_hat/shiny'
+    legacy-ids: [hat_364]
+  creeper_fossil:
+    name: 'Окаменелый крипер'
+    rarity: uncommon
+    category: misc
+    custom-model-data: 365
+    model: 'civilization:item/wearable/creeper_fossil/normal'
+    legacy-ids: [hat_365]
+  creeper_fossil_shiny:
+    name: 'Окаменелый крипер &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: misc
+    custom-model-data: 366
+    model: 'civilization:item/wearable/creeper_fossil/shiny'
+    legacy-ids: [hat_366]
+  fishbowl:
+    name: 'Аквариум'
+    rarity: common
+    category: ocean
+    custom-model-data: 367
+    model: 'civilization:item/wearable/fishbowl/normal'
+    legacy-ids: [hat_367]
+  fishbowl_shiny:
+    name: 'Аквариум &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: rare
+    category: ocean
+    custom-model-data: 368
+    model: 'civilization:item/wearable/fishbowl/shiny'
+    legacy-ids: [hat_368]
+  gearhead:
+    name: 'Шестерёночная голова'
+    rarity: uncommon
+    category: tech
+    custom-model-data: 369
+    model: 'civilization:item/wearable/gearhead/normal'
+    legacy-ids: [hat_369]
+  gearhead_shiny:
+    name: 'Шестерёночная голова &f✦'
+    lore:
+      - '&7Кастомная шляпа'
+      - '&eСияющая версия'
+    rarity: epic
+    category: tech
+    custom-model-data: 370
+    model: 'civilization:item/wearable/gearhead/shiny'
+    legacy-ids: [hat_370]

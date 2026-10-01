@@ -1,0 +1,103 @@
+# QWHatCase — основные настройки.
+# После изменения: /hatcases reload (ошибочная конфигурация не применяется — остаётся прежняя).
+
+storage:
+  # SQLite-файл в папке плагина. Изменение применяется только после перезапуска.
+  file: data.db
+
+# Редкости. Ключ — постоянный ID (используется в hats.yml и cases.yml).
+#   order         порядок: больше = реже (для сортировки и объявлений)
+#   compensation  жетоны за дубликат по умолчанию (шляпа может задать своё значение)
+#   pane          стекло для оформления окна результата
+#   win-sound     звук при выигрыше ('' = звук кейса)
+rarities:
+  common:
+    name: 'Обычная'
+    color: '&f'
+    order: 0
+    compensation: 5
+    pane: WHITE_STAINED_GLASS_PANE
+    win-sound: ''
+  uncommon:
+    name: 'Необычная'
+    color: '&a'
+    order: 1
+    compensation: 10
+    pane: LIME_STAINED_GLASS_PANE
+    win-sound: ''
+  rare:
+    name: 'Редкая'
+    color: '&9'
+    order: 2
+    compensation: 25
+    pane: BLUE_STAINED_GLASS_PANE
+    win-sound: 'minecraft:entity.player.levelup'
+  epic:
+    name: 'Эпическая'
+    color: '&5'
+    order: 3
+    compensation: 60
+    pane: PURPLE_STAINED_GLASS_PANE
+    win-sound: 'minecraft:entity.player.levelup'
+  legendary:
+    name: 'Легендарная'
+    color: '&6&l'
+    order: 4
+    compensation: 150
+    pane: ORANGE_STAINED_GLASS_PANE
+    win-sound: 'minecraft:ui.toast.challenge_complete'
+
+hat-display:
+  # Шляпка отображается в слоте шлема (так же, как в старом плагине PTrap).
+  # Что делать, если на игроке настоящий шлем:
+  #   MOVE_TO_INVENTORY — переложить шлем в свободный слот инвентаря; если места нет — отказ с сообщением
+  #   REFUSE            — отказать и попросить снять шлем
+  # Настоящий шлем никогда не удаляется и не заменяется без сохранения.
+  helmet-occupied: MOVE_TO_INVENTORY
+
+resource-pack:
+  # PLUGIN — плагин сам предлагает пак при входе (url + sha1 ниже);
+  # SERVER — пак выдаёт server.properties или другой плагин, QWHatCase только следит за статусом;
+  # NONE   — пак не проверяется.
+  mode: PLUGIN
+  # Прямая ссылка на zip (например, на свой веб-сервер). Пустая ссылка = режим NONE.
+  url: ''
+  # SHA-1 zip-файла (40 символов). Обязательно обновляйте при изменении пака.
+  sha1: ''
+  # true — клиент без пака будет отключён (ванильное поведение «обязательного» пака).
+  required: false
+  prompt: '&6Для шляпок нужен ресурс-пак сервера.'
+  # Блокировать открытие кейсов, пока пак не загружен. Баланс, коллекция и выдача наград работают всегда.
+  block-cases-until-loaded: true
+
+animation:
+  # Shift+клик по «Открыть» — открыть без анимации (результат тот же).
+  allow-skip-with-shift: true
+
+gui:
+  # Защита от быстрых повторных кликов.
+  click-cooldown-ms: 250
+
+history:
+  page-size: 10
+
+# Периодическое объявление (перенесено из старого плагина).
+announcement:
+  enabled: true
+  interval-minutes: 35
+  message: '&6🎩 &eКейсы со шляпками уже доступны! &7Откройте: &a/cases &7| Ваши шляпки: &a/hats'
+
+# Кнопка «Купить ключи» в меню кейсов (ссылка из старого плагина).
+external-shop:
+  enabled: true
+  url: 'https://t.me/AntonSodeon'
+
+migration:
+  # Файлы players.yml старого плагина (пути от корня сервера). Старые файлы только читаются.
+  source-files:
+    - plugins/PTrap/players.yml
+    - plugins/QWHats/players.yml
+  # CONVERT — при входе убирать предметы старого плагина, если шляпа уже есть в коллекции
+  #           (шляпа из слота шлема становится надетой). Предметы шляп, которых нет в коллекции, не трогаются.
+  # IGNORE  — не трогать старые предметы.
+  legacy-items: CONVERT

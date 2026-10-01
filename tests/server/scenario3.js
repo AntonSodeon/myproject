@@ -1,0 +1,28 @@
+const { sleep, consoleCmd, check, results, waitWindow, title, SERVER } = require('./lib');
+const { execFileSync } = require('child_process');
+const fs = require('fs'); const path = require('path');
+const db = name => JSON.parse(execFileSync('python3', ['db.py', '../server/plugins/QWHatCase/data.db', name]).toString());
+const cfgDir = path.join(SERVER, 'plugins/QWHatCase');
+(async () => {
+  const orig = fs.readFileSync(path.join(cfgDir, 'config.yml'), 'utf8');
+  fs.writeFileSync(path.join(cfgDir, 'config.yml'), orig.replace("url: ''", "url: 'http://127.0.0.1:8765/pack.zip'").replace("sha1: ''", "sha1: '6c49d711de3e86c76da007e2fd7ac36ba34385fb'"));
+  consoleCmd('hatcases reload'); consoleCmd('hatcases key give Tester1 basic 1'); await sleep(1000);
+  const bot = require('mineflayer').createBot({ host: '127.0.0.1', port: 25599, username: 'Tester1', version: '1.21.11', auth: 'offline' });
+  bot.chatLog = []; bot.on('messagestr', m => bot.chatLog.push(m));
+  bot._client.on('add_resource_pack', pk => bot._client.write('resource_pack_receive', { uuid: pk.uuid, result: 2 }));
+  await new Promise(r => bot.once('spawn', r)); await sleep(3000);
+  check('failed download → message + retry', bot.chatLog.some(m => /Не удалось загрузить/.test(m)) && bot.chatLog.some(m => /загрузить ресурс-пак снова/.test(m)), bot.chatLog);
+  const hat = db('Tester1').hats[1];
+  bot.chat('/hats unequip'); await sleep(500);
+  bot.chat('/hats equip ' + hat); await sleep(800);
+  check('equip works without pack', bot.inventory.slots[5]?.name === 'paper' && db('Tester1').selected === hat);
+  bot.chat('/hats'); const w = await waitWindow(bot, w => /Шляпки/.test(title(w)));
+  const warn = w && w.slots[26];
+  check('main menu warns that pack is missing', !!warn && JSON.stringify(warn.components || '').includes('Ресурс-пак не загружен'));
+  const k = db('Tester1').keys.basic;
+  bot.chat('/cases open basic'); await sleep(800);
+  check('failed pack blocks case opening, no key spent', db('Tester1').keys.basic === k);
+  fs.writeFileSync(path.join(cfgDir, 'config.yml'), orig); consoleCmd('hatcases reload');
+  bot.quit(); const f = results.filter(r => !r.ok).length;
+  console.log(`SUMMARY ${results.length - f}/${results.length} passed`); await sleep(500); process.exit(0);
+})().catch(e => { console.error('CRASH', e); process.exit(1); });
