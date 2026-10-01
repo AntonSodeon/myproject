@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "monolith_arsenal:item/test_weapon"
+  }
+}

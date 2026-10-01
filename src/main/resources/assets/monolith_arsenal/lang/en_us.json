@@ -1,0 +1,6 @@
+{
+  "item.monolith_arsenal.test_weapon": "Test Weapon",
+  "item.monolith_arsenal.debug_tool": "Debug Tool",
+  "itemGroup.monolith_arsenal": "Monolith Arsenal",
+  "entity.monolith_arsenal.animated_test": "Animated Test"
+}

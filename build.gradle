@@ -1,0 +1,81 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupAndSubgroups('software.bernie')
+        }
+    }
+    maven {
+        name = 'Player Animation Library'
+        url = 'https://repo.redlance.org/public/'
+        content {
+            includeGroupAndSubgroups('com.zigythebird')
+        }
+    }
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        'monolith_arsenal' {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // External mods: required in the player's mods folder, not bundled.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
+    modImplementation "com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_anim_version}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand 'version': inputs.properties.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+    it.options.encoding = 'UTF-8'
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jar {
+    inputs.property 'archivesName', project.base.archivesName
+
+    from('LICENSE') {
+        rename { "${it}_${inputs.properties.archivesName}" }
+    }
+}

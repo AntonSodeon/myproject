@@ -1,0 +1,32 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "test_weapon_pose": {
+      "animation_length": 1.0,
+      "loop": true,
+      "bones": {
+        "right_arm": {
+          "rotation": {
+            "0.0": { "post": [-55.0, -10.0, -24.0] }
+          },
+          "position": {
+            "0.0": { "post": [0.0, 1.0, -1.0] }
+          }
+        },
+        "left_arm": {
+          "rotation": {
+            "0.0": { "post": [-60.0, 12.0, 30.0] }
+          },
+          "position": {
+            "0.0": { "post": [0.0, 0.0, -0.5] }
+          }
+        },
+        "torso": {
+          "rotation": {
+            "0.0": { "post": [0.0, 6.0, 0.0] }
+          }
+        }
+      }
+    }
+  }
+}

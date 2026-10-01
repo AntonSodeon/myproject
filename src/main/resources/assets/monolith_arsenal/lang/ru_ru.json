@@ -1,0 +1,6 @@
+{
+  "item.monolith_arsenal.test_weapon": "Тестовое оружие",
+  "item.monolith_arsenal.debug_tool": "Инструмент отладки",
+  "itemGroup.monolith_arsenal": "Арсенал Монолита",
+  "entity.monolith_arsenal.animated_test": "Анимированный тестовый объект"
+}

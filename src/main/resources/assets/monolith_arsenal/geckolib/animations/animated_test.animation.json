@@ -1,0 +1,25 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.monolith_arsenal.idle": {
+      "loop": true,
+      "animation_length": 2.0,
+      "bones": {
+        "body": {
+          "rotation": {
+            "0.0": [0, -8, 0],
+            "1.0": [0, 8, 0],
+            "2.0": [0, -8, 0]
+          }
+        },
+        "top": {
+          "rotation": {
+            "0.0": [0, 0, -6],
+            "1.0": [0, 0, 6],
+            "2.0": [0, 0, -6]
+          }
+        }
+      }
+    }
+  }
+}
