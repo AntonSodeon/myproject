@@ -1,63 +1,54 @@
 # MONOLITH: ARSENAL
 
-Fabric mod for Minecraft **1.21.11** (Java 21). Mod ID: `monolith_arsenal`. Current version: **0.1.12**.
+Fabric mod for Minecraft **1.21.11** (Java 21). Mod ID: `monolith_arsenal`. Current version: **0.1.13**.
 
-The repository also contains **Monolith Skies** (`monolith-skies/`, mod ID `monolith_skies`): our own ship
-physics module. It replaces Valkyrien Skies, which has no official build for Minecraft 1.21.11.
-The release jar is **self-contained**: Fabric API, GeckoLib, Player Animation Library and Monolith Skies are
-nested into it with Fabric Loom Jar-in-Jar (`META-INF/jars/`), so the player puts **one file** into `mods`.
+Military content: a test weapon with a Player Animation Library pose, a GeckoLib test entity, and — new in
+0.1.13 — a physics backend for future vehicles built on **Valkyrien Skies** (an existing engine; no physics of our own).
+
+## Installation (players)
+
+See `INSTALL.txt` in the release archive. In short, the `mods` folder needs **two files**:
+
+| File | Source |
+|---|---|
+| `monolith-arsenal-0.1.13.jar` | this project (Fabric API, GeckoLib and Player Animation Library are nested inside) |
+| `ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar` | [CurseForge, file 8724931](https://www.curseforge.com/minecraft/mc-mods/vs-unofficial-port/files/8724931) — the original, unmodified jar |
+
+Fabric Loader 0.19.2+ is installed separately. Upgrading from 0.1.12? Read [docs/MIGRATION-from-0.1.12.md](docs/MIGRATION-from-0.1.12.md) first.
 
 ## Building
 
 ```bash
-./gradlew clean build          # Windows: gradlew.bat clean build
+./gradlew clean build            # Windows: gradlew.bat clean build
 ```
 
-Output:
-
-| File | Contents |
-|---|---|
-| `build/libs/monolith-arsenal-0.1.12.jar` | the mod with all libraries nested (`META-INF/jars/`) |
-| `monolith-skies/build/libs/monolith-skies-0.1.0.jar` | Monolith Skies as a standalone mod (for other modpacks) |
-
-Development runs: `./gradlew runClient`, `./gradlew runServer`.
-Automated in-game checks: `./gradlew runClientGameTest` (needs a display; on a headless Linux use
-`xvfb-run -a ./gradlew runClientGameTest`). Screenshots go to `build/run/clientGameTest/screenshots/`.
+The output is `build/libs/monolith-arsenal-0.1.13.jar`. Dev runs: `./gradlew runClient`, `./gradlew runServer`.
+In-game checks: `./gradlew runClientGameTest` (needs a display; on headless Linux use `xvfb-run -a ./gradlew runClientGameTest`).
 
 ## Dependencies
 
 | Library | Version | Maven coordinates | Repository | How it ships |
 |---|---|---|---|---|
-| Fabric Loader | 0.19.2 | `net.fabricmc:fabric-loader:0.19.2` | https://maven.fabricmc.net/ | installed by the Fabric installer |
-| Fabric API | 0.141.6+1.21.11 | `net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11` | https://maven.fabricmc.net/ | nested in the jar (Jar-in-Jar) |
-| GeckoLib | 5.4.5 | `software.bernie.geckolib:geckolib-fabric-1.21.11:5.4.5` | https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/ | nested in the jar (Jar-in-Jar) |
-| Player Animation Library | 1.1.7+mc.1.21.11 | `com.zigythebird.playeranim:PlayerAnimationLibFabric:1.1.7+mc.1.21.11` | https://repo.redlance.org/public/ | nested in the jar (Jar-in-Jar) |
-| Monolith Skies | 0.1.0 | Gradle subproject `:monolith-skies` | this repository | nested in the jar (Jar-in-Jar) |
-| Yarn mappings | 1.21.11+build.6 | `net.fabricmc:yarn:1.21.11+build.6:v2` | https://maven.fabricmc.net/ | build only |
+| Fabric Loader | 0.19.2 | `net.fabricmc:fabric-loader` | https://maven.fabricmc.net/ | installed by the Fabric installer |
+| Fabric API | 0.141.6+1.21.11 | `net.fabricmc.fabric-api:fabric-api` | https://maven.fabricmc.net/ | nested (Jar-in-Jar) |
+| GeckoLib | 5.4.5 | `software.bernie.geckolib:geckolib-fabric-1.21.11` | https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/ | nested (Jar-in-Jar) |
+| Player Animation Library | 1.1.7+mc.1.21.11 | `com.zigythebird.playeranim:PlayerAnimationLibFabric` | https://repo.redlance.org/public/ | nested (Jar-in-Jar) |
+| Valkyrien Skies (unofficial 1.21.11 port, LumixTeam) | 2.4.205+0d0017dd8a (file v3.1.1) | `curse.maven:vs-unofficial-port-1556051:8724931` | https://cursemaven.com | **separate jar in `mods`**, not bundled |
+| Fabric Language Kotlin | 1.13.1+kotlin.2.1.10 | `net.fabricmc:fabric-language-kotlin` | https://maven.fabricmc.net/ | build only (VS ships its own copy) |
+| Forge Config API Port | 21.11.1 | `maven.modrinth:forge-config-api-port:uXrWPsCu` | https://api.modrinth.com/maven | build/dev only (VS ships its own copy) |
+| Night Config | 3.8.3 | `com.electronwill.night-config:core`, `:toml` | Maven Central | build/dev only |
 
-Nested libraries keep their own `fabric.mod.json`, mixins and access wideners. If a player also installs
-one of them separately, Fabric Loader loads a single copy (the newest), with no conflict.
-Licences allow redistribution: Fabric API is Apache-2.0, GeckoLib and Player Animation Library are MIT; their licence files stay inside the nested jars.
+Architectury API and Cloth Config are **not** needed: the VS port has no references to Architectury classes,
+and it nests Fabric Language Kotlin, Forge Config API Port, MixinExtras and classmate itself.
 
-Valkyrien Skies and Architectury API aren't required anymore. If an external Valkyrien Skies is installed anyway,
-`ValkyrienSkiesCompat` detects it at runtime and logs its version.
+## Vehicle physics
 
-## Monolith Skies — ships
+Game code uses `ru.monolith.arsenal.physics.VehicleBody` / `VehiclePhysicsBackend` only. The Valkyrien Skies
+classes stay in `ru.monolith.arsenal.compat.valkyrienskies`. Design, threading rules and known limits are in
+[docs/VEHICLE-PHYSICS.md](docs/VEHICLE-PHYSICS.md).
 
-* **Assembly**: right-click any block of a structure with the *Ship Assembler* (Tools tab), or
-  `/monolith_skies assemble <x y z>`. All blocks connected to it face-to-face become a ship (limit 4096 blocks,
-  so a structure touching the ground is rejected). Chests and other block entities keep their contents.
-* **Physics** (server-side): gravity; buoyancy based on block density (wood 0.6, wool 0.25, stone 2.4,
-  metal 7.0, water 1.0), so wooden hulls float and stone sinks; water and air drag; ground friction;
-  world collisions; rotation around the vertical axis.
-* **Players and mobs** can walk on the deck and are carried along when the ship moves or turns.
-* **Disassembly**: right-click the ship with the assembler, or `/monolith_skies disassemble <ships>`.
-  The heading snaps to the nearest 90°, and block rotation and block entities are restored.
-* Ships are saved with the world.
-* Operator commands: `/monolith_skies list`, `push <ships> <dx dy dz>`, `spin <ships> <deg/tick>`.
-* API for other mods: `ru.monolith.skies.api.MonolithSkiesApi` / `Ship` (list ships, find a ship at a point,
-  impulses, coordinate conversion, assemble and disassemble).
-
-Current limits of version 0.1.0: rotation is yaw-only (no pitch or roll), ships don't collide with each other,
-block entities with special renderers (chests, signs) are invisible while a block is part of a ship,
-and ship blocks can't be targeted or edited directly (disassemble first).
+Operator diagnostics (permission level 2): `/monolith_arsenal physics backend | list | create_test <pos> | status <id> |
+info <id> | impulse <id> <x y z> | angular_impulse <id> <x y z> | force <id> <x y z> <seconds> |
+torque <id> <x y z> <seconds> | continuous <id> <channel> <force> <torque> | clear_continuous <id> <channel> |
+remove <id>`, plus `create_plain_vs <pos> <marker> <attachment>` and `vs_position <id>` for reproducing
+Valkyrien Skies behaviour without our code.
