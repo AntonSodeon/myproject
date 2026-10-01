@@ -33,7 +33,9 @@
 | `/hatcases tokens give\|take <player> <amount>` | `qwhatcase.admin.tokens` |
 | `/hatcases point add <case_id>` — привязать блок под прицелом | `qwhatcase.admin.points` |
 | `/hatcases point remove` — убрать привязку блока под прицелом | `qwhatcase.admin.points` |
-| `/hatcases point list` | `qwhatcase.admin.points` |
+| `/hatcases point list` — точки и их состояние (свободна / идёт открытие) | `qwhatcase.admin.points` |
+| `/hatcases status` — анимации в мире, занятые точки, надписи, временные сущности, задачи плагина | `qwhatcase.admin.points` |
+| `/hatcases preview [case_id]` — предпросмотр анимации над точкой под прицелом (без ключей и наград) | `qwhatcase.admin.preview` |
 | `/hatcases inspect <player>` — коллекция и балансы | `qwhatcase.admin.inspect` |
 | `/hatcases history <player> [page]`, `/hatcases history op <operation_id>` | `qwhatcase.admin.history` |
 | `/hatcases reload` — проверить и применить конфигурацию | `qwhatcase.admin.reload` |

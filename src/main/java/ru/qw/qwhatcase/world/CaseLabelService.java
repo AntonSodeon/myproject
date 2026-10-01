@@ -132,6 +132,10 @@ public final class CaseLabelService implements Listener {
         Set<String> alive = new HashSet<>();
         for (CasePoint point : plugin.points().all()) {
             alive.add(point.key());
+            if (plugin.catalog().caseDef(point.caseId()).isEmpty()) {
+                plugin.getLogger().warning("Точка " + point.key() + " привязана к неизвестному кейсу '" + point.caseId()
+                        + "' — надпись не показывается. Перепривяжите блок: /hatcases point add <кейс> или /hatcases point remove");
+            }
             ensure(point);
         }
         for (String key : List.copyOf(labels.keySet())) {

@@ -16,7 +16,8 @@ const db = name => JSON.parse(execFileSync('python3', ['db.py', '../server/plugi
   a.chat('/hats');
   let w = await waitWindow(a, w => /Шляпки/.test(title(w)));
   check('main menu opens', !!w, w && title(w));
-  const mainNames = w ? w.slots.slice(0, 27).map(itemName) : [];
+  await sleep(600);
+  const mainNames = a.currentWindow ? a.currentWindow.slots.slice(0, 27).map(itemName) : [];
   check('main menu has 5 sections', ['Кейсы', 'Мои шляпки', 'Каталог за жетоны', 'Снять шляпку', 'Ресурс-пак'].every(s => mainNames.some(n => n && n.includes(s))), mainNames.filter(n => n && n.trim()));
 
   // --- попытки вытащить предметы: обычный клик, shift, цифра, Q, двойной клик
