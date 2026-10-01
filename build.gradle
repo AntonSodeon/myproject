@@ -27,6 +27,13 @@ repositories {
         }
     }
     maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content {
+            includeGroup('maven.modrinth')
+        }
+    }
+    maven {
         name = 'Player Animation Library'
         url = 'https://repo.redlance.org/public/'
         content {
@@ -75,6 +82,10 @@ dependencies {
     // The VS API exposes Kotlin types; this is the exact Fabric Language Kotlin build nested inside that VS jar.
     // Development classpath only — at runtime VS brings its own copy.
     modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+    // Forge Config API Port 21.11.1 (nested in VS) and its Night Config core: compile-only, for the VS config
+    // bridge (see ValkyrienSkiesConfigBridge). At runtime the copies nested in VS are used.
+    modCompileOnly "maven.modrinth:forge-config-api-port:${project.forge_config_api_port_modrinth_version}"
+    compileOnly "com.electronwill.night-config:core:3.8.3"
 }
 
 processResources {

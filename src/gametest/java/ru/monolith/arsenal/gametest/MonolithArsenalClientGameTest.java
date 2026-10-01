@@ -12,17 +12,22 @@ import net.minecraft.client.option.Perspective;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import ru.monolith.arsenal.client.TestWeaponPose;
+import ru.monolith.arsenal.physics.ScheduledForces;
+import ru.monolith.arsenal.physics.VehicleBody;
+import ru.monolith.arsenal.physics.VehiclePhysics;
 import ru.monolith.arsenal.registry.EntityRegistry;
 import ru.monolith.arsenal.registry.ItemRegistry;
 
 
 /**
  * Drives a real client through the manual checklist: weapon pose (first/third person, re-enabled after slot
- * switches), the GeckoLib test entity, a Monolith Skies ship with the player on deck, and a world reload.
+ * switches), the GeckoLib test entity, a Valkyrien Skies physics body next to the player, and a world reload.
  */
 public final class MonolithArsenalClientGameTest implements FabricClientGameTest {
     private static final Logger LOGGER = LoggerFactory.getLogger("monolith_arsenal_gametest");
@@ -40,7 +45,7 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
 
             testWeaponPose(context, singleplayer);
             testAnimatedEntity(context, singleplayer);
-            testShip(context, singleplayer);
+            testPhysicsBody(context, singleplayer);
         }
 
         try (TestSingleplayerContext reopened = save.open()) {
@@ -48,10 +53,15 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             context.waitTicks(40);
             long animated = reopened.getServer().computeOnServer(server -> count(server, EntityRegistry.ANIMATED_TEST.getTranslationKey()));
             check(animated == 0, "killed animated_test must not come back after reload, found " + animated);
-            long ships = reopened.getServer().computeOnServer(server -> countShips(server));
-            check(ships == 1, "the ship must be saved with the world, found " + ships);
+            long id = bodyId;
+            boolean present = reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent());
+            check(present, "the physics body must be saved with the world");
             context.takeScreenshot("12_after_reload");
-            LOGGER.info("[gametest] reload: animated_test={}, ships={}", animated, ships);
+            boolean removed = reopened.getServer().computeOnServer(server -> VehiclePhysics.backend().remove(server.getOverworld(), id));
+            context.waitTicks(10);
+            boolean stillThere = reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent());
+            check(removed && !stillThere, "the physics body must be removed safely");
+            LOGGER.info("[gametest] reload: animated_test={}, body {} restored and removed", animated, id);
         }
         LOGGER.info("[gametest] ALL CHECKS PASSED");
     }
@@ -111,53 +121,76 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         check(left == 0, "animated_test must be removed by /kill");
     }
 
-    private static void testShip(ClientGameTestContext context, TestSingleplayerContext singleplayer) {
+    private static void testPhysicsBody(ClientGameTestContext context, TestSingleplayerContext singleplayer) {
         var server = singleplayer.getServer();
-        // A pool of water with a wooden raft above it.
-        server.runCommand("fill 10 -64 -6 30 -58 14 minecraft:stone");
-        server.runCommand("fill 11 -62 -5 29 -58 13 minecraft:water");
-        server.runCommand("fill 14 -54 0 18 -54 4 minecraft:oak_planks");
-        server.runCommand("fill 14 -53 0 18 -53 0 minecraft:oak_fence");
-        server.runCommand("monolith_skies assemble 14 -54 0");
+        check(server.computeOnServer(s -> VehiclePhysics.backend().isAvailable()), "Valkyrien Skies backend must be available");
+        server.runCommand("fill 10 -61 -12 40 -61 22 minecraft:stone");
+        long id = server.computeOnServer(s -> VehiclePhysics.backend()
+                .createTestBody(s.getOverworld(), new BlockPos(20, -50, 5)).orElseThrow());
+        LOGGER.info("[gametest] created Valkyrien Skies test body {}", id);
+        server.runCommand("tp @a 14 -59 5 -90 15");
+        context.waitTicks(100);
+
+        Vec3d landed = server.computeOnServer(s -> body(s, id).position());
+        check(landed.y < -57.0 && landed.y > -60.0, "body must fall and rest on the floor, y=" + landed.y);
+        Vec3d clientPos = context.computeOnClient(client -> clientShipPosition(client, id));
+        check(clientPos != null && clientPos.distanceTo(landed) < 0.5,
+                "client must see the body where the server has it: client " + clientPos + ", server " + landed);
+        context.takeScreenshot("08_vs_body_landed");
+
+        double mass = server.computeOnServer(s -> body(s, id).mass());
+        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(mass * 8.0, 0.0, 0.0), Vec3d.ZERO, 20));
+        context.waitTicks(10);
+        double vx = server.computeOnServer(s -> body(s, id).linearVelocity().x);
+        check(vx > 1.0, "force must accelerate the body next to the player, vx=" + vx);
+        context.takeScreenshot("09_vs_body_moving");
+        context.waitTicks(40);
+        Vec3d moved = server.computeOnServer(s -> body(s, id).position());
+        Vec3d clientMoved = context.computeOnClient(client -> clientShipPosition(client, id));
+        check(moved.x - landed.x > 1.0, "body must have moved along +X, dx=" + (moved.x - landed.x));
+        check(clientMoved != null && clientMoved.distanceTo(moved) < 0.5,
+                "client copy must follow the moving body: client " + clientMoved + ", server " + moved);
+
+        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(0.0, mass * 14.0, 0.0), Vec3d.ZERO, 25));
+        context.waitTicks(10);
+        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, Vec3d.ZERO, new Vec3d(mass * 5.0, 0.0, mass * 5.0), 8));
+        context.waitTicks(12);
+        Vec3d spin = server.computeOnServer(s -> body(s, id).angularVelocity());
+        check(Math.abs(spin.x) > 0.2 && Math.abs(spin.z) > 0.2, "torque must spin the body around X and Z, angVel=" + spin);
+        context.takeScreenshot("10_vs_body_rotating");
         context.waitTicks(120);
 
-        ShipEntity ship = server.computeOnServer(MonolithArsenalClientGameTest::firstShip);
-        check(ship != null, "ship must exist after assembly");
-        double submerged = server.computeOnServer(s -> firstShip(s).getSubmergedFraction());
-        check(submerged > 0.3 && submerged < 0.9, "wooden ship must float partly submerged, got " + submerged);
-        Vec3d shipPos = server.computeOnServer(s -> firstShip(s).getEntityPos());
-        LOGGER.info("[gametest] ship floating at {} submerged {}", shipPos, submerged);
-
-        server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 25", shipPos.x, shipPos.y + 2.0, shipPos.z + 1.0));
-        context.waitTicks(40);
-        double playerY = context.computeOnClient(client -> client.player.getY());
-        boolean onGround = context.computeOnClient(client -> client.player.isOnGround());
-        check(onGround && playerY > shipPos.y, "player must stand on the deck (y=" + playerY + ", ship y=" + shipPos.y + ")");
-        context.takeScreenshot("08_player_on_ship");
-
-        double startX = context.computeOnClient(client -> client.player.getX());
-        server.runCommand("monolith_skies push @e[type=monolith_skies:ship] 0.25 0 0");
-        context.waitTicks(40);
-        double endX = context.computeOnClient(client -> client.player.getX());
-        double shipEndX = server.computeOnServer(s -> firstShip(s).getEntityPos().x);
-        check(endX - startX > 1.0, "player must be carried by the moving ship (moved " + (endX - startX) + ")");
-        LOGGER.info("[gametest] ship moved to x={}, player carried {} blocks", shipEndX, endX - startX);
-        context.takeScreenshot("09_ship_moved_with_player");
-
-        server.runCommand("monolith_skies spin @e[type=monolith_skies:ship] 3");
+        // Stand on the resting hull and drag it: the player must stay on the deck.
+        Vec3d rest = server.computeOnServer(s -> body(s, id).position());
+        server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 30", rest.x, rest.y + 2.5, rest.z));
         context.waitTicks(30);
-        double yaw = server.computeOnServer(s -> firstShip(s).getShipYaw());
-        check(Math.abs(yaw) > 5.0, "ship must rotate, yaw=" + yaw);
-        context.takeScreenshot("10_ship_rotated");
+        double startX = context.computeOnClient(client -> client.player.getX());
+        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(mass * 4.0, 0.0, 0.0), Vec3d.ZERO, 20));
+        context.waitTicks(50);
+        double carried = context.computeOnClient(client -> client.player.getX()) - startX;
+        double bodyDx = server.computeOnServer(s -> body(s, id).position().x) - rest.x;
+        LOGGER.info("[gametest] body moved {} blocks, player on deck moved {} blocks", bodyDx, carried);
+        context.takeScreenshot("11_player_on_moving_body");
 
-        // Hover outside the pool (creative flight) and look back at the rotated ship.
-        server.runCommand("tp @a 20 -53 -12 0 30");
-        context.runOnClient(client -> {
-            client.player.getAbilities().flying = true;
-            client.player.setVelocity(0.0, 0.0, 0.0);
-        });
+        server.runCommand("tp @a 30 -55 -8 30 20");
         context.waitTicks(20);
-        context.takeScreenshot("11_ship_from_side");
+        context.takeScreenshot("11b_vs_body_from_side");
+        bodyId = id;
+    }
+
+    private static long bodyId;
+
+    private static VehicleBody body(MinecraftServer server, long id) {
+        return VehiclePhysics.find(server.getOverworld(), id).orElseThrow(() -> new AssertionError("body " + id + " is not loaded"));
+    }
+
+    private static Vec3d clientShipPosition(MinecraftClient client, long id) {
+        var ship = ValkyrienSkies.api().getClientShipWorld(client).getAllShips().getById(id);
+        if (ship == null) {
+            return null;
+        }
+        var p = ship.getTransform().getPositionInWorld();
+        return new Vec3d(p.x(), p.y(), p.z());
     }
 
     private static void selectSlot(ClientGameTestContext context, int slot) {
@@ -188,25 +221,6 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         for (Entity entity : server.getOverworld().iterateEntities()) {
             if (entity.getType().getTranslationKey().equals(typeKey)) {
                 return entity;
-            }
-        }
-        return null;
-    }
-
-    private static long countShips(MinecraftServer server) {
-        long n = 0;
-        for (Entity entity : server.getOverworld().iterateEntities()) {
-            if (entity instanceof ShipEntity) {
-                n++;
-            }
-        }
-        return n;
-    }
-
-    private static ShipEntity firstShip(MinecraftServer server) {
-        for (Entity entity : server.getOverworld().iterateEntities()) {
-            if (entity instanceof ShipEntity ship) {
-                return ship;
             }
         }
         return null;
