@@ -67,6 +67,12 @@ public interface VehicleBody {
 
     void clearContinuous(String channel);
 
+    /**
+     * Whether the backend is simulating this body right now. Valkyrien Skies keeps ships without nearby players
+     * loaded but frozen; commands sent meanwhile stay queued and apply once simulation resumes.
+     */
+    boolean isSimulated();
+
     /** Backend-specific diagnostics for logs and commands (e.g. physics steps seen). */
     default String diagnostics() {
         return "";

@@ -29,6 +29,16 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
     /** How long a freshly assembled ship may take to load before the creation fails and is cleaned up. */
     static final int CREATION_TIMEOUT_TICKS = 100;
 
+    /** Server ticks a ship's shipyard chunks must have been loaded before queued commands are released. */
+    static final int RESUME_STREAK_TICKS = 10;
+
+    /** Commands held on the server thread while their ship is not being simulated, by ship id. */
+    private final Map<Long, java.util.ArrayDeque<PhysicsCommand>> held = new java.util.HashMap<>();
+    /** Consecutive server ticks each tracked ship has had all of its shipyard chunks loaded. */
+    private final Map<Long, Integer> tickingStreak = new java.util.HashMap<>();
+
+    private MinecraftServer lastServer;
+
     /** Pending and recently finished creations by ship id. */
     private final Map<Long, Pending> creations = new ConcurrentHashMap<>();
 
@@ -64,12 +74,12 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
         return result;
     }
 
-    private static Optional<VehicleBody> wrap(LoadedServerShip ship, String dimension) {
+    private Optional<VehicleBody> wrap(LoadedServerShip ship, String dimension) {
         if (!ship.getChunkClaimDimension().equals(dimension)) {
             return Optional.empty();
         }
         VehicleControlAttachment control = ship.getAttachment(VehicleControlAttachment.class);
-        return control == null ? Optional.empty() : Optional.of(new VsVehicleBody(ship, control));
+        return control == null ? Optional.empty() : Optional.of(new VsVehicleBody(ship, control, this));
     }
 
     /**
@@ -144,8 +154,69 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
         }
     }
 
+    /**
+     * True if VS is simulating the ship now. This VS port keeps ships without nearby players (and without
+     * keep-active) in memory but holds them still, ignoring forces, while their shipyard chunks are not loaded.
+     * That state is not exposed through the VS API, so it is derived from those chunks, with a short streak to
+     * cover VS resuming a tick later.
+     */
+    boolean isSimulated(LoadedServerShip ship, VehicleControlAttachment control) {
+        return this.tickingStreak.getOrDefault(ship.getId(), 0) >= RESUME_STREAK_TICKS && control.isStepping();
+    }
+
+    /** Server thread: queue a command, holding it while the ship is not simulated. */
+    boolean submit(LoadedServerShip ship, VehicleControlAttachment control, PhysicsCommand command) {
+        java.util.ArrayDeque<PhysicsCommand> waiting = this.held.get(ship.getId());
+        if (waiting == null && this.isSimulated(ship, control)) {
+            return control.enqueue(command);
+        }
+        if (waiting == null) {
+            waiting = new java.util.ArrayDeque<>();
+            this.held.put(ship.getId(), waiting);
+        }
+        if (waiting.size() >= VehicleControlAttachment.MAX_QUEUED) {
+            return false;
+        }
+        waiting.add(command);
+        return true;
+    }
+
+    int heldCount(long id) {
+        java.util.ArrayDeque<PhysicsCommand> waiting = this.held.get(id);
+        return waiting == null ? 0 : waiting.size();
+    }
+
+    int tickingStreak(long id) {
+        return this.tickingStreak.getOrDefault(id, 0);
+    }
+
+    String voxelChunksOf(LoadedServerShip ship) {
+        return this.lastServer == null ? "?" : this.voxelChunks(this.lastServer, ship);
+    }
+
+    /** Diagnostics: "loaded/entity-ticking/total" shipyard (voxel) chunks of the ship. */
+    String voxelChunks(MinecraftServer server, LoadedServerShip ship) {
+        ServerWorld world = worldOf(server, ship);
+        if (world == null) {
+            return "?";
+        }
+        int[] counts = new int[3];
+        ship.getActiveChunksSet().forEach((x, z) -> {
+            counts[2]++;
+            if (world.getChunkManager().isChunkLoaded(x, z)) {
+                counts[0]++;
+            }
+            if (world.shouldTickEntityAt(new BlockPos(x << 4, 0, z << 4))) {
+                counts[1]++;
+            }
+        });
+        return counts[0] + "/" + counts[1] + "/" + counts[2];
+    }
+
     @Override
     public void tick(MinecraftServer server) {
+        this.lastServer = server;
+        this.updateActivity(server);
         if (this.creations.isEmpty()) {
             return;
         }
@@ -170,6 +241,54 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
                 this.cleanUpFailedCreation(server, id, entry.getValue());
             }
         }
+    }
+
+    /** Tracks which of our ships sit in entity-ticking chunks and releases held commands once they do. */
+    private void updateActivity(MinecraftServer server) {
+        Set<Long> seen = new java.util.HashSet<>();
+        for (LoadedServerShip ship : ValkyrienSkies.api().getServerShipWorld(server).getLoadedShips()) {
+            VehicleControlAttachment control = ship.getAttachment(VehicleControlAttachment.class);
+            if (control == null) {
+                continue;
+            }
+            seen.add(ship.getId());
+            ServerWorld world = worldOf(server, ship);
+            boolean ready = world != null && allVoxelChunksLoaded(world, ship);
+            this.tickingStreak.put(ship.getId(), ready ? this.tickingStreak.getOrDefault(ship.getId(), 0) + 1 : 0);
+            java.util.ArrayDeque<PhysicsCommand> waiting = this.held.get(ship.getId());
+            if (waiting != null && this.isSimulated(ship, control)) {
+                PhysicsCommand command;
+                while ((command = waiting.peek()) != null && control.enqueue(command)) {
+                    waiting.poll();
+                }
+                if (waiting.isEmpty()) {
+                    this.held.remove(ship.getId());
+                }
+            }
+        }
+        this.tickingStreak.keySet().retainAll(seen);
+        this.held.keySet().removeIf(id -> !seen.contains(id) && !this.creations.containsKey(id));
+    }
+
+    /** VS only simulates a ship whose shipyard (voxel) chunks are loaded; otherwise it holds it in place. */
+    private static boolean allVoxelChunksLoaded(ServerWorld world, LoadedServerShip ship) {
+        boolean[] all = {ship.getActiveChunksSet().getSize() > 0};
+        ship.getActiveChunksSet().forEach((x, z) -> {
+            if (!world.getChunkManager().isChunkLoaded(x, z)) {
+                all[0] = false;
+            }
+        });
+        return all[0];
+    }
+
+    private static ServerWorld worldOf(MinecraftServer server, LoadedServerShip ship) {
+        String dimension = ship.getChunkClaimDimension();
+        for (ServerWorld world : server.getWorlds()) {
+            if (ValkyrienSkies.api().getDimensionId(world).equals(dimension)) {
+                return world;
+            }
+        }
+        return null;
     }
 
     private void cleanUpFailedCreation(MinecraftServer server, long id, Pending pending) {
@@ -200,6 +319,8 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
         }
         VsVehicleBody vsBody = (VsVehicleBody) body.get();
         vsBody.control().clearAll();
+        this.held.remove(id);
+        this.tickingStreak.remove(id);
         this.creations.remove(id);
         // deleteBlocks = true removes the hull from the shipyard; dropBlocks = false spawns no items.
         ShipAssembler.INSTANCE.deleteShip(world, vsBody.ship(), true, false);
@@ -210,5 +331,8 @@ final class VsVehicleBackend implements VehiclePhysicsBackend {
     @Override
     public void clear() {
         this.creations.clear();
+        this.held.clear();
+        this.tickingStreak.clear();
+        this.lastServer = null;
     }
 }

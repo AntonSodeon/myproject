@@ -13,10 +13,16 @@ import ru.monolith.arsenal.physics.VehicleBody;
 final class VsVehicleBody implements VehicleBody {
     private final LoadedServerShip ship;
     private final VehicleControlAttachment control;
+    private final VsVehicleBackend backend;
 
-    VsVehicleBody(LoadedServerShip ship, VehicleControlAttachment control) {
+    VsVehicleBody(LoadedServerShip ship, VehicleControlAttachment control, VsVehicleBackend backend) {
         this.ship = ship;
         this.control = control;
+        this.backend = backend;
+    }
+
+    private boolean submit(PhysicsCommand command) {
+        return this.backend.submit(this.ship, this.control, command);
     }
 
     @Override
@@ -65,34 +71,34 @@ final class VsVehicleBody implements VehicleBody {
 
     @Override
     public boolean applyImpulse(Vec3d impulse) {
-        return this.control.enqueue(new PhysicsCommand.Impulse(PhysicsCommand.V3.of(impulse), PhysicsCommand.V3.ZERO, null));
+        return this.submit(new PhysicsCommand.Impulse(PhysicsCommand.V3.of(impulse), PhysicsCommand.V3.ZERO, null));
     }
 
     @Override
     public boolean applyImpulseAt(Vec3d impulse, Vec3d worldPosition) {
-        return this.control.enqueue(new PhysicsCommand.Impulse(PhysicsCommand.V3.of(impulse), PhysicsCommand.V3.ZERO,
+        return this.submit(new PhysicsCommand.Impulse(PhysicsCommand.V3.of(impulse), PhysicsCommand.V3.ZERO,
                 PhysicsCommand.V3.of(this.worldToLocal(worldPosition))));
     }
 
     @Override
     public boolean applyAngularImpulse(Vec3d angularImpulse) {
-        return this.control.enqueue(new PhysicsCommand.Impulse(PhysicsCommand.V3.ZERO, PhysicsCommand.V3.of(angularImpulse), null));
+        return this.submit(new PhysicsCommand.Impulse(PhysicsCommand.V3.ZERO, PhysicsCommand.V3.of(angularImpulse), null));
     }
 
     @Override
     public boolean applyForce(Vec3d force, double seconds) {
-        return this.control.enqueue(new PhysicsCommand.Timed(PhysicsCommand.V3.of(force), PhysicsCommand.V3.ZERO, null, seconds));
+        return this.submit(new PhysicsCommand.Timed(PhysicsCommand.V3.of(force), PhysicsCommand.V3.ZERO, null, seconds));
     }
 
     @Override
     public boolean applyForceAt(Vec3d force, Vec3d worldPosition, double seconds) {
-        return this.control.enqueue(new PhysicsCommand.Timed(PhysicsCommand.V3.of(force), PhysicsCommand.V3.ZERO,
+        return this.submit(new PhysicsCommand.Timed(PhysicsCommand.V3.of(force), PhysicsCommand.V3.ZERO,
                 PhysicsCommand.V3.of(this.worldToLocal(worldPosition)), seconds));
     }
 
     @Override
     public boolean applyTorque(Vec3d torque, double seconds) {
-        return this.control.enqueue(new PhysicsCommand.Timed(PhysicsCommand.V3.ZERO, PhysicsCommand.V3.of(torque), null, seconds));
+        return this.submit(new PhysicsCommand.Timed(PhysicsCommand.V3.ZERO, PhysicsCommand.V3.of(torque), null, seconds));
     }
 
     @Override
@@ -107,7 +113,15 @@ final class VsVehicleBody implements VehicleBody {
 
     @Override
     public String diagnostics() {
-        return String.format(java.util.Locale.ROOT, "physicsSteps=%d lastDt=%.5f", this.control.physicsSteps(), this.control.lastDelta());
+        return String.format(java.util.Locale.ROOT, "voxelChunks(loaded/ticking/total)=%s physicsSteps=%d staticSteps=%d sleeping=%s lastDt=%.5f tickingStreak=%d held=%d queued=%d simulated=%s",
+                this.backend.voxelChunksOf(this.ship), this.control.physicsSteps(), this.control.staticSteps(), this.control.lastSleeping(), this.control.lastDelta(),
+                this.backend.tickingStreak(this.ship.getId()), this.backend.heldCount(this.ship.getId()),
+                this.control.queuedCommands(), this.isSimulated());
+    }
+
+    @Override
+    public boolean isSimulated() {
+        return this.backend.isSimulated(this.ship, this.control);
     }
 
     LoadedServerShip ship() {

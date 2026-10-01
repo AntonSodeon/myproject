@@ -202,21 +202,63 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         // (ShipActivationManager); commands sent meanwhile must wait in the queue, not be lost or repeated.
         Vec3d before = server.computeOnServer(s -> body(s, id).position());
         server.runCommand("tp @a 12000 -50 12000");
-        context.waitTicks(100);
+        for (int i = 0; i < 5; i++) {
+            context.waitTicks(20);
+            LOGGER.info("[gametest] away t={}s: {}", i + 1, server.computeOnServer(s -> body(s, id).diagnostics()));
+        }
         Vec3d away1 = server.computeOnServer(s -> body(s, id).position());
         server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
-        context.waitTicks(100);
+        for (int i = 0; i < 5; i++) {
+            context.waitTicks(20);
+            LOGGER.info("[gametest] away+impulse t={}s: {}", i + 1, server.computeOnServer(s -> body(s, id).diagnostics()));
+        }
         Vec3d away2 = server.computeOnServer(s -> body(s, id).position());
-        LOGGER.info("[gametest] player away: body {} -> {} -> {} (impulse queued while away)", before, away1, away2);
+        LOGGER.info("[gametest] player away: body {} -> {} -> {} (impulse queued while away); {}", before, away1, away2,
+                server.computeOnServer(s -> body(s, id).diagnostics()));
         check(away2.distanceTo(away1) < 0.01, "without players nearby the body must not be simulated, moved " + away2.distanceTo(away1));
 
         server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 15", rest.x - 8, rest.y + 1, rest.z));
+        int resumeWait = 0;
         double peak = away2.y;
-        for (int i = 0; i < 160; i++) {
+        while (!server.computeOnServer(s -> body(s, id).isSimulated()) && resumeWait < 600) {
             context.waitTicks(1);
+            resumeWait++;
+            peak = Math.max(peak, server.computeOnServer(s -> body(s, id).position().y));
+        }
+        LOGGER.info("[gametest] player back: simulation resumed after {} ticks; {}", resumeWait,
+                server.computeOnServer(s -> body(s, id).diagnostics()));
+        for (int i = 0; i < 4; i++) {
+            context.waitTicks(20);
+            LOGGER.info("[gametest] back t={}s: y={} {}", i + 1, server.computeOnServer(s -> body(s, id).position().y),
+                    server.computeOnServer(s -> body(s, id).diagnostics()));
+        }
+        check(resumeWait < 600, "simulation must resume after the player returns");
+        for (int i = 0; i < 40; i++) {
+            context.waitTicks(4);
             peak = Math.max(peak, server.computeOnServer(s -> body(s, id).position().y));
         }
         double rise = peak - away2.y;
+        // Characterise: does the body react to a fresh impulse 10 s after the player returned?
+        context.waitTicks(200);
+        double yA = server.computeOnServer(s -> body(s, id).position().y);
+        server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
+        double peakA = yA;
+        for (int i = 0; i < 20; i++) {
+            context.waitTicks(2);
+            peakA = Math.max(peakA, server.computeOnServer(s -> body(s, id).position().y));
+        }
+        LOGGER.info("[gametest] probe: fresh impulse 10 s after return lifted the body by {}", peakA - yA);
+        server.runCommand("vs set-keep-active @v[id=" + id + "] true");
+        context.waitTicks(40);
+        double yB = server.computeOnServer(s -> body(s, id).position().y);
+        server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
+        double peakB = yB;
+        for (int i = 0; i < 20; i++) {
+            context.waitTicks(2);
+            peakB = Math.max(peakB, server.computeOnServer(s -> body(s, id).position().y));
+        }
+        LOGGER.info("[gametest] probe: impulse after keep-active toggle lifted the body by {}", peakB - yB);
+        server.runCommand("vs set-keep-active @v[id=" + id + "] false");
         double yBack = server.computeOnServer(s -> body(s, id).position().y);
         LOGGER.info("[gametest] player back: deferred impulse lifted the body by {} blocks, now y={}", rise, yBack);
         check(rise > 1.0 && rise < 3.0, "the impulse queued while away must apply exactly once after return (expected rise ~1.8, got " + rise + ")");

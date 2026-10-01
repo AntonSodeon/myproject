@@ -37,6 +37,11 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
     private final transient AtomicInteger physicsSteps = new AtomicInteger();
     /** Length of the last physics step in seconds, for diagnostics. */
     private transient volatile double lastDelta;
+    /** System.nanoTime() of the last physics step, and whether VS had the ship static then. */
+    private transient volatile long lastStepNanos;
+    private transient volatile boolean lastStatic;
+    private transient volatile boolean lastSleeping;
+    private final transient AtomicInteger staticSteps = new AtomicInteger();
 
     record Continuous(PhysicsCommand.V3 force, PhysicsCommand.V3 torque) {
     }
@@ -92,6 +97,23 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
         return this.lastDelta;
     }
 
+    int staticSteps() {
+        return this.staticSteps.get();
+    }
+
+    boolean lastSleeping() {
+        return this.lastSleeping;
+    }
+
+    int queuedCommands() {
+        return this.queued.get();
+    }
+
+    /** True if VS ran a physics step for this ship within the last half second and the ship is not static. */
+    boolean isStepping() {
+        return !this.lastStatic && this.lastStepNanos != 0 && System.nanoTime() - this.lastStepNanos < 500_000_000L;
+    }
+
     @Override
     public void physTick(PhysShip ship, PhysLevel level) {
         // VS calls the overload with the step length; this one exists only to satisfy the interface.
@@ -101,6 +123,15 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
     public void physTick(PhysShip ship, PhysLevel level, double delta) {
         this.physicsSteps.incrementAndGet();
         this.lastDelta = delta;
+        this.lastStepNanos = System.nanoTime();
+        this.lastStatic = ship.isStatic();
+        this.lastSleeping = ship.isSleeping();
+        if (this.lastStatic) {
+            // VS silently drops forces on static ships (PhysShipImpl.canApplyWrenches), e.g. while the ship is frozen
+            // without nearby players. Keep commands queued until it is dynamic again instead of losing them.
+            this.staticSteps.incrementAndGet();
+            return;
+        }
         if (delta <= 0.0) {
             return;
         }
