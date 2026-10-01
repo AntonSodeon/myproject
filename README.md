@@ -4,7 +4,8 @@ Fabric mod for Minecraft **1.21.11** (Java 21). Mod ID: `monolith_arsenal`. Curr
 
 The repository also contains **Monolith Skies** (`monolith-skies/`, mod ID `monolith_skies`): our own ship
 physics module. It replaces Valkyrien Skies, which has no official build for Minecraft 1.21.11.
-Monolith Skies is nested into the Monolith Arsenal jar (Jar-in-Jar), so it doesn't need to be installed separately.
+The release jar is **self-contained**: Fabric API, GeckoLib, Player Animation Library and Monolith Skies are
+nested into it with Fabric Loom Jar-in-Jar (`META-INF/jars/`), so the player puts **one file** into `mods`.
 
 ## Building
 
@@ -16,7 +17,7 @@ Output:
 
 | File | Contents |
 |---|---|
-| `build/libs/monolith-arsenal-0.1.12.jar` | the mod (Monolith Skies nested in `META-INF/jars/`) |
+| `build/libs/monolith-arsenal-0.1.12.jar` | the mod with all libraries nested (`META-INF/jars/`) |
 | `monolith-skies/build/libs/monolith-skies-0.1.0.jar` | Monolith Skies as a standalone mod (for other modpacks) |
 
 Development runs: `./gradlew runClient`, `./gradlew runServer`.
@@ -25,14 +26,18 @@ Automated in-game checks: `./gradlew runClientGameTest` (needs a display; on a h
 
 ## Dependencies
 
-| Library | Version | Maven coordinates | Repository | In the player's `mods` folder |
+| Library | Version | Maven coordinates | Repository | How it ships |
 |---|---|---|---|---|
 | Fabric Loader | 0.19.2 | `net.fabricmc:fabric-loader:0.19.2` | https://maven.fabricmc.net/ | installed by the Fabric installer |
-| Fabric API | 0.141.6+1.21.11 | `net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11` | https://maven.fabricmc.net/ | yes, separate jar |
-| GeckoLib | 5.4.5 | `software.bernie.geckolib:geckolib-fabric-1.21.11:5.4.5` | https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/ | yes, separate jar |
-| Player Animation Library | 1.1.7+mc.1.21.11 | `com.zigythebird.playeranim:PlayerAnimationLibFabric:1.1.7+mc.1.21.11` | https://repo.redlance.org/public/ | yes, separate jar |
-| Monolith Skies | 0.1.0 | Gradle subproject `:monolith-skies` | this repository | no, nested in the arsenal jar |
+| Fabric API | 0.141.6+1.21.11 | `net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11` | https://maven.fabricmc.net/ | nested in the jar (Jar-in-Jar) |
+| GeckoLib | 5.4.5 | `software.bernie.geckolib:geckolib-fabric-1.21.11:5.4.5` | https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/ | nested in the jar (Jar-in-Jar) |
+| Player Animation Library | 1.1.7+mc.1.21.11 | `com.zigythebird.playeranim:PlayerAnimationLibFabric:1.1.7+mc.1.21.11` | https://repo.redlance.org/public/ | nested in the jar (Jar-in-Jar) |
+| Monolith Skies | 0.1.0 | Gradle subproject `:monolith-skies` | this repository | nested in the jar (Jar-in-Jar) |
 | Yarn mappings | 1.21.11+build.6 | `net.fabricmc:yarn:1.21.11+build.6:v2` | https://maven.fabricmc.net/ | build only |
+
+Nested libraries keep their own `fabric.mod.json`, mixins and access wideners. If a player also installs
+one of them separately, Fabric Loader loads a single copy (the newest), with no conflict.
+Licences allow redistribution: Fabric API is Apache-2.0, GeckoLib and Player Animation Library are MIT; their licence files stay inside the nested jars.
 
 Valkyrien Skies and Architectury API aren't required anymore. If an external Valkyrien Skies is installed anyway,
 `ValkyrienSkiesCompat` detects it at runtime and logs its version.

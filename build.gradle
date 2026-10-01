@@ -60,10 +60,12 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // External mods: required in the player's mods folder, not bundled.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
-    modImplementation "com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_anim_version}"
+    // Bundled libraries: nested into the release jar via Jar-in-Jar, so only one file goes into mods.
+    // Each keeps its own fabric.mod.json, mixins and access wideners; Fabric Loader picks the newest
+    // copy if the player also installs one of them separately.
+    modImplementation include("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
+    modImplementation include("software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}")
+    modImplementation include("com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_anim_version}")
 
     // Monolith Skies: our own ship physics module, nested into the release jar (Jar-in-Jar).
     implementation project(path: ':monolith-skies', configuration: 'namedElements')
