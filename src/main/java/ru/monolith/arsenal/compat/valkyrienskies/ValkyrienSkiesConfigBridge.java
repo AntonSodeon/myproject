@@ -19,6 +19,7 @@ import ru.monolith.arsenal.MonolithArsenal;
 public final class ValkyrienSkiesConfigBridge {
     private static final String MOD_ID = "valkyrienskies";
     private static final String LEGACY_API = "fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry";
+    private static final String CURRENT_API = "fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry";
     private static boolean applied;
 
     private ValkyrienSkiesConfigBridge() {
@@ -36,32 +37,57 @@ public final class ValkyrienSkiesConfigBridge {
         } catch (ClassNotFoundException expected) {
             // The case this bridge exists for.
         }
-
-        // Listen first: STARTUP configs are loaded inside register(), so a listener added afterwards misses them.
-        ModConfigEvents.loading(MOD_ID).register(ValkyrienSkiesConfigBridge::applyLoadedConfig);
-        ModConfigEvents.reloading(MOD_ID).register(ValkyrienSkiesConfigBridge::applyLoadedConfig);
-        VSConfigUpdater updater = VSConfigUpdater.INSTANCE;
-        ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.STARTUP, (IConfigSpec) updater.getCORE_SERVER_SPEC(), "valkyrienskies-core-server.toml");
-        ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.SERVER, (IConfigSpec) updater.getSERVER_SPEC(), "valkyrienskies-server.toml");
-        ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, (IConfigSpec) updater.getCOMMON_SPEC(), "valkyrienskies-common.toml");
-        ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.CLIENT, (IConfigSpec) updater.getCLIENT_SPEC(), "valkyrienskies-client.toml");
-        MonolithArsenal.LOGGER.info("Valkyrien Skies TOML configs registered through Forge Config API Port v5 (compatibility bridge)");
+        if (!isPresent(CURRENT_API)) {
+            MonolithArsenal.LOGGER.warn("Forge Config API Port is not available; Valkyrien Skies keeps its default config values");
+            return;
+        }
+        V5.register();
     }
 
-    /** Same as VS's own handler: push the loaded TOML values into the VS config objects. */
-    private static void applyLoadedConfig(ModConfig config) {
-        if (!(config.getSpec() instanceof ModConfigSpec spec)) {
-            return;
+    private static boolean isPresent(String className) {
+        try {
+            Class.forName(className, false, ValkyrienSkiesConfigBridge.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
         }
-        var loaded = config.getLoadedConfig();
-        if (loaded == null) {
-            return;
+    }
+
+    /**
+     * Everything that touches Forge Config API Port / NeoForge config classes. A separate class, so those classes
+     * are only resolved after {@link #apply()} has checked that FCAP is installed.
+     */
+    private static final class V5 {
+        private V5() {
         }
-        CommentedConfig values = loaded.config();
-        if (values == null) {
-            return;
+
+        static void register() {
+            // Listen first: STARTUP configs are loaded inside register(), so a listener added afterwards misses them.
+            ModConfigEvents.loading(MOD_ID).register(V5::applyLoadedConfig);
+            ModConfigEvents.reloading(MOD_ID).register(V5::applyLoadedConfig);
+            VSConfigUpdater updater = VSConfigUpdater.INSTANCE;
+            ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.STARTUP, (IConfigSpec) updater.getCORE_SERVER_SPEC(), "valkyrienskies-core-server.toml");
+            ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.SERVER, (IConfigSpec) updater.getSERVER_SPEC(), "valkyrienskies-server.toml");
+            ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, (IConfigSpec) updater.getCOMMON_SPEC(), "valkyrienskies-common.toml");
+            ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.CLIENT, (IConfigSpec) updater.getCLIENT_SPEC(), "valkyrienskies-client.toml");
+            MonolithArsenal.LOGGER.info("Valkyrien Skies TOML configs registered through Forge Config API Port v5 (compatibility bridge)");
         }
-        VSConfigUpdater.INSTANCE.applyFromConfigLoad(spec, key -> values.get(key));
-        MonolithArsenal.LOGGER.info("Applied Valkyrien Skies config {}", config.getFileName());
+
+        /** Same as VS's own handler: push the loaded TOML values into the VS config objects. */
+        private static void applyLoadedConfig(ModConfig config) {
+            if (!(config.getSpec() instanceof ModConfigSpec spec)) {
+                return;
+            }
+            var loaded = config.getLoadedConfig();
+            if (loaded == null) {
+                return;
+            }
+            CommentedConfig values = loaded.config();
+            if (values == null) {
+                return;
+            }
+            VSConfigUpdater.INSTANCE.applyFromConfigLoad(spec, key -> values.get(key));
+            MonolithArsenal.LOGGER.info("Applied Valkyrien Skies config {}", config.getFileName());
+        }
     }
 }

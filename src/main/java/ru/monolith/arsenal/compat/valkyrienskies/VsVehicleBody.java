@@ -105,6 +105,11 @@ final class VsVehicleBody implements VehicleBody {
         this.control.setContinuous(channel, new VehicleControlAttachment.Continuous(PhysicsCommand.V3.ZERO, PhysicsCommand.V3.ZERO));
     }
 
+    @Override
+    public String diagnostics() {
+        return String.format(java.util.Locale.ROOT, "physicsSteps=%d lastDt=%.5f", this.control.physicsSteps(), this.control.lastDelta());
+    }
+
     LoadedServerShip ship() {
         return this.ship;
     }

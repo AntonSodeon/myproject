@@ -66,4 +66,9 @@ public interface VehicleBody {
     void setContinuous(String channel, Vec3d force, Vec3d torque);
 
     void clearContinuous(String channel);
+
+    /** Backend-specific diagnostics for logs and commands (e.g. physics steps seen). */
+    default String diagnostics() {
+        return "";
+    }
 }

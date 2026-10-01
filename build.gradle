@@ -86,6 +86,11 @@ dependencies {
     // bridge (see ValkyrienSkiesConfigBridge). At runtime the copies nested in VS are used.
     modCompileOnly "maven.modrinth:forge-config-api-port:${project.forge_config_api_port_modrinth_version}"
     compileOnly "com.electronwill.night-config:core:3.8.3"
+    // Loom does not load the jars nested inside VS in dev runs; this makes runClient/runServer/gametests match a
+    // real install (where VS brings FCAP 21.11.1). Not part of the published dependencies.
+    modLocalRuntime "maven.modrinth:forge-config-api-port:${project.forge_config_api_port_modrinth_version}"
+    localRuntime "com.electronwill.night-config:core:3.8.3"
+    localRuntime "com.electronwill.night-config:toml:3.8.3"
 }
 
 processResources {

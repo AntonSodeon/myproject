@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import ru.monolith.arsenal.client.TestWeaponPose;
-import ru.monolith.arsenal.physics.ScheduledForces;
+import ru.monolith.arsenal.physics.BodyCreation;
 import ru.monolith.arsenal.physics.VehicleBody;
 import ru.monolith.arsenal.physics.VehiclePhysics;
 import ru.monolith.arsenal.registry.EntityRegistry;
@@ -54,8 +54,24 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             long animated = reopened.getServer().computeOnServer(server -> count(server, EntityRegistry.ANIMATED_TEST.getTranslationKey()));
             check(animated == 0, "killed animated_test must not come back after reload, found " + animated);
             long id = bodyId;
+            int wait = 0;
+            while (!reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent()) && wait < 200) {
+                context.waitTicks(5);
+                wait += 5;
+            }
             boolean present = reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent());
             check(present, "the physics body must be saved with the world");
+            double y0 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
+            context.waitTicks(100);
+            double y1 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
+            check(Math.abs(y1 - y0) < 0.5 && y1 > -61.0, "restored body must stay on the ground with a player nearby: y " + y0 + " -> " + y1);
+            double m = reopened.getServer().computeOnServer(server -> body(server, id).mass());
+            double v0 = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().y);
+            reopened.getServer().runOnServer(server -> body(server, id).applyImpulse(new Vec3d(0.0, m * 6.0, 0.0)));
+            context.waitTicks(2);
+            double dv = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().y) - v0;
+            check(dv > 3.0 && dv < 6.3, "impulse after world reload is applied once: dvy=" + dv);
+            context.waitTicks(80);
             context.takeScreenshot("12_after_reload");
             boolean removed = reopened.getServer().computeOnServer(server -> VehiclePhysics.backend().remove(server.getOverworld(), id));
             context.waitTicks(10);
@@ -125,10 +141,19 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         var server = singleplayer.getServer();
         check(server.computeOnServer(s -> VehiclePhysics.backend().isAvailable()), "Valkyrien Skies backend must be available");
         server.runCommand("fill 10 -61 -12 40 -61 22 minecraft:stone");
-        long id = server.computeOnServer(s -> VehiclePhysics.backend()
-                .createTestBody(s.getOverworld(), new BlockPos(20, -50, 5)).orElseThrow());
-        LOGGER.info("[gametest] created Valkyrien Skies test body {}", id);
+        server.runCommand("fill 34 -60 -6 34 -52 16 minecraft:obsidian");
         server.runCommand("tp @a 14 -59 5 -90 15");
+        context.waitTicks(20);
+
+        BodyCreation creation = server.computeOnServer(s -> VehiclePhysics.backend().createTestBody(s.getOverworld(), new BlockPos(20, -50, 5)));
+        long id = creation.id();
+        int waited = 0;
+        while (server.computeOnServer(s -> creation.state()) == BodyCreation.State.PENDING && waited < 120) {
+            context.waitTicks(1);
+            waited++;
+        }
+        check(creation.state() == BodyCreation.State.READY, "creation must become READY, got " + creation.state() + " after " + waited + " ticks");
+        // No keep-active here: the player is next to the body, which is how VS normally simulates ships.
         context.waitTicks(100);
 
         Vec3d landed = server.computeOnServer(s -> body(s, id).position());
@@ -139,7 +164,7 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         context.takeScreenshot("08_vs_body_landed");
 
         double mass = server.computeOnServer(s -> body(s, id).mass());
-        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(mass * 8.0, 0.0, 0.0), Vec3d.ZERO, 20));
+        server.runOnServer(s -> body(s, id).applyForce(new Vec3d(mass * 8.0, 0.0, 0.0), 1.0));
         context.waitTicks(10);
         double vx = server.computeOnServer(s -> body(s, id).linearVelocity().x);
         check(vx > 1.0, "force must accelerate the body next to the player, vx=" + vx);
@@ -150,29 +175,58 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         check(moved.x - landed.x > 1.0, "body must have moved along +X, dx=" + (moved.x - landed.x));
         check(clientMoved != null && clientMoved.distanceTo(moved) < 0.5,
                 "client copy must follow the moving body: client " + clientMoved + ", server " + moved);
+        context.waitTicks(60);
 
-        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(0.0, mass * 14.0, 0.0), Vec3d.ZERO, 25));
-        context.waitTicks(10);
-        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, Vec3d.ZERO, new Vec3d(mass * 5.0, 0.0, mass * 5.0), 8));
-        context.waitTicks(12);
+        server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 9.0, 0.0)));
+        context.waitTicks(3);
+        server.runOnServer(s -> body(s, id).applyAngularImpulse(new Vec3d(mass * 3.0, 0.0, mass * 3.0)));
+        context.waitTicks(8);
         Vec3d spin = server.computeOnServer(s -> body(s, id).angularVelocity());
-        check(Math.abs(spin.x) > 0.2 && Math.abs(spin.z) > 0.2, "torque must spin the body around X and Z, angVel=" + spin);
+        check(Math.abs(spin.x) > 0.2 && Math.abs(spin.z) > 0.2, "angular impulse must spin the body around X and Z, angVel=" + spin);
         context.takeScreenshot("10_vs_body_rotating");
-        context.waitTicks(120);
+        context.waitTicks(160);
 
-        // Stand on the resting hull and drag it: the player must stay on the deck.
+        // Stand on the resting hull and push it: the player must stay with the deck.
         Vec3d rest = server.computeOnServer(s -> body(s, id).position());
-        server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 30", rest.x, rest.y + 2.5, rest.z));
-        context.waitTicks(30);
+        server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 30", rest.x, rest.y + 2.0, rest.z));
+        context.waitTicks(40);
         double startX = context.computeOnClient(client -> client.player.getX());
-        server.runOnServer(s -> ScheduledForces.add(s.getOverworld(), id, new Vec3d(mass * 4.0, 0.0, 0.0), Vec3d.ZERO, 20));
+        server.runOnServer(s -> body(s, id).applyForce(new Vec3d(mass * 4.0, 0.0, 0.0), 1.0));
         context.waitTicks(50);
         double carried = context.computeOnClient(client -> client.player.getX()) - startX;
         double bodyDx = server.computeOnServer(s -> body(s, id).position().x) - rest.x;
-        LOGGER.info("[gametest] body moved {} blocks, player on deck moved {} blocks", bodyDx, carried);
+        LOGGER.info("[gametest] player on deck: body moved {} blocks, player moved {} blocks", bodyDx, carried);
         context.takeScreenshot("11_player_on_moving_body");
 
+        // Leave the area: VS unloads ships beyond shipUnloadDistance (default 8704 blocks) from every player.
+        server.runCommand("tp @a 12000 -50 12000");
+        int unloadWait = 0;
+        while (server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()) && unloadWait < 400) {
+            context.waitTicks(5);
+            unloadWait += 5;
+        }
+        boolean unloaded = !server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent());
+        LOGGER.info("[gametest] after the player left: body loaded={} (waited {} ticks)", !unloaded, unloadWait);
+        server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 15", rest.x - 8, rest.y + 1, rest.z));
+        int reloadWait = 0;
+        while (!server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()) && reloadWait < 400) {
+            context.waitTicks(5);
+            reloadWait += 5;
+        }
+        check(unloaded, "the body must unload once the player is far away");
+        check(server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()), "the body must load again when the player returns");
+        context.waitTicks(60);
+        double yBack = server.computeOnServer(s -> body(s, id).position().y);
+        check(yBack > -61.0, "reloaded body must not fall through the ground, y=" + yBack);
+        double vy0 = server.computeOnServer(s -> body(s, id).linearVelocity().y);
+        server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
+        context.waitTicks(2);
+        double dvy = server.computeOnServer(s -> body(s, id).linearVelocity().y) - vy0;
+        check(dvy > 3.0 && dvy < 6.3, "exactly one controller after reload: impulse 6 m/s gives dvy=" + dvy);
+        context.waitTicks(80);
+
         server.runCommand("tp @a 30 -55 -8 30 20");
+        context.runOnClient(client -> client.player.getAbilities().flying = true);
         context.waitTicks(20);
         context.takeScreenshot("11b_vs_body_from_side");
         bodyId = id;

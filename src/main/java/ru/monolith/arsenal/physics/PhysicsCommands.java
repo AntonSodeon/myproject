@@ -156,7 +156,7 @@ public final class PhysicsCommands {
         if (body.isEmpty()) {
             return 0;
         }
-        String line = describe(body.get());
+        String line = describe(body.get()) + " " + body.get().diagnostics();
         context.getSource().sendFeedback(() -> Text.literal(line), false);
         return 1;
     }

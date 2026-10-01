@@ -35,6 +35,8 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
     private final transient List<ActiveTimed> active = new ArrayList<>();
     /** Physics steps observed, for diagnostics. */
     private final transient AtomicInteger physicsSteps = new AtomicInteger();
+    /** Length of the last physics step in seconds, for diagnostics. */
+    private transient volatile double lastDelta;
 
     record Continuous(PhysicsCommand.V3 force, PhysicsCommand.V3 torque) {
     }
@@ -86,6 +88,10 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
         return this.physicsSteps.get();
     }
 
+    double lastDelta() {
+        return this.lastDelta;
+    }
+
     @Override
     public void physTick(PhysShip ship, PhysLevel level) {
         // VS calls the overload with the step length; this one exists only to satisfy the interface.
@@ -94,6 +100,7 @@ public final class VehicleControlAttachment implements ShipPhysicsListener {
     @Override
     public void physTick(PhysShip ship, PhysLevel level, double delta) {
         this.physicsSteps.incrementAndGet();
+        this.lastDelta = delta;
         if (delta <= 0.0) {
             return;
         }

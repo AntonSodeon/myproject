@@ -9,7 +9,7 @@
   },
   "depends": {
     "monolith_arsenal": "*",
-    "monolith_skies": "*",
+    "valkyrienskies": "*",
     "fabric-client-gametest-api-v1": "*"
   }
 }
