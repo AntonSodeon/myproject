@@ -61,24 +61,9 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             }
             boolean present = reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent());
             check(present, "the physics body must be saved with the world");
-            for (int i = 0; i < 4; i++) {
-                LOGGER.info("[gametest] reopened t={}s: plain VS ship at {}", i, reopened.getServer().computeOnServer(server ->
-                        ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(server.getOverworld(), plainId)));
-                LOGGER.info("[gametest] reopened t={}s: y={} {}", i, reopened.getServer().computeOnServer(server -> body(server, id).position().y),
-                        reopened.getServer().computeOnServer(server -> body(server, id).diagnostics()));
-                context.waitTicks(20);
-            }
-            double y0 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
-            context.waitTicks(100);
-            double y1 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
-            String plainAfter = reopened.getServer().computeOnServer(server ->
-                    ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(server.getOverworld(), plainId));
-            // Known VS port defect (2.4.205+0d0017dd8a): after a world reload ships fall through terrain. The plain
-            // VS ship above has none of our code and behaves the same, so this is recorded, not asserted.
-            LOGGER.info("[gametest] KNOWN-VS-DEFECT check: restored body y {} -> {} (stays on ground: {}); plain VS ship now at {}",
-                    y0, y1, Math.abs(y1 - y0) < 0.5 && y1 > -61.0, plainAfter);
+            // Controller restored: an impulse right after loading is applied exactly once (horizontal, so it does
+            // not matter that the body may already be falling, see the known defect below).
             double m = reopened.getServer().computeOnServer(server -> body(server, id).mass());
-            // Horizontal, so the result does not depend on whether the body is resting or falling (see above).
             double v0 = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().x);
             reopened.getServer().runOnServer(server -> body(server, id).applyImpulse(new Vec3d(m * 6.0, 0.0, 0.0)));
             int w = 0;
@@ -88,7 +73,23 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             }
             context.waitTicks(2);
             double dv = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().x) - v0;
-            check(dv > 5.5 && dv < 6.5, "impulse after world reload is applied exactly once: dvx=" + dv + " (expected 6.0)");
+            check(dv > 5.5 && dv < 6.5, "impulse after world reload is applied exactly once: dvx=" + dv + " (expected 6.0, after " + w + " ticks)");
+
+            double y0 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
+            for (int i = 0; i < 4; i++) {
+                LOGGER.info("[gametest] reopened t={}s: plain VS ship at {}; our body y={} {}", i,
+                        reopened.getServer().computeOnServer(server ->
+                                ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(server.getOverworld(), plainId)),
+                        reopened.getServer().computeOnServer(server -> body(server, id).position().y),
+                        reopened.getServer().computeOnServer(server -> body(server, id).diagnostics()));
+                context.waitTicks(20);
+            }
+            double y1 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
+            // Known VS port defect (2.4.205+0d0017dd8a): after a world reload ships fall through terrain. The plain
+            // VS ship above has none of our code and behaves the same, so this is recorded, not asserted.
+            LOGGER.info("[gametest] KNOWN-VS-DEFECT check: restored body y {} -> {} (stays on ground: {}); plain VS ship now at {}",
+                    y0, y1, Math.abs(y1 - y0) < 0.5 && y1 > -61.0, reopened.getServer().computeOnServer(server ->
+                            ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(server.getOverworld(), plainId)));
             context.waitTicks(80);
             context.takeScreenshot("12_after_reload");
             boolean removed = reopened.getServer().computeOnServer(server -> VehiclePhysics.backend().remove(server.getOverworld(), id));
