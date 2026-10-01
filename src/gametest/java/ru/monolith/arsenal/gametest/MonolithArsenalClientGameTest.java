@@ -96,7 +96,7 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             Entity entity = first(server, EntityRegistry.ANIMATED_TEST.getTranslationKey());
             return entity instanceof net.minecraft.entity.LivingEntity living ? living.getHealth() : -1.0F;
         });
-        singleplayer.getServer().runCommand("damage @e[type=monolith_arsenal:animated_test,limit=1] 2 minecraft:player_attack @p");
+        singleplayer.getServer().runCommand("damage @e[type=monolith_arsenal:animated_test,limit=1] 2 minecraft:player_attack by @p");
         context.waitTicks(5);
         float damaged = singleplayer.getServer().computeOnServer(server -> {
             Entity entity = first(server, EntityRegistry.ANIMATED_TEST.getTranslationKey());
@@ -150,7 +150,12 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         check(Math.abs(yaw) > 5.0, "ship must rotate, yaw=" + yaw);
         context.takeScreenshot("10_ship_rotated");
 
-        server.runCommand("tp @a 22 -50 -3 20 35");
+        // Hover outside the pool (creative flight) and look back at the rotated ship.
+        server.runCommand("tp @a 20 -53 -12 0 30");
+        context.runOnClient(client -> {
+            client.player.getAbilities().flying = true;
+            client.player.setVelocity(0.0, 0.0, 0.0);
+        });
         context.waitTicks(20);
         context.takeScreenshot("11_ship_from_side");
     }
