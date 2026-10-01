@@ -12,7 +12,9 @@ public record CaseDef(String id, boolean enabled, String name, List<String> desc
                       AnimationSettings animation, String winMessage,
                       boolean broadcastEnabled, int broadcastMinRarity, String broadcastMessage,
                       double duplicateMultiplier, long duplicateBonus,
-                      List<CaseReward> rewards, double totalWeight) {
+                      List<CaseReward> rewards, double totalWeight,
+                      ru.qw.qwhatcase.world.WorldAnimSettings worldAnimation,
+                      ru.qw.qwhatcase.world.LabelSettings label) {
 
     /** Фактическая вероятность награды в процентах: вес / сумма весов × 100. */
     public double chancePercent(CaseReward reward) {

@@ -52,7 +52,8 @@ public final class PointListener implements Listener {
             plugin.messages().send(player, "cases.disabled");
             return;
         }
-        new CaseContentMenu(plugin, player, point.caseId(), 0).open();
+        plugin.labels().ensure(point);
+        new CaseContentMenu(plugin, player, point.caseId(), 0, ru.qw.qwhatcase.world.OpenContext.block(point)).open();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

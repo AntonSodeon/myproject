@@ -56,6 +56,7 @@ permissions:
       qwhatcase.admin.reload: true
       qwhatcase.admin.migrate: true
       qwhatcase.admin.simulate: true
+      qwhatcase.admin.preview: true
   qwhats.admin:
     description: Старое право PTrap — даёт все административные права QWHatCase
     default: op
@@ -78,4 +79,6 @@ permissions:
   qwhatcase.admin.migrate:
     default: op
   qwhatcase.admin.simulate:
+    default: op
+  qwhatcase.admin.preview:
     default: op

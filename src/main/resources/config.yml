@@ -122,3 +122,70 @@ migration:
   # CONVERT — убирать только предметы шляп, которые уже есть в коллекции;
   # IGNORE  — не трогать старые предметы.
   legacy-items: IMPORT
+
+# ---------------------------------------------------------------------------
+# Открытие кейса через привязанный блок: анимация прямо в мире над блоком.
+# Открытие командой (/cases open) и из обычного меню (/cases) показывается в GUI, как раньше.
+# Любой параметр можно переопределить для конкретного кейса в cases.yml → <кейс>.world-animation.
+# Настройки фиксируются в момент старта: /hatcases reload не меняет уже идущую анимацию.
+world-animation:
+  enabled: true
+  spin-duration-ms: 6000        # длительность прокрутки
+  result-duration-ms: 3000      # показ выигрыша
+  visible-models: 5             # видимых моделей в полосе (нечётное число)
+  scroll-items: 30              # сколько моделей проходит через центр до остановки
+  height: 0.9                   # высота центра полосы над верхней гранью блока
+  spacing: 0.7                  # расстояние между моделями
+  model-scale: 0.6              # масштаб моделей в полосе
+  center-scale: 0.8             # масштаб модели в центральной позиции
+  winner-scale: 1.2             # масштаб выигранной шляпы
+  winner-rise: 0.3              # подъём выигранной шляпы
+  rotation-speed: 120           # градусов в секунду при показе результата
+  deceleration-power: 3.0       # сила замедления: 1 — равномерно, 3 — плавно, 5 — резко в конце
+  slowdown-at: 0.75             # доля прокрутки, после которой звучит звук замедления
+  view-range: 48                # дальность видимости моделей, блоков
+  model-transform: HEAD         # как показывать модель: HEAD (как на голове), FIXED, GUI, GROUND
+  model-yaw-offset: 0           # доворот моделей, если в паке «лицо» шляпы смотрит не туда
+  glow-center: true             # подсветка модели в центре цветом её редкости
+  center-marker: '&e▼'          # метка над центральной позицией ('' — без метки)
+  # Звуки: sound — событие ресурс-пака (minecraft:custom....) или обычный звук Minecraft.
+  # Слышат только игроки рядом с кейсом (дальность ≈ 16 блоков × volume).
+  sounds:
+    start:     {enabled: true, sound: 'minecraft:custom.mystery_crate.open',   volume: 1.0, pitch: 1.0}
+    # Проигрывается при прохождении КАЖДОЙ модели через центр: при замедлении интервалы растут сами.
+    tick:      {enabled: true, sound: 'minecraft:custom.mystery_crate.scroll', volume: 0.6, pitch: 0.9, pitch-end: 1.4}
+    # В паке нет отдельного звука замедления — используется стандартный звук Minecraft.
+    slowdown:  {enabled: true, sound: 'minecraft:block.note_block.bell',       volume: 0.8, pitch: 0.7}
+    # Для редкости с собственным win-sound (config → rarities) используется он.
+    win:       {enabled: true, sound: 'minecraft:custom.mystery_crate.unlock', volume: 1.0, pitch: 1.0}
+    duplicate: {enabled: true, sound: 'minecraft:custom.currency.tokens',      volume: 1.0, pitch: 1.0}
+  # Частицы: type — имя Particle (END_ROD, ENCHANT, DUST, HAPPY_VILLAGER, TOTEM_OF_UNDYING ...).
+  # DUST в результате окрашивается в цвет редкости. Видят только игроки рядом.
+  particles:
+    max-per-tick: 80
+    start:  {enabled: true, type: ENCHANT, count: 40, offset-x: 0.6, offset-y: 0.6, offset-z: 0.6, speed: 0.6}
+    spin:   {enabled: true, type: END_ROD, count: 2,  offset-x: 0.05, offset-y: 0.05, offset-z: 0.05, speed: 0.01}
+    result: {enabled: true, type: DUST,    count: 40, offset-x: 0.5, offset-y: 0.5, offset-z: 0.5, speed: 0.0, size: 1.4}
+  # Подпись результата над выигранной шляпой. {hat} {rarity} {case} {player} {tokens} {balance}
+  result-label:
+    lines: ['&fВы получили: {hat}', '&7Редкость: {rarity}']
+    duplicate-lines: ['&fВыпала: {hat}', '&eУже есть в коллекции', '&7Компенсация: &e{tokens} жетонов']
+    scale: 0.9
+    offset-y: 0.75
+    background: '#80000000'     # #AARRGGBB или default
+    shadow: true
+
+# Постоянная надпись над каждой точкой кейса (TextDisplay, без сторонних плагинов).
+# Переопределяется для кейса в cases.yml → <кейс>.label.
+case-labels:
+  enabled: true
+  height: 0.45                  # над верхней гранью блока
+  lines: ['{case}', '&7ПКМ — открыть кейс']   # {case} — название из cases.yml (с его цветами)
+  scale: 1.0
+  view-range: 32                # блоков
+  background: '#40000000'       # #AARRGGBB (прозрачность — первые две цифры) или default
+  shadow: true
+  see-through: false            # видна сквозь блоки
+  billboard: CENTER             # CENTER — поворачивается к смотрящему; VERTICAL; HORIZONTAL; FIXED
+  line-width: 200
+  raise-during-animation: 0.9   # на сколько поднимать надпись во время открытия

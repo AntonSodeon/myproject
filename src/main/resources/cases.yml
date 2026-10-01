@@ -11,6 +11,8 @@
 #   win-message    сообщение о выигрыше ('' — стандартное из messages.yml).
 #                  Подстановки: {player} {case} {hat} {rarity} {chance} {tokens} {balance} {keys} {operation}
 #   broadcast      объявление всем при выигрыше редкости не ниже min-rarity
+#   world-animation  переопределение config.yml → world-animation для этого кейса (анимация над блоком)
+#   label          переопределение config.yml → case-labels (надпись над блоком)
 #   duplicate      правила компенсации за дубликат: жетоны = компенсация шляпы × multiplier + bonus
 #   rewards        список наград. Каждая строка:
 #                    - hat: <id>       weight: <вес>     — конкретная шляпа
@@ -79,6 +81,16 @@ cases:
       frame: PURPLE_STAINED_GLASS_PANE
       pointer: YELLOW_STAINED_GLASS_PANE
     win-message: ''
+    # Переопределение внешней анимации только для этого кейса (остальное — из config.yml → world-animation).
+    world-animation:
+      spin-duration-ms: 7000
+      visible-models: 7
+      winner-scale: 1.4
+      particles:
+        result: {enabled: true, type: DUST, count: 60, offset-x: 0.6, offset-y: 0.6, offset-z: 0.6, size: 1.6}
+    # Переопределение надписи над блоком.
+    label:
+      lines: ['{case}', '&7ПКМ — открыть кейс', '&8редкие, эпические, легендарные']
     broadcast:
       enabled: true
       min-rarity: epic

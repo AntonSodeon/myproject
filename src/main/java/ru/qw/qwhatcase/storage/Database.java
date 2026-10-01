@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * Каждое изменение — отдельная транзакция: либо применяется целиком, либо откатывается.
  */
 public final class Database implements AutoCloseable {
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     /** Точка внедрения сбоя для тестов: бросает SQLException в заданной стадии транзакции. */
     public interface FaultHook {
@@ -153,6 +153,17 @@ public final class Database implements AutoCloseable {
                 st.execute(sql);
             }
             st.execute("INSERT OR IGNORE INTO meta(k, v) VALUES ('schema_version', '" + SCHEMA_VERSION + "')");
+            // v2: точка кейса в мире, через которую выполнено открытие.
+            boolean hasPoint = false;
+            try (ResultSet rs = st.executeQuery("PRAGMA table_info(openings)")) {
+                while (rs.next()) {
+                    hasPoint |= "point".equals(rs.getString("name"));
+                }
+            }
+            if (!hasPoint) {
+                st.execute("ALTER TABLE openings ADD COLUMN point TEXT");
+            }
+            st.execute("UPDATE meta SET v = '" + SCHEMA_VERSION + "' WHERE k = 'schema_version'");
         }
     }
 
@@ -596,7 +607,7 @@ public final class Database implements AutoCloseable {
                 OpeningResult.Outcome outcome = isNew ? OpeningResult.Outcome.NEW : OpeningResult.Outcome.DUPLICATE;
                 try (PreparedStatement ps = connection.prepareStatement(
                         "INSERT INTO openings(op_id, uuid, case_id, key_type, hat_id, keys_spent, outcome, tokens_awarded, "
-                                + "tokens_balance, keys_balance, created_at, shown) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)")) {
+                                + "tokens_balance, keys_balance, created_at, shown, point) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)")) {
                     ps.setString(1, request.operationId().toString());
                     ps.setString(2, request.player().toString());
                     ps.setString(3, request.caseId());
@@ -608,11 +619,13 @@ public final class Database implements AutoCloseable {
                     ps.setLong(9, tokens);
                     ps.setLong(10, keys);
                     ps.setLong(11, request.createdAt());
+                    ps.setString(12, request.point());
                     ps.executeUpdate();
                 }
                 audit(request.playerName() == null ? request.player().toString() : request.playerName(), request.player(),
                         "case.open", "op=" + request.operationId() + " case=" + request.caseId() + " hat=" + request.hatId()
-                                + " keys=" + request.keyCost() + " outcome=" + outcome + " tokens=" + awarded);
+                                + " keys=" + request.keyCost() + " outcome=" + outcome + " tokens=" + awarded
+                                + (request.point() == null ? "" : " point=" + request.point()));
                 faultHook.at("opening.before-commit");
                 return new OpeningResult(OpeningResult.Status.SUCCESS, request.operationId(), request.caseId(),
                         request.hatId(), outcome, awarded, tokens, keys, request.createdAt());
@@ -672,7 +685,7 @@ public final class Database implements AutoCloseable {
     }
 
     private static final String HISTORY_SELECT = "SELECT op_id, uuid, case_id, hat_id, keys_spent, outcome, tokens_awarded, "
-            + "tokens_balance, created_at, shown FROM openings";
+            + "tokens_balance, created_at, shown, point FROM openings";
 
     private List<HistoryEntry> history(String where, UUID uuid, int limit, int offset) throws SQLException {
         List<HistoryEntry> result = new ArrayList<>();
@@ -691,7 +704,8 @@ public final class Database implements AutoCloseable {
 
     private static HistoryEntry readHistory(ResultSet rs) throws SQLException {
         return new HistoryEntry(UUID.fromString(rs.getString(1)), UUID.fromString(rs.getString(2)), rs.getString(3),
-                rs.getString(4), rs.getInt(5), rs.getString(6), rs.getLong(7), rs.getLong(8), rs.getLong(9), rs.getInt(10) != 0);
+                rs.getString(4), rs.getInt(5), rs.getString(6), rs.getLong(7), rs.getLong(8), rs.getLong(9), rs.getInt(10) != 0,
+                rs.getString(11));
     }
 
     // ---------------------------------------------------------------- каталог за жетоны

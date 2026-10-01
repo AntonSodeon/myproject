@@ -9,6 +9,7 @@ import ru.qw.qwhatcase.service.HatItems;
 import ru.qw.qwhatcase.service.Profile;
 import ru.qw.qwhatcase.util.Format;
 import ru.qw.qwhatcase.util.Placeholders;
+import ru.qw.qwhatcase.world.OpenContext;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,12 +20,19 @@ public final class CaseContentMenu extends Menu {
     private static final int PER_PAGE = 45;
     private final String caseId;
     private final int page;
+    private final OpenContext context;
 
     public CaseContentMenu(QWHatCasePlugin plugin, Player viewer, String caseId, int page) {
+        this(plugin, viewer, caseId, page, OpenContext.MENU);
+    }
+
+    /** @param context откуда открыто меню; для блока содержит точку, над которой пойдёт анимация */
+    public CaseContentMenu(QWHatCasePlugin plugin, Player viewer, String caseId, int page, OpenContext context) {
         super(plugin, viewer, 6, plugin.messages().raw("menu.content.title", Placeholders.of("case",
                 plugin.catalog().caseDef(caseId).map(CaseDef::name).orElse(caseId))));
         this.caseId = caseId;
         this.page = page;
+        this.context = context == null ? OpenContext.MENU : context;
     }
 
     @Override
@@ -70,20 +78,28 @@ public final class CaseContentMenu extends Menu {
                 click -> new CasesMenu(plugin, viewer, 0).open());
         if (current > 0) {
             set(48, button(Material.SPECTRAL_ARROW, "menu.common.prev-name", "menu.common.page-lore", ph),
-                    click -> new CaseContentMenu(plugin, viewer, caseId, current - 1).open());
+                    click -> new CaseContentMenu(plugin, viewer, caseId, current - 1, context).open());
         }
         set(49, HatItems.button(def.iconMaterial(), Material.CHEST, def.iconItemModel(), def.iconCustomModelData(),
                 def.name(), concat(def.description(), msg().lines("menu.content.info-lore", ph)), false));
         if (current + 1 < pages) {
             set(50, button(Material.SPECTRAL_ARROW, "menu.common.next-name", "menu.common.page-lore", ph),
-                    click -> new CaseContentMenu(plugin, viewer, caseId, current + 1).open());
+                    click -> new CaseContentMenu(plugin, viewer, caseId, current + 1, context).open());
         }
         String deny = plugin.openings().denyReason(viewer, def);
+        if (deny == null && context.isBlock()) {
+            deny = plugin.openings().worldDenyReason(viewer, def, context);
+        }
         ph.put("reason", deny == null ? "" : msg().raw(deny, ph));
         set(53, button(deny == null ? Material.LIME_CONCRETE : Material.RED_CONCRETE, "menu.content.open-name",
                 deny == null ? "menu.content.open-lore" : "menu.content.open-denied-lore", ph), click -> {
+            if (context.isBlock()) {
+                // Меню закроется только после успешного сохранения результата.
+                plugin.openings().open(viewer, def.id(), false, context);
+                return;
+            }
             viewer.closeInventory();
-            plugin.openings().open(viewer, def.id(), click.isShiftClick() && plugin.catalog().settings().allowSkipAnimation());
+            plugin.openings().open(viewer, def.id(), click.isShiftClick() && plugin.catalog().settings().allowSkipAnimation(), context);
         });
         if (!plugin.packs().hasModels(viewer)) {
             set(46, button(Material.YELLOW_STAINED_GLASS_PANE, "menu.common.no-pack-name", "menu.common.no-pack-lore", ph));

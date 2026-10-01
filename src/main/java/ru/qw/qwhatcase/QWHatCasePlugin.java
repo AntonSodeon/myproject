@@ -59,6 +59,8 @@ public final class QWHatCasePlugin extends JavaPlugin {
     private PlayerResolver resolver;
     private PlayerCommands commands;
     private ApiImpl api;
+    private ru.qw.qwhatcase.world.CaseLabelService labels;
+    private ru.qw.qwhatcase.world.WorldAnimationService worldAnimations;
     private ru.qw.qwhatcase.service.ChatInput chatInput;
     private BukkitTask announcement;
 
@@ -100,6 +102,8 @@ public final class QWHatCasePlugin extends JavaPlugin {
         resolver = new PlayerResolver(this);
         commands = new PlayerCommands(this);
         api = new ApiImpl(this);
+        labels = new ru.qw.qwhatcase.world.CaseLabelService(this);
+        worldAnimations = new ru.qw.qwhatcase.world.WorldAnimationService(this);
         chatInput = new ru.qw.qwhatcase.service.ChatInput(this);
 
         try {
@@ -115,6 +119,14 @@ public final class QWHatCasePlugin extends JavaPlugin {
         pm.registerEvents(new PointListener(this), this);
         pm.registerEvents(new PackListener(this), this);
         pm.registerEvents(chatInput, this);
+        pm.registerEvents(labels, this);
+        pm.registerEvents(worldAnimations, this);
+        // Остатки после аварийного перезапуска или /reload: удаляем только сущности с меткой плагина.
+        int purged = labels.purgeAll(true);
+        if (purged > 0) {
+            getLogger().info("Удалено оставшихся сущностей плагина: " + purged);
+        }
+        labels.refreshAll();
 
         bind("hats", commands);
         bind("cases", commands);
@@ -143,6 +155,12 @@ public final class QWHatCasePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (worldAnimations != null) {
+            worldAnimations.shutdown();
+        }
+        if (labels != null) {
+            labels.purgeAll(true);
+        }
         if (openings != null) {
             openings.shutdown();
         }
@@ -216,6 +234,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
             display.refresh(player);
         }
+        labels.refreshAll();
         scheduleAnnouncement();
     }
 
@@ -306,6 +325,14 @@ public final class QWHatCasePlugin extends JavaPlugin {
 
     public QWHatCaseApi api() {
         return api;
+    }
+
+    public ru.qw.qwhatcase.world.CaseLabelService labels() {
+        return labels;
+    }
+
+    public ru.qw.qwhatcase.world.WorldAnimationService worldAnimations() {
+        return worldAnimations;
     }
 
     public ru.qw.qwhatcase.service.ChatInput chatInput() {

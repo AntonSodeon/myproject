@@ -33,6 +33,10 @@ public final class PointService {
         return points.isEmpty() ? null : points.get(key(block));
     }
 
+    public CasePoint byKey(String key) {
+        return key == null ? null : points.get(key);
+    }
+
     public List<CasePoint> all() {
         return new ArrayList<>(points.values());
     }
@@ -42,7 +46,11 @@ public final class PointService {
             db.addPoint(point, actor);
             return null;
         }, ignored -> {
-            points.put(point.key(), point);
+            CasePoint previous = points.put(point.key(), point);
+            if (previous != null && !previous.caseId().equals(point.caseId())) {
+                plugin.worldAnimations().abort(point.key(), "rebind");
+            }
+            plugin.labels().ensure(point);
             onDone.run();
         }, error -> plugin.messages().send(plugin.getServer().getConsoleSender(), "error.database"));
     }
@@ -53,7 +61,10 @@ public final class PointService {
         int y = block.getY();
         int z = block.getZ();
         plugin.storage().run(db -> db.removePoint(world, x, y, z, actor), removed -> {
-            points.remove(world + ";" + x + ";" + y + ";" + z);
+            String key = world + ";" + x + ";" + y + ";" + z;
+            points.remove(key);
+            plugin.worldAnimations().abort(key, "point-removed");
+            plugin.labels().remove(key);
             onDone.accept(removed);
         }, error -> onDone.accept(false));
     }

@@ -41,7 +41,7 @@ public final class ConfigLoader {
                 problems.add("shop.yml: неизвестная шляпа '" + priced + "' — пропущена");
             }
         }
-        Map<String, CaseDef> cases = loadCases(casesFile, hats, rarities, settings);
+        Map<String, CaseDef> cases = loadCases(casesFile, hats, rarities, settings, config);
         return new Catalog(settings, rarities, categories, hats, legacy, cases, problems);
     }
 
@@ -228,7 +228,7 @@ public final class ConfigLoader {
     }
 
     private Map<String, CaseDef> loadCases(ConfigurationSection file, Map<String, Hat> hats,
-                                           Map<String, Rarity> rarities, Settings settings) {
+                                           Map<String, Rarity> rarities, Settings settings, ConfigurationSection config) {
         Map<String, CaseDef> result = new LinkedHashMap<>();
         ConfigurationSection cases = file == null ? null : file.getConfigurationSection("cases");
         if (cases == null) {
@@ -237,7 +237,7 @@ public final class ConfigLoader {
         }
         for (String id : cases.getKeys(false)) {
             try {
-                result.put(id, loadCase(id, cases.getConfigurationSection(id), hats, rarities));
+                result.put(id, loadCase(id, cases.getConfigurationSection(id), hats, rarities, config));
             } catch (ConfigException e) {
                 problems.add("Кейс '" + id + "' отключён: " + e.getMessage());
             }
@@ -246,7 +246,7 @@ public final class ConfigLoader {
     }
 
     private CaseDef loadCase(String id, ConfigurationSection c, Map<String, Hat> hats,
-                             Map<String, Rarity> rarities) throws ConfigException {
+                             Map<String, Rarity> rarities, ConfigurationSection config) throws ConfigException {
         if (c == null) {
             throw new ConfigException("секция кейса некорректна");
         }
@@ -359,7 +359,11 @@ public final class ConfigLoader {
                 keyType, keyCost, c.getString("permission", ""),
                 animation, c.getString("win-message", ""),
                 c.getBoolean("broadcast.enabled", false), broadcastMin, c.getString("broadcast.message", ""),
-                multiplier, bonus, List.copyOf(rewards), total);
+                multiplier, bonus, List.copyOf(rewards), total,
+                ru.qw.qwhatcase.world.WorldConfig.animation(config.getConfigurationSection("world-animation"),
+                        c.getConfigurationSection("world-animation"), problems, "cases." + id + ".world-animation"),
+                ru.qw.qwhatcase.world.WorldConfig.label(config.getConfigurationSection("case-labels"),
+                        c.getConfigurationSection("label"), problems, "cases." + id + ".label"));
     }
 
     /** "protection" → "minecraft:protection". */

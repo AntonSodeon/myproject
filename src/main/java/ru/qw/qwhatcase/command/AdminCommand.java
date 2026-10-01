@@ -108,6 +108,25 @@ public final class AdminCommand implements CommandExecutor, TabCompleter {
                     simulate(sender, args);
                 }
             }
+            case "status" -> {
+                if (check(sender, "qwhatcase.admin.points")) {
+                    long tasks = Bukkit.getScheduler().getPendingTasks().stream().filter(t -> t.getOwner() == plugin).count();
+                    long entities = Bukkit.getWorlds().stream().flatMap(w -> w.getEntities().stream())
+                            .filter(ru.qw.qwhatcase.world.WorldEntities::isOurs)
+                            .filter(e -> ru.qw.qwhatcase.world.WorldEntities.ANIMATION.equals(ru.qw.qwhatcase.world.WorldEntities.kind(e)))
+                            .count();
+                    plugin.messages().send(sender, "admin.status", Placeholders.of(
+                            "animations", plugin.worldAnimations().activeCount(),
+                            "locks", plugin.worldAnimations().locks().size(),
+                            "labels", plugin.labels().count(), "points", plugin.points().all().size(),
+                            "entities", entities, "tasks", tasks));
+                }
+            }
+            case "preview" -> {
+                if (check(sender, "qwhatcase.admin.preview")) {
+                    preview(sender, args);
+                }
+            }
             default -> usage(sender);
         }
         return true;
@@ -271,7 +290,8 @@ public final class AdminCommand implements CommandExecutor, TabCompleter {
             plugin.messages().send(sender, "point.list-header", Placeholders.of("count", list.size()));
             for (CasePoint point : list) {
                 plugin.messages().sendPlain(sender, "point.list-line", Placeholders.of("world", point.world(), "x", point.x(),
-                        "y", point.y(), "z", point.z(), "case", point.caseId()));
+                        "y", point.y(), "z", point.z(), "case", point.caseId(),
+                        "state", plugin.messages().raw(plugin.worldAnimations().isActive(point.key()) ? "point.state-busy" : "point.state-free")));
             }
             return;
         }
@@ -390,6 +410,41 @@ public final class AdminCommand implements CommandExecutor, TabCompleter {
                 "player", entry.player()));
     }
 
+    // ------------------------------------------------------------------ preview
+
+    /**
+     * Предпросмотр анимации в мире над точкой под прицелом: случайная награда кейса,
+     * без списания ключей и без выдачи. Учитывает занятость точки.
+     */
+    private void preview(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            plugin.messages().send(sender, "error.players-only");
+            return;
+        }
+        Block block = player.getTargetBlockExact(6);
+        CasePoint point = block == null ? null : plugin.points().at(block);
+        if (point == null) {
+            plugin.messages().send(player, "point.not-found");
+            return;
+        }
+        String caseId = args.length >= 2 ? args[1] : point.caseId();
+        CaseDef def = plugin.catalog().caseDef(caseId).orElse(null);
+        if (def == null) {
+            plugin.messages().send(player, "cases.unknown", Placeholders.of("case", caseId));
+            return;
+        }
+        String token = "preview-" + UUID.randomUUID();
+        if (!plugin.worldAnimations().locks().tryLock(point.key(), player.getUniqueId(), token)) {
+            plugin.messages().send(player, "world.point-busy");
+            return;
+        }
+        Hat hat = plugin.openings().roller().roll(def).hat();
+        boolean started = plugin.worldAnimations().start(token, point, def, hat, null, player.getUniqueId(),
+                player.getName(), player.getLocation(), true, null);
+        plugin.messages().send(player, started ? "world.preview-started" : "world.point-unloaded",
+                Placeholders.of("case", def.name()));
+    }
+
     // ------------------------------------------------------------------ simulate
 
     private void simulate(CommandSender sender, String[] args) {
@@ -438,7 +493,7 @@ public final class AdminCommand implements CommandExecutor, TabCompleter {
         List<String> options = new ArrayList<>();
         String sub = args.length > 0 ? args[0].toLowerCase(Locale.ROOT) : "";
         switch (args.length) {
-            case 1 -> options.addAll(List.of("key", "hat", "tokens", "point", "inspect", "history", "reload", "migrate", "simulate"));
+            case 1 -> options.addAll(List.of("key", "hat", "tokens", "point", "inspect", "history", "reload", "migrate", "simulate", "preview", "status"));
             case 2 -> {
                 switch (sub) {
                     case "key" -> options.addAll(List.of("give", "take", "set"));
@@ -446,7 +501,7 @@ public final class AdminCommand implements CommandExecutor, TabCompleter {
                     case "tokens" -> options.addAll(List.of("give", "take"));
                     case "point" -> options.addAll(List.of("add", "remove", "list"));
                     case "migrate" -> options.addAll(List.of("preview", "confirm"));
-                    case "simulate" -> options.addAll(plugin.catalog().cases().keySet());
+                    case "simulate", "preview" -> options.addAll(plugin.catalog().cases().keySet());
                     case "inspect", "history" -> Bukkit.getOnlinePlayers().forEach(p -> options.add(p.getName()));
                     default -> {
                     }

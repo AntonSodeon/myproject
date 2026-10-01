@@ -155,6 +155,16 @@ public final class HatItems {
         return result;
     }
 
+    /** Модель шляпы для ItemDisplay в мире: только модель, без чар и подписей (это не предмет игрока). */
+    public static ItemStack displayItem(Hat hat) {
+        ItemStack item = new ItemStack(material(hat.material(), Material.CARVED_PUMPKIN));
+        item.editMeta(meta -> {
+            applyModel(meta, hat.itemModel(), hat.customModelData());
+            meta.getPersistentDataContainer().set(GUI, PersistentDataType.BYTE, (byte) 1);
+        });
+        return item;
+    }
+
     /** Простая кнопка меню. */
     public static ItemStack button(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material);
