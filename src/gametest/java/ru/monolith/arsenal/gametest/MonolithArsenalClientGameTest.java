@@ -198,31 +198,34 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         LOGGER.info("[gametest] player on deck: body moved {} blocks, player moved {} blocks", bodyDx, carried);
         context.takeScreenshot("11_player_on_moving_body");
 
-        // Leave the area: VS unloads ships beyond shipUnloadDistance (default 8704 blocks) from every player.
+        // Leave the area. This VS port keeps the ship in memory but stops simulating it without nearby players
+        // (ShipActivationManager); commands sent meanwhile must wait in the queue, not be lost or repeated.
+        Vec3d before = server.computeOnServer(s -> body(s, id).position());
         server.runCommand("tp @a 12000 -50 12000");
-        int unloadWait = 0;
-        while (server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()) && unloadWait < 400) {
-            context.waitTicks(5);
-            unloadWait += 5;
-        }
-        boolean unloaded = !server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent());
-        LOGGER.info("[gametest] after the player left: body loaded={} (waited {} ticks)", !unloaded, unloadWait);
+        context.waitTicks(100);
+        Vec3d away1 = server.computeOnServer(s -> body(s, id).position());
+        server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
+        context.waitTicks(100);
+        Vec3d away2 = server.computeOnServer(s -> body(s, id).position());
+        LOGGER.info("[gametest] player away: body {} -> {} -> {} (impulse queued while away)", before, away1, away2);
+        check(away2.distanceTo(away1) < 0.01, "without players nearby the body must not be simulated, moved " + away2.distanceTo(away1));
+
         server.runCommand(String.format(java.util.Locale.ROOT, "tp @a %.2f %.2f %.2f -90 15", rest.x - 8, rest.y + 1, rest.z));
-        int reloadWait = 0;
-        while (!server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()) && reloadWait < 400) {
-            context.waitTicks(5);
-            reloadWait += 5;
+        double peak = away2.y;
+        for (int i = 0; i < 160; i++) {
+            context.waitTicks(1);
+            peak = Math.max(peak, server.computeOnServer(s -> body(s, id).position().y));
         }
-        check(unloaded, "the body must unload once the player is far away");
-        check(server.computeOnServer(s -> VehiclePhysics.find(s.getOverworld(), id).isPresent()), "the body must load again when the player returns");
-        context.waitTicks(60);
+        double rise = peak - away2.y;
         double yBack = server.computeOnServer(s -> body(s, id).position().y);
-        check(yBack > -61.0, "reloaded body must not fall through the ground, y=" + yBack);
+        LOGGER.info("[gametest] player back: deferred impulse lifted the body by {} blocks, now y={}", rise, yBack);
+        check(rise > 1.0 && rise < 3.0, "the impulse queued while away must apply exactly once after return (expected rise ~1.8, got " + rise + ")");
+        check(yBack > -61.0, "body must not fall through the ground after the player returns, y=" + yBack);
         double vy0 = server.computeOnServer(s -> body(s, id).linearVelocity().y);
         server.runOnServer(s -> body(s, id).applyImpulse(new Vec3d(0.0, mass * 6.0, 0.0)));
         context.waitTicks(2);
         double dvy = server.computeOnServer(s -> body(s, id).linearVelocity().y) - vy0;
-        check(dvy > 3.0 && dvy < 6.3, "exactly one controller after reload: impulse 6 m/s gives dvy=" + dvy);
+        check(dvy > 3.0 && dvy < 6.3, "exactly one controller after the player returned: impulse 6 m/s gives dvy=" + dvy);
         context.waitTicks(80);
 
         server.runCommand("tp @a 30 -55 -8 30 20");
