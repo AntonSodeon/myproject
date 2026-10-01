@@ -3,6 +3,8 @@ plugins {
     id 'maven-publish'
 }
 
+evaluationDependsOn(':monolith-skies')
+
 version = project.mod_version
 group = project.maven_group
 
@@ -35,6 +37,21 @@ loom {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
+        'monolith_skies' {
+            sourceSet 'main', ':monolith-skies'
+            sourceSet 'client', ':monolith-skies'
+        }
+    }
+}
+
+fabricApi {
+    // Automated in-game checks: ./gradlew runClientGameTest (needs a display, e.g. xvfb-run on Linux).
+    configureTests {
+        createSourceSet = true
+        modId = 'monolith_arsenal_gametest'
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
     }
 }
 
@@ -47,6 +64,11 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
     modImplementation "com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_anim_version}"
+
+    // Monolith Skies: our own ship physics module, nested into the release jar (Jar-in-Jar).
+    implementation project(path: ':monolith-skies', configuration: 'namedElements')
+    clientImplementation rootProject.project(':monolith-skies').sourceSets.client.output
+    include project(':monolith-skies')
 }
 
 processResources {
@@ -78,4 +100,9 @@ jar {
     from('LICENSE') {
         rename { "${it}_${inputs.properties.archivesName}" }
     }
+}
+
+// Lets the dev server read console commands typed into Gradle's terminal.
+tasks.named('runServer') {
+    standardInput = System.in
 }

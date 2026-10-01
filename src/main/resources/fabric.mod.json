@@ -17,6 +17,7 @@
     "java": ">=21",
     "fabric-api": ">=0.141.6",
     "geckolib": ">=5.4.5",
-    "player_animation_library": ">=1.1.7"
+    "player_animation_library": ">=1.1.7",
+    "monolith_skies": ">=0.1.0"
   }
 }

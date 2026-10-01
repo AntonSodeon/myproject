@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "monolith_arsenal_gametest",
+  "version": "1.0.0",
+  "name": "Monolith Arsenal client game tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["ru.monolith.arsenal.gametest.MonolithArsenalClientGameTest"]
+  },
+  "depends": {
+    "monolith_arsenal": "*",
+    "monolith_skies": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}

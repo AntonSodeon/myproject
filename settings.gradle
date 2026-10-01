@@ -10,3 +10,5 @@ pluginManagement {
 }
 
 rootProject.name = 'monolith-arsenal'
+
+include 'monolith-skies'

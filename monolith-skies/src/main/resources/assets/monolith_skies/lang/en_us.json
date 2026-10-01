@@ -1,0 +1,12 @@
+{
+  "item.monolith_skies.ship_assembler": "Ship Assembler",
+  "entity.monolith_skies.ship": "Ship",
+  "message.monolith_skies.assemble.success": "Ship assembled from %s blocks",
+  "message.monolith_skies.assemble.invalid_block": "This block cannot become part of a ship",
+  "message.monolith_skies.assemble.too_big": "Structure is too large (is it connected to the ground?)",
+  "message.monolith_skies.assemble.failed": "Could not create the ship",
+  "message.monolith_skies.disassemble.success": "Ship placed back into the world (%s blocks)",
+  "message.monolith_skies.disassemble.obstructed": "Cannot place the ship here: something is in the way",
+  "message.monolith_skies.not_server": "Ships can only be changed on the server",
+  "message.monolith_skies.list": "%s ship(s) loaded"
+}

@@ -1,0 +1,12 @@
+{
+  "item.monolith_skies.ship_assembler": "Сборщик корабля",
+  "entity.monolith_skies.ship": "Корабль",
+  "message.monolith_skies.assemble.success": "Корабль собран из блоков: %s",
+  "message.monolith_skies.assemble.invalid_block": "Этот блок не может стать частью корабля",
+  "message.monolith_skies.assemble.too_big": "Конструкция слишком большая (не соединена ли она с землёй?)",
+  "message.monolith_skies.assemble.failed": "Не удалось создать корабль",
+  "message.monolith_skies.disassemble.success": "Корабль возвращён в мир (блоков: %s)",
+  "message.monolith_skies.disassemble.obstructed": "Здесь нельзя разместить корабль: мешают блоки",
+  "message.monolith_skies.not_server": "Корабли можно менять только на сервере",
+  "message.monolith_skies.list": "Загружено кораблей: %s"
+}

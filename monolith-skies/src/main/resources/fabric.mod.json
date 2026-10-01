@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "monolith_skies",
+  "version": "${version}",
+  "name": "Monolith Skies",
+  "description": "Block ships with rigid-body physics for Monolith Arsenal: gravity, buoyancy, world collisions and walkable decks.",
+  "authors": ["Monolith Arsenal contributors"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["ru.monolith.skies.MonolithSkies"],
+    "client": ["ru.monolith.skies.client.MonolithSkiesClient"]
+  },
+  "mixins": ["monolith_skies.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": ">=0.141.6"
+  }
+}

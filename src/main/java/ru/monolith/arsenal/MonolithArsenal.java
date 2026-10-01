@@ -3,6 +3,7 @@ package ru.monolith.arsenal;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.monolith.arsenal.compat.skies.MonolithSkiesCompat;
 import ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat;
 import ru.monolith.arsenal.registry.BlockRegistry;
 import ru.monolith.arsenal.registry.EntityRegistry;
@@ -19,6 +20,7 @@ public final class MonolithArsenal implements ModInitializer {
         ModItemGroups.initialize();
         BlockRegistry.initialize();
         EntityRegistry.initialize();
+        MonolithSkiesCompat.initialize();
         ValkyrienSkiesCompat.initialize();
         LOGGER.info("Monolith Arsenal initialized for Minecraft 1.21.11");
     }
