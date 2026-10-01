@@ -1,6 +1,9 @@
 # Ресурс-пак
 
-Плагин использует существующий пак **без изменений**: модели шляп лежат в
+Используйте обновлённый пак **`demoraRPuniversal_v6.2_QWHatCase.zip`** — что изменено, см. [PACK-CHANGES.md](PACK-CHANGES.md).
+Пересобрать его из исходного: `python3 tools/update_pack.py <распакованный v6.1> <папка> --zip <файл.zip>`.
+
+Модели шляп не менялись: они лежат в
 `assets/minecraft/items/carved_pumpkin.json` (`range_dispatch` по `custom_model_data`), шляпы — номера 90…370.
 
 ## Проверка
@@ -9,9 +12,10 @@
 python3 tools/validate_pack.py <распакованный пак>
 ```
 
-Результат для `demoraRPuniversal_v6.1.zip`: 281 шляпа, 0 ошибок, 4 предупреждения
-(нет `display.head` у CMD 139, 140, 143, 144 — проверить вид на голове глазами). Подробно — [AUDIT.md](AUDIT.md).
+Результат: 281 шляпа, 0 ошибок, 4 предупреждения — у CMD 139, 140, 143, 144 нет `display.head`: эти модели
+построены в координатах «блока на голове» и выводятся как сама тыква (так же было в PTrap).
 
+SHA-1 `demoraRPuniversal_v6.2_QWHatCase.zip`: `fce683382eedc5ed62883f04b2c7e1fe88bcae91` (для `resource-pack.sha1`).
 SHA-1 исходного `demoraRPuniversal_v6.1.zip`: `6c49d711de3e86c76da007e2fd7ac36ba34385fb`.
 **Если вы перепаковываете или объединяете пак — SHA-1 изменится, пересчитайте его** (`sha1sum pack.zip`).
 

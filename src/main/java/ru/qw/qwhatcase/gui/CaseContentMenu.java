@@ -60,7 +60,8 @@ public final class CaseContentMenu extends Menu {
                     "owned", msg().raw(owned ? "menu.content.owned-yes" : "menu.content.owned-no"),
                     "compensation", def.compensationFor(reward.hat()));
             set(i, HatItems.icon(reward.hat(), reward.hat().coloredName(),
-                    concat(reward.hat().lore(), msg().lines("menu.content.reward-lore", ph)), false));
+                    concat(reward.hat().lore(), msg().lines("menu.content.reward-lore", ph)), false,
+                    plugin.display().baseStats()));
         }
         long keys = profile == null ? 0 : profile.keys(def.keyType());
         Map<String, Object> ph = Placeholders.of("case", def.name(), "keys", keys, "cost", def.keyCost(),

@@ -1,0 +1,24 @@
+const { join, sleep, consoleCmd, waitWindow, title, itemName } = require('./lib');
+(async () => {
+  const a = await join('Tester1'); await sleep(800);
+  consoleCmd('give Tester1 enchanted_book[stored_enchantments={thorns:3}]'); await sleep(800);
+  a.chat('/hat'); let w = await waitWindow(a, w => /Мои шляпы/.test(title(w)));
+  console.log('owned:', w.slots.slice(0, 54).filter(s => s && /Шляпа #/.test(itemName(s) || '')).map(itemName));
+  const slot = w.slots.findIndex(s => s && itemName(s) && itemName(s).includes('#90'));
+  await a.clickWindow(slot, 0, 0); await sleep(600);
+  await waitWindow(a, w => /Шляпа/.test(title(w)));
+  await a.clickWindow(11, 0, 0); await sleep(800);
+  w = await waitWindow(a, w => w.type && String(w.type).includes('anvil') || /Наковальня/.test(title(w)));
+  console.log('anvil window:', w && title(w), w && w.type);
+  const book = a.currentWindow.slots.findIndex((s, i) => i >= 3 && s && s.name === 'enchanted_book');
+  console.log('book slot', book);
+  await a.clickWindow(book, 0, 1); await sleep(800);
+  console.log('anvil slots:', a.currentWindow.slots.slice(0, 3).map(s => s && s.name));
+  await a.clickWindow(2, 0, 0); await sleep(1000);
+  console.log('chat:', a.chatLog.slice(-2));
+  if (a.currentWindow) a.closeWindow(a.currentWindow);
+  consoleCmd('give Tester1 carved_pumpkin[custom_data={PublicBukkitValues:{"ptrap:hat-id":"hat_160"}},custom_model_data={floats:[160f]},enchantments={unbreaking:3},custom_name="Шляпа #160"]');
+  await sleep(1000);
+  console.log('inv:', a.inventory.items().map(i => i.name + ':' + itemName(i)), 'head:', itemName(a.inventory.slots[5]));
+  a.quit(); await sleep(1500); process.exit(0);
+})().catch(e => { console.error('CRASH', e); process.exit(1); });

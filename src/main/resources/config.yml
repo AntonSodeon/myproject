@@ -31,21 +31,40 @@ rarities:
     order: 2
     compensation: 25
     pane: BLUE_STAINED_GLASS_PANE
-    win-sound: 'minecraft:entity.player.levelup'
+    win-sound: 'minecraft:custom.mystery_crate.unlock'
   epic:
     name: 'Эпическая'
     color: '&5'
     order: 3
     compensation: 60
     pane: PURPLE_STAINED_GLASS_PANE
-    win-sound: 'minecraft:entity.player.levelup'
+    win-sound: 'minecraft:custom.mystery_crate.unlock'
   legendary:
     name: 'Легендарная'
     color: '&6&l'
     order: 4
     compensation: 150
     pane: ORANGE_STAINED_GLASS_PANE
-    win-sound: 'minecraft:ui.toast.challenge_complete'
+    win-sound: 'minecraft:custom.mystery_crate.unlock.mythical'
+
+# Характеристики шляпы — как в PTrap 1.1.19. Все шляпы получают эти чары и атрибуты,
+# а чары, наложенные игроком книгой, добавляются поверх (уровень с книги заменяет базовый).
+hat-item:
+  enchantments:
+    protection: 4
+  attributes:
+    armor: 3.0
+    armor_toughness: 2.0
+  # Сияние зачарованного предмета (в PTrap было выключено).
+  glint: false
+  # Наложение чар на шляпу зачарованной книгой (ПКМ по шляпе в коллекции → «Наложить чары»).
+  book-enchanting: true
+
+# Магазин PTrap (/hat menu): каталог шляп с ценой и покупкой через Telegram.
+donate-shop:
+  enabled: true
+  price: '75 ₽'
+  telegram: 'AntonSodeon'
 
 hat-display:
   # Шляпка отображается в слоте шлема (так же, как в старом плагине PTrap).
@@ -85,7 +104,7 @@ history:
 announcement:
   enabled: true
   interval-minutes: 35
-  message: '&6🎩 &eКейсы со шляпками уже доступны! &7Откройте: &a/cases &7| Ваши шляпки: &a/hats'
+  message: '&6🎩 &eКастомные шляпы уже доступны! &7Откройте каталог: &a/hat menu &7| Ваши шляпы: &a/hat &7| Кейсы: &a/cases'
 
 # Кнопка «Купить ключи» в меню кейсов (ссылка из старого плагина).
 external-shop:
@@ -97,7 +116,9 @@ migration:
   source-files:
     - plugins/PTrap/players.yml
     - plugins/QWHats/players.yml
-  # CONVERT — при входе убирать предметы старого плагина, если шляпа уже есть в коллекции
-  #           (шляпа из слота шлема становится надетой). Предметы шляп, которых нет в коллекции, не трогаются.
+  # Предметы шляп PTrap (с меткой ptrap:hat-id) в инвентаре игрока при входе:
+  # IMPORT  — как в PTrap: шляпа и её чары добавляются в коллекцию, предмет убирается,
+  #           шляпа из слота шлема становится надетой;
+  # CONVERT — убирать только предметы шляп, которые уже есть в коллекции;
   # IGNORE  — не трогать старые предметы.
-  legacy-items: CONVERT
+  legacy-items: IMPORT

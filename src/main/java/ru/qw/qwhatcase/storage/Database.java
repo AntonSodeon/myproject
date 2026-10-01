@@ -139,6 +139,13 @@ public final class Database implements AutoCloseable {
                   unknown INTEGER NOT NULL,
                   backup TEXT,
                   report TEXT)""",
+                """
+                CREATE TABLE IF NOT EXISTS hat_enchants (
+                  uuid TEXT NOT NULL,
+                  hat_id TEXT NOT NULL,
+                  enchant TEXT NOT NULL,
+                  level INTEGER NOT NULL,
+                  PRIMARY KEY (uuid, hat_id, enchant))""",
                 "CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)"
         };
         try (Statement st = connection.createStatement()) {
@@ -255,7 +262,90 @@ public final class Database implements AutoCloseable {
                 }
             }
         }
-        return new PlayerData(uuid, name, tokens, selected, owned, keys);
+        return new PlayerData(uuid, name, tokens, selected, owned, keys, loadEnchants(uuid));
+    }
+
+    public Map<String, Map<String, Integer>> loadEnchants(UUID uuid) throws SQLException {
+        Map<String, Map<String, Integer>> result = new LinkedHashMap<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT hat_id, enchant, level FROM hat_enchants WHERE uuid = ? ORDER BY hat_id, enchant")) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.computeIfAbsent(rs.getString(1), k -> new LinkedHashMap<>()).put(rs.getString(2), rs.getInt(3));
+                }
+            }
+        }
+        return result;
+    }
+
+    private void putEnchants(UUID uuid, String hatId, Map<String, Integer> enchants, boolean overwrite) throws SQLException {
+        String sql = overwrite
+                ? "INSERT INTO hat_enchants(uuid, hat_id, enchant, level) VALUES (?, ?, ?, ?) "
+                + "ON CONFLICT(uuid, hat_id, enchant) DO UPDATE SET level = excluded.level"
+                : "INSERT OR IGNORE INTO hat_enchants(uuid, hat_id, enchant, level) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (Map.Entry<String, Integer> e : enchants.entrySet()) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, hatId);
+                ps.setString(3, e.getKey());
+                ps.setInt(4, e.getValue());
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    /**
+     * Чары с книги на шляпу коллекции (механика PTrap). Уровень с книги заменяет прежний.
+     * @return новые личные чары шляпы или пустой Optional, если шляпы нет в коллекции
+     */
+    public Optional<Map<String, Integer>> enchantHat(UUID uuid, String hatId, Map<String, Integer> book, String actor)
+            throws SQLException {
+        return inTransaction(() -> {
+            if (!ownsHat(uuid, hatId)) {
+                return Optional.<Map<String, Integer>>empty();
+            }
+            putEnchants(uuid, hatId, book, true);
+            faultHook.at("enchant.before-commit");
+            audit(actor, uuid, "hat.enchant", "hat=" + hatId + " book=" + book);
+            return Optional.of(loadEnchants(uuid).getOrDefault(hatId, Map.of()));
+        });
+    }
+
+    /**
+     * Импорт старого предмета шляпы из инвентаря (механика PTrap): шляпа и её чары
+     * добавляются в коллекцию, если их там ещё нет.
+     */
+    public boolean importHatItem(UUID uuid, String name, String hatId, Map<String, Integer> enchants, String source)
+            throws SQLException {
+        return inTransaction(() -> {
+            ensurePlayer(uuid, name);
+            boolean added = insertHat(uuid, hatId, System.currentTimeMillis(), source);
+            putEnchants(uuid, hatId, enchants, false);
+            audit("system", uuid, "legacy.import", "hat=" + hatId + " added=" + added + " enchants=" + enchants);
+            return added;
+        });
+    }
+
+    /** Полная очистка коллекции игрока (админ-меню PTrap «Удалить все шляпы»). */
+    public int revokeAll(UUID uuid, String actor) throws SQLException {
+        return inTransaction(() -> {
+            int removed;
+            try (PreparedStatement ps = connection.prepareStatement("DELETE FROM collection WHERE uuid = ?")) {
+                ps.setString(1, uuid.toString());
+                removed = ps.executeUpdate();
+            }
+            try (PreparedStatement ps = connection.prepareStatement("DELETE FROM hat_enchants WHERE uuid = ?")) {
+                ps.setString(1, uuid.toString());
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = connection.prepareStatement("UPDATE players SET selected_hat = NULL WHERE uuid = ?")) {
+                ps.setString(1, uuid.toString());
+                ps.executeUpdate();
+            }
+            audit(actor, uuid, "hat.revoke-all", "removed=" + removed);
+            return removed;
+        });
     }
 
     public void setSelectedHat(UUID uuid, String hatId) throws SQLException {
@@ -442,6 +532,12 @@ public final class Database implements AutoCloseable {
                 ps.setString(1, uuid.toString());
                 ps.setString(2, hatId);
                 removed = ps.executeUpdate();
+            }
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM hat_enchants WHERE uuid = ? AND hat_id = ?")) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, hatId);
+                ps.executeUpdate();
             }
             try (PreparedStatement ps = connection.prepareStatement(
                     "UPDATE players SET selected_hat = NULL WHERE uuid = ? AND selected_hat = ?")) {
@@ -704,6 +800,10 @@ public final class Database implements AutoCloseable {
                     found++;
                     if (insertHat(player.uuid(), hat, now, "migration:" + source)) {
                         added++;
+                    }
+                    Map<String, Integer> enchants = player.enchants().get(hat);
+                    if (enchants != null && !enchants.isEmpty()) {
+                        putEnchants(player.uuid(), hat, enchants, false);
                     }
                 }
                 for (LegacyImport.Unknown u : player.unknown()) {

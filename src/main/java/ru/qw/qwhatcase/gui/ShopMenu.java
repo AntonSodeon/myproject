@@ -43,7 +43,8 @@ public final class ShopMenu extends Menu {
             Map<String, Object> ph = Placeholders.of("price", hat.shopPrice(), "tokens", tokens,
                     "rarity", hat.rarity().color() + hat.rarity().name(), "category", hat.category().name());
             String loreKey = owned ? "menu.shop.owned-lore" : affordable ? "menu.shop.buy-lore" : "menu.shop.expensive-lore";
-            set(i, HatItems.icon(hat, hat.coloredName(), concat(hat.lore(), msg().lines(loreKey, ph)), false), click -> {
+            set(i, HatItems.icon(hat, hat.coloredName(), concat(hat.lore(), msg().lines(loreKey, ph)), false,
+                    plugin.display().stats(profile, hat.id())), click -> {
                 if (owned) {
                     msg().send(viewer, "shop.already-owned");
                     return;

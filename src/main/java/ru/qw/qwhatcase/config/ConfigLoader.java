@@ -59,9 +59,28 @@ public final class ConfigLoader {
             problems.add("resource-pack.url не задан: ресурс-пак не отправляется и не проверяется (режим NONE)");
             packMode = Settings.PackMode.NONE;
         }
-        String legacyMode = c.getString("migration.legacy-items", "CONVERT").toUpperCase(Locale.ROOT);
-        if (!legacyMode.equals("CONVERT") && !legacyMode.equals("IGNORE")) {
-            throw new ConfigException("migration.legacy-items: ожидается CONVERT или IGNORE");
+        Settings.LegacyItems legacyItems = parseEnum(Settings.LegacyItems.class,
+                c.getString("migration.legacy-items", "IMPORT"), "migration.legacy-items");
+        Map<String, Integer> enchantments = new LinkedHashMap<>();
+        ConfigurationSection ench = c.getConfigurationSection("hat-item.enchantments");
+        if (ench != null) {
+            for (String key : ench.getKeys(false)) {
+                int level = ench.getInt(key);
+                if (level < 1 || level > 255) {
+                    throw new ConfigException("hat-item.enchantments." + key + ": уровень должен быть от 1 до 255");
+                }
+                enchantments.put(normalizeKey(key), level);
+            }
+        }
+        Map<String, Double> attributes = new LinkedHashMap<>();
+        ConfigurationSection attr = c.getConfigurationSection("hat-item.attributes");
+        if (attr != null) {
+            for (String key : attr.getKeys(false)) {
+                double value = attr.getDouble(key);
+                if (value != 0) {
+                    attributes.put(normalizeKey(key), value);
+                }
+            }
         }
         return new Settings(
                 c.getString("storage.file", "data.db"),
@@ -78,8 +97,14 @@ public final class ConfigLoader {
                 c.getBoolean("external-shop.enabled", false),
                 c.getString("external-shop.url", ""),
                 c.getStringList("migration.source-files"),
-                legacyMode.equals("CONVERT"),
-                Math.max(1, c.getInt("history.page-size", 10)));
+                legacyItems,
+                Math.max(1, c.getInt("history.page-size", 10)),
+                Map.copyOf(enchantments), Map.copyOf(attributes),
+                c.getBoolean("hat-item.glint", false),
+                c.getBoolean("hat-item.book-enchanting", true),
+                c.getBoolean("donate-shop.enabled", true),
+                c.getString("donate-shop.price", "75 ₽"),
+                c.getString("donate-shop.telegram", "AntonSodeon").replace("@", "").trim());
     }
 
     private Map<String, Rarity> loadRarities(ConfigurationSection section) throws ConfigException {
@@ -335,6 +360,12 @@ public final class ConfigLoader {
                 animation, c.getString("win-message", ""),
                 c.getBoolean("broadcast.enabled", false), broadcastMin, c.getString("broadcast.message", ""),
                 multiplier, bonus, List.copyOf(rewards), total);
+    }
+
+    /** "protection" → "minecraft:protection". */
+    public static String normalizeKey(String key) {
+        String k = key.trim().toLowerCase(Locale.ROOT);
+        return k.contains(":") ? k : "minecraft:" + k;
     }
 
     private static double toDouble(Object value, double fallback) {

@@ -28,6 +28,16 @@ public final class HatDisplayService {
         this.plugin = plugin;
     }
 
+    /** Базовые характеристики шляпы из config.yml (как в PTrap: Защита IV, +3 брони, +2 прочности). */
+    public HatItems.Stats baseStats() {
+        Settings s = plugin.catalog().settings();
+        return new HatItems.Stats(s.hatEnchantments(), s.hatAttributes(), s.hatGlint());
+    }
+
+    public HatItems.Stats stats(Profile profile, String hatId) {
+        return baseStats().with(profile == null ? null : profile.enchants(hatId));
+    }
+
     public Result equip(Player player, String hatId) {
         Profile profile = plugin.profiles().get(player);
         if (profile == null) {
@@ -60,7 +70,7 @@ public final class HatDisplayService {
             inventory.setItem(free, current);
             inventory.setHelmet(null);
         }
-        inventory.setHelmet(HatItems.cosmetic(hat.get()));
+        inventory.setHelmet(HatItems.cosmetic(hat.get(), stats(profile, hatId)));
         profile.setSelectedHat(hatId);
         plugin.storage().submit(db -> {
             db.setSelectedHat(player.getUniqueId(), hatId);
@@ -140,7 +150,7 @@ public final class HatDisplayService {
             return;
         }
         if (helmet == null || helmet.isEmpty() || HatItems.isCosmetic(helmet)) {
-            player.getInventory().setHelmet(HatItems.cosmetic(hat.get()));
+            player.getInventory().setHelmet(HatItems.cosmetic(hat.get(), stats(profile, selected)));
         } else {
             // Настоящий шлем имеет приоритет: шляпа не надевается поверх него.
             plugin.messages().send(player, "hat.helmet-blocks-restore", Placeholders.of("hat", hat.get().coloredName()));

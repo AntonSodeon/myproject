@@ -16,10 +16,11 @@
 #   legacy-ids         идентификаторы из старого плагина PTrap (для миграции)
 
 defaults:
-  # Базовый предмет. PAPER не является блоком и не даёт защиты от эндерменов (в отличие от CARVED_PUMPKIN).
-  material: PAPER
-  # Определение предмета в паке, в котором лежит range_dispatch по custom_model_data.
-  item-model: minecraft:carved_pumpkin
+  # Базовый предмет, как в PTrap: вырезанная тыква (защищает от взгляда эндермена).
+  # Модели шляп в паке привязаны к assets/minecraft/items/carved_pumpkin.json.
+  material: CARVED_PUMPKIN
+  # item_model: для CARVED_PUMPKIN не нужен. Для другого material укажите minecraft:carved_pumpkin.
+  item-model: ''
   lore:
     - '&7Кастомная шляпа'
 

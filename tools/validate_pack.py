@@ -75,7 +75,7 @@ def main():
                 has_head = True
             current = model.get("parent")
         if not has_head:
-            warnings.append(f"{hat_id} (cmd {cmd}, {ref}): нет display.head — проверьте положение на голове визуально")
+            warnings.append(f"{hat_id} (cmd {cmd}, {ref}): нет display.head — выводится как блок на голове (как тыква)")
     for ref, ids in used.items():
         if len(ids) > 1:
             errors.append(f"одна модель {ref} у нескольких шляп: {ids}")

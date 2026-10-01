@@ -59,6 +59,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
     private PlayerResolver resolver;
     private PlayerCommands commands;
     private ApiImpl api;
+    private ru.qw.qwhatcase.service.ChatInput chatInput;
     private BukkitTask announcement;
 
     @Override
@@ -77,6 +78,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
             return;
         }
         catalog.problems().forEach(problem -> getLogger().warning(problem));
+        checkRegistries(catalog);
 
         try {
             File dbFile = new File(getDataFolder(), catalog.settings().databaseFile());
@@ -98,6 +100,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
         resolver = new PlayerResolver(this);
         commands = new PlayerCommands(this);
         api = new ApiImpl(this);
+        chatInput = new ru.qw.qwhatcase.service.ChatInput(this);
 
         try {
             points.load(storage.blocking(Database::points));
@@ -111,6 +114,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
         pm.registerEvents(new SessionListener(this), this);
         pm.registerEvents(new PointListener(this), this);
         pm.registerEvents(new PackListener(this), this);
+        pm.registerEvents(chatInput, this);
 
         bind("hats", commands);
         bind("cases", commands);
@@ -202,6 +206,7 @@ public final class QWHatCasePlugin extends JavaPlugin {
         }
         catalog = next;
         messages = nextMessages;
+        checkRegistries(next);
         next.problems().forEach(problem -> getLogger().warning(problem));
         messages.send(sender, "admin.reloaded", Placeholders.of("hats", next.hats().size(), "cases", next.cases().size(),
                 "enabled", next.enabledCases().size(), "problems", next.problems().size()));
@@ -212,6 +217,16 @@ public final class QWHatCasePlugin extends JavaPlugin {
             display.refresh(player);
         }
         scheduleAnnouncement();
+    }
+
+    /** Проверка названий чар и атрибутов из hat-item (нужен работающий сервер). */
+    private void checkRegistries(Catalog c) {
+        c.settings().hatEnchantments().keySet().stream()
+                .filter(k -> ru.qw.qwhatcase.service.HatItems.enchantment(k) == null)
+                .forEach(k -> getLogger().warning("hat-item.enchantments: неизвестные чары '" + k + "' — пропущены"));
+        c.settings().hatAttributes().keySet().stream()
+                .filter(k -> ru.qw.qwhatcase.service.HatItems.attribute(k) == null)
+                .forEach(k -> getLogger().warning("hat-item.attributes: неизвестный атрибут '" + k + "' — пропущен"));
     }
 
     private void scheduleAnnouncement() {
@@ -291,5 +306,9 @@ public final class QWHatCasePlugin extends JavaPlugin {
 
     public QWHatCaseApi api() {
         return api;
+    }
+
+    public ru.qw.qwhatcase.service.ChatInput chatInput() {
+        return chatInput;
     }
 }

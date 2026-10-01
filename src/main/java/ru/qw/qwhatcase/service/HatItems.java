@@ -1,6 +1,12 @@
 package ru.qw.qwhatcase.service;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -14,7 +20,9 @@ import ru.qw.qwhatcase.config.Hat;
 import ru.qw.qwhatcase.util.Text;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Создание предметов шляп. Все служебные предметы помечаются ключами PDC —
@@ -53,9 +61,52 @@ public final class HatItems {
         }
     }
 
-    /** Предмет, который надевается в слот шлема. Не даёт защиты и не снимается вручную. */
-    public static ItemStack cosmetic(Hat hat) {
-        ItemStack item = new ItemStack(material(hat.material(), Material.PAPER));
+    /** Чары и атрибуты шляпы (как в PTrap): базовые из config.yml + личные чары игрока поверх них. */
+    public record Stats(Map<String, Integer> enchantments, Map<String, Double> attributes, boolean glint) {
+        public static final Stats NONE = new Stats(Map.of(), Map.of(), false);
+
+        /** Личные чары перекрывают базовые (как addUnsafeEnchantment в PTrap). */
+        public Stats with(Map<String, Integer> personal) {
+            if (personal == null || personal.isEmpty()) {
+                return this;
+            }
+            Map<String, Integer> merged = new LinkedHashMap<>(enchantments);
+            merged.putAll(personal);
+            return new Stats(merged, attributes, glint);
+        }
+    }
+
+    public static Enchantment enchantment(String key) {
+        NamespacedKey nk = NamespacedKey.fromString(key);
+        return nk == null ? null : RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(nk);
+    }
+
+    public static Attribute attribute(String key) {
+        NamespacedKey nk = NamespacedKey.fromString(key);
+        return nk == null ? null : RegistryAccess.registryAccess().getRegistry(RegistryKey.ATTRIBUTE).get(nk);
+    }
+
+    private static void applyStats(ItemMeta meta, Hat hat, Stats stats) {
+        for (Map.Entry<String, Integer> e : stats.enchantments().entrySet()) {
+            Enchantment enchantment = enchantment(e.getKey());
+            if (enchantment != null) {
+                meta.addEnchant(enchantment, e.getValue(), true);
+            }
+        }
+        for (Map.Entry<String, Double> e : stats.attributes().entrySet()) {
+            Attribute attribute = attribute(e.getKey());
+            if (attribute != null) {
+                String path = ("hat_" + e.getKey().replace(':', '_')).toLowerCase(java.util.Locale.ROOT);
+                meta.addAttributeModifier(attribute, new AttributeModifier(new NamespacedKey("qwhatcase", path),
+                        e.getValue(), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
+            }
+        }
+        meta.setEnchantmentGlintOverride(stats.glint());
+    }
+
+    /** Предмет, который надевается в слот шлема. Снять его вручную нельзя — только через меню/команду. */
+    public static ItemStack cosmetic(Hat hat, Stats stats) {
+        ItemStack item = new ItemStack(material(hat.material(), Material.CARVED_PUMPKIN));
         item.editMeta(meta -> {
             meta.displayName(Text.item(hat.coloredName()));
             meta.lore(Text.itemLines(hat.lore()));
@@ -68,25 +119,40 @@ public final class HatItems {
             equippable.setCameraOverlay(null);
             meta.setEquippable(equippable);
             meta.setMaxStackSize(1);
-            meta.setEnchantmentGlintOverride(false);
-            meta.addItemFlags(ItemFlag.values());
+            applyStats(meta, hat, stats);
             meta.getPersistentDataContainer().set(COSMETIC, PersistentDataType.STRING, hat.id());
         });
         return item;
     }
 
-    /** Иконка шляпы для меню (та же модель, без возможности надеть). */
-    public static ItemStack icon(Hat hat, String name, List<String> lore, boolean glint) {
-        ItemStack item = new ItemStack(material(hat.material(), Material.PAPER));
+    /** Иконка шляпы для меню: та же модель, чары и характеристики, но надеть её нельзя. */
+    public static ItemStack icon(Hat hat, String name, List<String> lore, boolean glint, Stats stats) {
+        ItemStack item = new ItemStack(material(hat.material(), Material.CARVED_PUMPKIN));
         item.editMeta(meta -> {
             meta.displayName(Text.item(name));
             meta.lore(Text.itemLines(lore));
             applyModel(meta, hat.itemModel(), hat.customModelData());
-            meta.setEnchantmentGlintOverride(glint);
-            meta.addItemFlags(ItemFlag.values());
+            applyStats(meta, hat, stats);
+            if (glint) {
+                meta.setEnchantmentGlintOverride(true);
+            }
+            if (stats.enchantments().isEmpty() && stats.attributes().isEmpty()) {
+                meta.addItemFlags(ItemFlag.values());
+            }
             meta.getPersistentDataContainer().set(GUI, PersistentDataType.BYTE, (byte) 1);
         });
         return item;
+    }
+
+    public static ItemStack icon(Hat hat, String name, List<String> lore, boolean glint) {
+        return icon(hat, name, lore, glint, Stats.NONE);
+    }
+
+    /** Чары предмета в виде "minecraft:key" → уровень. */
+    public static Map<String, Integer> enchantKeys(Map<Enchantment, Integer> enchants) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        enchants.forEach((e, level) -> result.put(e.getKey().asString(), level));
+        return result;
     }
 
     /** Простая кнопка меню. */

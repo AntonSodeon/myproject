@@ -118,6 +118,24 @@ public final class HatProtectionListener implements Listener {
         }
     }
 
+    /** Основа шляпы — тыква (как в PTrap): поставить её блоком нельзя. */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void place(org.bukkit.event.block.BlockPlaceEvent event) {
+        if (HatItems.isService(event.getItemInHand())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void craft(org.bukkit.event.inventory.PrepareItemCraftEvent event) {
+        for (ItemStack item : event.getInventory().getMatrix()) {
+            if (HatItems.isService(item)) {
+                event.getInventory().setResult(null);
+                return;
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void drop(PlayerDropItemEvent event) {
         if (HatItems.isService(event.getItemDrop().getItemStack())) {

@@ -18,6 +18,7 @@ public final class Profile {
     private String selectedHat;
     private final Map<String, Long> owned;
     private final Map<String, Long> keys;
+    private final Map<String, Map<String, Integer>> enchants;
 
     public Profile(PlayerData data) {
         this.uuid = data.uuid();
@@ -25,6 +26,27 @@ public final class Profile {
         this.selectedHat = data.selectedHat();
         this.owned = new LinkedHashMap<>(data.owned());
         this.keys = new HashMap<>(data.keys());
+        this.enchants = new HashMap<>();
+        data.enchants().forEach((hat, map) -> enchants.put(hat, new LinkedHashMap<>(map)));
+    }
+
+    /** Личные чары шляпы (наложенные книгами или перенесённые из PTrap). */
+    public Map<String, Integer> enchants(String hatId) {
+        return enchants.getOrDefault(hatId, Map.of());
+    }
+
+    public void setEnchants(String hatId, Map<String, Integer> map) {
+        if (map == null || map.isEmpty()) {
+            enchants.remove(hatId);
+        } else {
+            enchants.put(hatId, new LinkedHashMap<>(map));
+        }
+    }
+
+    public void clearOwned() {
+        owned.clear();
+        enchants.clear();
+        selectedHat = null;
     }
 
     public UUID uuid() {
@@ -65,6 +87,7 @@ public final class Profile {
 
     public void removeOwned(String hatId) {
         owned.remove(hatId);
+        enchants.remove(hatId);
         if (hatId.equals(selectedHat)) {
             selectedHat = null;
         }

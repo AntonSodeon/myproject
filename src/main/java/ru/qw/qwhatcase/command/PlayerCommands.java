@@ -34,12 +34,21 @@ public final class PlayerCommands implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+        if (command.getName().equalsIgnoreCase("hats") && args.length >= 1 && args[0].equalsIgnoreCase("grant")) {
+            grant(sender, args);
+            return true;
+        }
         if (!(sender instanceof Player player)) {
             plugin.messages().send(sender, "error.players-only");
             return true;
         }
         if (command.getName().equalsIgnoreCase("cases")) {
             cases(player, args);
+        } else if (args.length == 0 && label.equalsIgnoreCase("hat")) {
+            // Как в PTrap: /hat без аргументов — «Мои шляпы».
+            if (check(player, "qwhatcase.menu")) {
+                new CollectionMenu(plugin, player).open();
+            }
         } else {
             hats(player, args);
         }
@@ -65,6 +74,15 @@ public final class PlayerCommands implements CommandExecutor, TabCompleter {
             case "collection" -> {
                 if (check(player, "qwhatcase.menu")) {
                     new CollectionMenu(plugin, player).open();
+                }
+            }
+            case "menu" -> {
+                if (check(player, "qwhatcase.menu")) {
+                    if (plugin.catalog().settings().donateShopEnabled()) {
+                        new ru.qw.qwhatcase.gui.DonateShopMenu(plugin, player, 0).open();
+                    } else {
+                        new ShopMenu(plugin, player, 0).open();
+                    }
                 }
             }
             case "shop" -> {
@@ -139,6 +157,54 @@ public final class PlayerCommands implements CommandExecutor, TabCompleter {
         }
     }
 
+    /**
+     * /hat grant — админ-меню выдачи (как в PTrap); /hat grant &lt;игрок&gt; &lt;id&gt; — выдать шляпу.
+     * ID можно указывать новый (pirate_hat) или старый из PTrap (hat_90).
+     */
+    private void grant(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("qwhatcase.admin.hats")) {
+            plugin.messages().send(sender, "error.no-permission");
+            return;
+        }
+        if (args.length == 1) {
+            if (sender instanceof Player player) {
+                new ru.qw.qwhatcase.gui.AdminMenus.Players(plugin, player, 0, null).open();
+            } else {
+                plugin.messages().send(sender, "usage.grant");
+            }
+            return;
+        }
+        if (args.length < 3) {
+            plugin.messages().send(sender, "usage.grant");
+            return;
+        }
+        Hat hat = plugin.catalog().hat(args[2]).or(() -> plugin.catalog().byLegacy(args[2])).orElse(null);
+        if (hat == null) {
+            plugin.messages().send(sender, "hat.unknown", Placeholders.of("hat", args[2]));
+            return;
+        }
+        plugin.resolver().resolve(args[1]).whenComplete((target, error) -> org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+            if (error != null || target.isEmpty()) {
+                plugin.messages().send(sender, "error.unknown-player", Placeholders.of("player", args[1]));
+                return;
+            }
+            var t = target.get();
+            plugin.api().grantHat(t.uuid(), hat.id(), sender.getName()).whenComplete((added, err) ->
+                    org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                        Map<String, Object> ph = Placeholders.of("player", t.name(), "hat", hat.coloredName());
+                        if (err != null) {
+                            plugin.messages().send(sender, "error.database");
+                            return;
+                        }
+                        plugin.messages().send(sender, added ? "admin.hat-given" : "admin.hat-already", ph);
+                        Player online = org.bukkit.Bukkit.getPlayer(t.uuid());
+                        if (added && online != null) {
+                            plugin.messages().send(online, "hat.received", ph);
+                        }
+                    }));
+        }));
+    }
+
     public void reportEquip(Player player, Hat hat, HatDisplayService.Result result) {
         String key = switch (result) {
             case EQUIPPED -> "hat.equipped";
@@ -178,7 +244,14 @@ public final class PlayerCommands implements CommandExecutor, TabCompleter {
             }
         } else {
             if (args.length == 1) {
-                options.addAll(List.of("collection", "equip", "unequip", "pack", "shop"));
+                options.addAll(List.of("collection", "equip", "unequip", "pack", "shop", "menu"));
+                if (sender.hasPermission("qwhatcase.admin.hats")) {
+                    options.add("grant");
+                }
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("grant")) {
+                org.bukkit.Bukkit.getOnlinePlayers().forEach(p -> options.add(p.getName()));
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("grant")) {
+                options.addAll(plugin.catalog().hats().keySet());
             } else if (args.length == 2 && args[0].equalsIgnoreCase("equip") && sender instanceof Player player) {
                 Profile profile = plugin.profiles().get(player);
                 if (profile != null) {

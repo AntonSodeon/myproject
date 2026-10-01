@@ -4,7 +4,9 @@
 
 | Команда | Право | Описание |
 |---|---|---|
-| `/hats` (`/hat`) | `qwhatcase.menu` | Главное меню: Кейсы, Мои шляпки, Каталог за жетоны, Снять шляпку, Ресурс-пак |
+| `/hat` | `qwhatcase.menu` | «Мои шляпки» (как в PTrap). ЛКМ — надеть, ПКМ — действия: «Наложить чар» книгой, «Надеть» |
+| `/hat menu` (`/hats menu`) | `qwhatcase.menu` | Магазин шляп PTrap: все шляпы, цена, «Купить в Telegram» |
+| `/hats` | `qwhatcase.menu` | Главное меню: Кейсы, Мои шляпки, Каталог за жетоны, Магазин шляп, Снять шляпку, Ресурс-пак |
 | `/hats collection` | `qwhatcase.menu` | Коллекция (страницы, фильтры, сортировка) |
 | `/hats shop` | `qwhatcase.menu` (+ `qwhatcase.shop` для покупки) | Каталог за жетоны |
 | `/hats equip <hat_id>` | `qwhatcase.equip` | Надеть открытую шляпку |
@@ -24,6 +26,8 @@
 
 | Команда | Право |
 |---|---|
+| `/hat grant` — админ-меню PTrap: выбор игрока (поиск ника через чат), выдать / удалить шляпу, удалить все | `qwhatcase.admin.hats` |
+| `/hat grant <player> <hat_id>` — выдать (ID новый или старый `hat_N`) | `qwhatcase.admin.hats` |
 | `/hatcases key give\|take\|set <player> <case_id> <amount>` | `qwhatcase.admin.keys` |
 | `/hatcases hat give\|revoke <player> <hat_id>` | `qwhatcase.admin.hats` |
 | `/hatcases tokens give\|take <player> <amount>` | `qwhatcase.admin.tokens` |
@@ -36,7 +40,8 @@
 | `/hatcases migrate` (предпросмотр) → `/hatcases migrate confirm` | `qwhatcase.admin.migrate` |
 | `/hatcases simulate <case_id> [N]` — статистическая проверка вероятностей (по умолчанию 1 000 000) | `qwhatcase.admin.simulate` |
 
-`qwhatcase.admin` (default: op) включает все административные права. Обычным игрокам они не выдаются.
+`qwhatcase.admin` (default: op) включает все административные права. Старое право PTrap `qwhats.admin`
+сохранено и тоже даёт все административные права. Обычным игрокам они не выдаются.
 
 `take` списывает не больше, чем есть (баланс не уходит в минус) и сообщает, сколько списано фактически.
 

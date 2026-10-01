@@ -5,7 +5,7 @@ const db = name => JSON.parse(execFileSync('python3', ['db.py', '../server/plugi
 const cfgDir = path.join(SERVER, 'plugins/QWHatCase');
 (async () => {
   const orig = fs.readFileSync(path.join(cfgDir, 'config.yml'), 'utf8');
-  fs.writeFileSync(path.join(cfgDir, 'config.yml'), orig.replace("url: ''", "url: 'http://127.0.0.1:8765/pack.zip'").replace("sha1: ''", "sha1: '6c49d711de3e86c76da007e2fd7ac36ba34385fb'"));
+  fs.writeFileSync(path.join(cfgDir, 'config.yml'), orig.replace("url: ''", "url: 'http://127.0.0.1:8765/pack.zip'").replace("sha1: ''", "sha1: 'fce683382eedc5ed62883f04b2c7e1fe88bcae91'"));
   consoleCmd('hatcases reload'); consoleCmd('hatcases key give Tester1 basic 1'); await sleep(1000);
   const bot = require('mineflayer').createBot({ host: '127.0.0.1', port: 25599, username: 'Tester1', version: '1.21.11', auth: 'offline' });
   bot.chatLog = []; bot.on('messagestr', m => bot.chatLog.push(m));
@@ -15,7 +15,7 @@ const cfgDir = path.join(SERVER, 'plugins/QWHatCase');
   const hat = db('Tester1').hats[1];
   bot.chat('/hats unequip'); await sleep(500);
   bot.chat('/hats equip ' + hat); await sleep(800);
-  check('equip works without pack', bot.inventory.slots[5]?.name === 'paper' && db('Tester1').selected === hat);
+  check('equip works without pack', bot.inventory.slots[5]?.name === 'carved_pumpkin' && db('Tester1').selected === hat);
   bot.chat('/hats'); const w = await waitWindow(bot, w => /Шляпки/.test(title(w)));
   const warn = w && w.slots[26];
   check('main menu warns that pack is missing', !!warn && JSON.stringify(warn.components || '').includes('Ресурс-пак не загружен'));

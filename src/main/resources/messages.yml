@@ -16,6 +16,7 @@ usage:
     - '&6/hats collection &7— моя коллекция'
     - '&6/hats equip <id> &7— надеть открытую шляпку'
     - '&6/hats unequip &7— снять шляпку'
+    - '&6/hat &7— мои шляпы; &6/hat menu &7— магазин шляп'
     - '&6/hats shop &7— каталог за жетоны'
     - '&6/hats pack &7— повторно загрузить ресурс-пак'
   cases:
@@ -32,8 +33,10 @@ usage:
   inspect: '&eИспользование: &f/hatcases inspect <игрок>'
   history: '&eИспользование: &f/hatcases history <игрок> [страница] &7или &f/hatcases history op <ID операции>'
   simulate: '&eИспользование: &f/hatcases simulate <кейс> [розыгрышей]'
+  grant: '&eИспользование: &f/hat grant &7(меню) или &f/hat grant <игрок> <id>'
   admin:
     - '&6&lQWHatCase — администрирование'
+    - '&6/hat grant &7— меню выдачи и удаления шляп; &6/hat grant <игрок> <id>'
     - '&6/hatcases key give|take|set <игрок> <кейс> <кол-во>'
     - '&6/hatcases hat give|revoke <игрок> <шляпа>'
     - '&6/hatcases tokens give|take <игрок> <кол-во>'
@@ -55,9 +58,21 @@ hat:
   helmet-cursed: '&cНа шлеме проклятие несъёмности — шляпку надеть нельзя.'
   unequipped: '&aШляпка снята. Она осталась в коллекции.'
   nothing-to-unequip: '&7На вас нет шляпки.'
-  slot-locked: '&eСлот головы занят шляпкой. Снимите её: &f/hats unequip'
+  slot-locked: '&cСнять шляпу можно только через /hat'
   helmet-blocks-restore: '&eШляпка {hat}&e не надета: слот занят шлемом. Снимите шлем и наденьте её в &f/hats&e.'
-  received: '&aВ вашу коллекцию добавлена шляпка {hat}&a! Откройте &f/hats'
+  received: '&aВ вашу коллекцию добавлена шляпка {hat}&a! Откройте &f/hat'
+  revoked-by-admin: '&cОдна из ваших шляп была удалена администратором.'
+  all-revoked-by-admin: '&cВаша коллекция шляп была очищена администратором.'
+
+enchant:
+  wrong-item: '&cДля чар нужна зачарованная книга.'
+  done: '&aЧары наложены и сохранены в вашей коллекции.'
+
+donate:
+  buy-line: '&6Покупка «{hat}&6»: '
+  link: '&b&nнаписать @{user}'
+  hover: 'Открыть Telegram'
+  hint: '&7Нажмите на голубую ссылку, чтобы открыть Telegram.'
 
 keys:
   received: '&aВы получили &f{amount}&a ключ(ей) для кейса {case}&a. Всего: &f{balance}'
@@ -145,6 +160,8 @@ admin:
   audit-header: '&6Последние действия:'
   audit-line: '&8 • &7{date} &f{actor} &e{action} &7{details}'
   reloaded: '&aКонфигурация применена: шляпок &f{hats}&a, кейсов &f{cases}&a (включено &f{enabled}&a), замечаний: &f{problems}'
+  search-prompt: '&eНапишите ник или часть ника в чат. &7Для отмены: cancel'
+  all-revoked: '&aКоллекция шляп игрока &f{player}&a полностью удалена ({count}).'
   reload-failed: '&cКонфигурация содержит ошибку и НЕ применена (оставлена прежняя): &f{error}'
   simulate-start: '&7Моделирую &f{rolls}&7 открытий кейса {case}&7...'
   simulate-ok: '&aРаспределение соответствует настройкам: χ²={chi}, степеней свободы {df}, z={z}, макс. отклонение {dev} п.п. ({rolls} розыгрышей)'
@@ -160,7 +177,8 @@ migrate:
   preview-first: '&cСначала выполните предпросмотр: &f/hatcases migrate'
   done: '&aМиграция выполнена: игроков &f{players}&a, записей &f{hats}&a, добавлено &f{added}&a, неизвестных &f{unknown}&a. Резервная копия: &f{backup}&a, отчёт: &f{report}'
   failed: '&cМиграция не выполнена, изменения откатаны: &f{error}'
-  items-converted: '&7Старые предметы шляпок ({count}) заменены записями в коллекции: &f/hats'
+  items-converted: '&7Старые предметы шляпок ({count}) заменены записями в коллекции: &f/hat'
+  items-imported: '&aШляп из инвентаря добавлено в коллекцию: &f{count}&a. Откройте &f/hat'
 
 menu:
   common:
@@ -189,6 +207,8 @@ menu:
     shop-lore: ['&7Баланс: &e{tokens} жетонов', '&7Жетоны дают за повторные шляпки', '', '&eНажмите, чтобы открыть']
     unequip-name: '&c&lСнять шляпку'
     unequip-lore: ['&7Шляпка останется в коллекции']
+    donate-name: '&6&lМагазин шляп'
+    donate-lore: ['&7Все шляпы и покупка через Telegram', '', '&eНажмите, чтобы открыть']
     pack-name: '&d&lРесурс-пак'
     pack-lore: ['&7Состояние: {state}', '', '&eНажмите, чтобы загрузить снова']
   cases:
@@ -253,8 +273,8 @@ menu:
     back-lore: ['&7К содержимому кейса']
   collection:
     title: '&8Мои шляпки'
-    owned-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&eНажмите, чтобы надеть']
-    worn-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&a&l✔ НАДЕТА']
+    owned-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&eЛКМ — надеть', '&dПКМ — действия (чары)']
+    worn-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '&7Получена: &f{date}', '', '&aСейчас надета', '&dПКМ — действия (чары)']
     locked-name: '&8🔒 {hat}'
     locked-lore: ['', '&7Редкость: {rarity}', '&7Категория: {category}', '', '&cЗакрыта — ещё не получена']
     filter-all: '&fвсе'
@@ -285,6 +305,65 @@ menu:
     balance-lore: ['&7Жетоны начисляются за повторные шляпки из кейсов']
     empty-name: '&7Каталог пуст'
     empty-lore: []
+  actions:
+    title: '&8Шляпа: {hat}'
+    enchant-name: '&dНаложить чар'
+    enchant-lore: ['&7Положите зачарованную книгу:', '&7нажмите на неё в своём инвентаре.']
+    equip-name: '&aНадеть'
+    equip-lore: ['&7Надеть эту шляпу на голову.']
+    back-lore: ['&7Вернуться к вашим шляпам.']
+  enchant:
+    title: '&8Наковальня: {hat}'
+    info-name: '&dНажмите на зачарованную книгу'
+    info-lore:
+      - '&7в своём инвентаре — её чары'
+      - '&7перейдут на шляпу. Книга расходуется,'
+      - '&7опыт не нужен.'
+  donate:
+    title: '&8Магазин шляп'
+    hat-lore: ['', '&7Редкость: {rarity}', '&eЦена: &6{price}']
+    owned-lore: ['', '&7Редкость: {rarity}', '&eЦена: &6{price}', '&aУже есть в коллекции']
+    page-name: '&6Страница {page} из {pages}'
+    page-lore: ['&7Цена каждой шляпы: &e{price}', '&7Нажмите — главное меню']
+    detail-title: '&8Покупка шляпы'
+    detail-lore: ['', '&eЦена: &6{price}']
+    buy-name: '&aКупить в Telegram'
+    buy-lore: ['&7Нажмите — получите ссылку на', '&b@{user}']
+    back-lore: ['&7Вернуться к каталогу']
+  admin:
+    players-title: '&8Выбор игрока'
+    player-online-name: '&a{player}'
+    player-offline-name: '&7{player}'
+    player-online-lore: ['&a● В сети', '&eНажмите, чтобы выбрать']
+    player-offline-lore: ['&8● Не в сети', '&eНажмите, чтобы выбрать']
+    filter-none: '&7все известные игроки'
+    search-name: '&eПоиск по нику'
+    search-lore: ['&7Нажмите и напишите ник в чат.']
+    players-info-name: '&6Игроки: {count}'
+    players-info-lore: ['&7Поиск: &f{filter}', '&aЗелёные — онлайн', '&7Серые — офлайн']
+    target-title: '&8Шляпы игрока: &f{player}'
+    give-name: '&aВыдать шляпу'
+    give-lore: ['&7Добавить шляпу в коллекцию.']
+    manage-name: '&cУправлять шляпами'
+    manage-lore: ['&7Посмотреть и удалить шляпы.']
+    back-players-lore: ['&7Вернуться к игрокам.']
+    back-target-lore: ['&7Вернуться к игроку.']
+    grant-title: '&8Выдать: &f{player}'
+    grant-hat-lore: ['&8{id}', '&aНажмите, чтобы выдать']
+    grant-info-name: '&6Выберите шляпу'
+    grant-info-lore: ['&7Она будет добавлена в коллекцию игрока.', '&7Нажмите — назад']
+    remove-title: '&8Удалить шляпы: &f{player}'
+    remove-hat-lore: ['&8{id}', '&cНажмите, чтобы удалить']
+    unknown-hat-name: '&cНеизвестная шляпа'
+    remove-all-name: '&cУдалить все шляпы'
+    remove-all-lore: ['&7Полностью очистить коллекцию игрока ({count}).', '&cПотребуется подтверждение.']
+    confirm-title: '&4Подтвердите удаление'
+    confirm-info-name: '&6Игрок: &f{player}'
+    confirm-info-lore: ['&7Шляп в коллекции: &e{count}']
+    confirm-yes-name: '&cДа, удалить все'
+    confirm-yes-lore: ['&7Будут удалены все шляпы игрока', '&7и надетая шляпа.']
+    confirm-no-name: '&eОтмена'
+    confirm-no-lore: ['&7Вернуться к управлению.']
   confirm:
     title: '&8Подтверждение покупки'
     hat-lore: ['&7Цена: &e{price}', '&7Баланс: &e{tokens} &7→ &e{after}']

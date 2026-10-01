@@ -36,9 +36,10 @@ cases:
       duration-ms: 5000
       steps: 45
       sounds: true
-      tick-sound: 'minecraft:ui.button.click'
-      finish-sound: 'minecraft:entity.player.levelup'
-      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      # Звуки из ресурс-пака (custom.mystery_crate.*, custom.currency.tokens).
+      tick-sound: 'minecraft:custom.mystery_crate.scroll'
+      finish-sound: 'minecraft:custom.mystery_crate.unlock'
+      duplicate-sound: 'minecraft:custom.currency.tokens'
       frame: BLACK_STAINED_GLASS_PANE
       pointer: LIME_STAINED_GLASS_PANE
     win-message: ''
@@ -72,9 +73,9 @@ cases:
       duration-ms: 6000
       steps: 50
       sounds: true
-      tick-sound: 'minecraft:block.note_block.hat'
-      finish-sound: 'minecraft:entity.player.levelup'
-      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      tick-sound: 'minecraft:custom.mystery_crate.scroll'
+      finish-sound: 'minecraft:custom.mystery_crate.unlock'
+      duplicate-sound: 'minecraft:custom.currency.tokens'
       frame: PURPLE_STAINED_GLASS_PANE
       pointer: YELLOW_STAINED_GLASS_PANE
     win-message: ''
@@ -110,9 +111,9 @@ cases:
       duration-ms: 5000
       steps: 45
       sounds: true
-      tick-sound: 'minecraft:block.amethyst_block.chime'
-      finish-sound: 'minecraft:entity.player.levelup'
-      duplicate-sound: 'minecraft:entity.experience_orb.pickup'
+      tick-sound: 'minecraft:custom.mystery_crate.scroll'
+      finish-sound: 'minecraft:custom.mystery_crate.unlock'
+      duplicate-sound: 'minecraft:custom.currency.tokens'
       frame: LIGHT_BLUE_STAINED_GLASS_PANE
       pointer: WHITE_STAINED_GLASS_PANE
     win-message: '&bЗимний кейс подарил вам {hat}&b! &8({rarity}&8, шанс {chance})'

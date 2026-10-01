@@ -30,7 +30,8 @@ public final class ResultMenu extends Menu {
         Map<String, Object> ph = plugin.openings().placeholders(viewer, caseDef, hat, result);
         boolean duplicate = result.outcome() == OpeningResult.Outcome.DUPLICATE;
         set(13, HatItems.icon(hat, hat.coloredName(),
-                msg().lines(duplicate ? "menu.result.duplicate-lore" : "menu.result.new-lore", ph), !duplicate));
+                msg().lines(duplicate ? "menu.result.duplicate-lore" : "menu.result.new-lore", ph), !duplicate,
+                plugin.display().stats(plugin.profiles().get(viewer), hat.id())));
         set(11, button(Material.ARMOR_STAND, "menu.result.collection-name", "menu.result.collection-lore", ph),
                 click -> new CollectionMenu(plugin, viewer).open());
         Profile profile = plugin.profiles().get(viewer);

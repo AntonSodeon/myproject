@@ -107,7 +107,7 @@ const db = name => JSON.parse(execFileSync('python3', ['db.py', '../server/plugi
   check('real helmet worn', a2.inventory.slots[5]?.name === 'diamond_helmet');
   consoleCmd('clear Tester1 minecraft:dirt'); // нет эффекта, просто синхронизация
   a2.chat('/hats equip ' + hat); await sleep(800);
-  check('hat equipped into head slot', a2.inventory.slots[5] && a2.inventory.slots[5].name === 'paper', a2.inventory.slots[5]?.name);
+  check('hat equipped into head slot', a2.inventory.slots[5] && a2.inventory.slots[5].name === 'carved_pumpkin', a2.inventory.slots[5]?.name);
   check('real helmet moved to inventory (not lost)', a2.inventory.items().some(i => i.name === 'diamond_helmet'));
   check('selected hat saved', db('Tester1').selected === hat);
   // попытки снять шляпу
@@ -119,15 +119,15 @@ const db = name => JSON.parse(execFileSync('python3', ['db.py', '../server/plugi
   // ПКМ шлемом при надетой шляпе
   const helm2 = a2.inventory.items().find(i => i.name === 'diamond_helmet');
   await a2.equip(helm2, 'hand'); await sleep(200); a2.activateItem(); await sleep(600);
-  check('hat cannot be removed via clicks/shift/number/drop/right-click helmet', a2.inventory.slots[5]?.name === 'paper'
-    && !a2.inventory.items().some(i => i.name === 'paper') && !a2.inventory.cursor, { head: a2.inventory.slots[5]?.name, items: inventoryItems(a2) });
+  check('hat cannot be removed via clicks/shift/number/drop/right-click helmet', a2.inventory.slots[5]?.name === 'carved_pumpkin'
+    && !a2.inventory.items().some(i => i.name === 'carved_pumpkin') && !a2.inventory.cursor, { head: a2.inventory.slots[5]?.name, items: inventoryItems(a2) });
   check('helmet not duplicated', a2.inventory.items().filter(i => i.name === 'diamond_helmet').length === 1);
   // смерть
   consoleCmd('kill Tester1'); await sleep(1000);
   try { a2.respawn(); } catch (e) { }
   await sleep(2000);
-  const drops = Object.values(a2.entities).filter(e => e.name === 'item' && e.metadata && JSON.stringify(e.metadata).includes('paper'));
-  check('hat restored after death/respawn', a2.inventory.slots[5]?.name === 'paper', a2.inventory.slots[5]?.name);
+  const drops = Object.values(a2.entities).filter(e => e.name === 'item' && e.metadata && JSON.stringify(e.metadata).includes('carved_pumpkin'));
+  check('hat restored after death/respawn', a2.inventory.slots[5]?.name === 'carved_pumpkin', a2.inventory.slots[5]?.name);
   check('hat not dropped on death', drops.length === 0, drops.length);
   // снять
   a2.chat('/hats unequip'); await sleep(600);

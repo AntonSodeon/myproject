@@ -40,7 +40,11 @@ public final class MainMenu extends Menu {
             viewer.closeInventory();
             plugin.commands().offerPack(viewer);
         });
-        set(22, button(Material.BARRIER, "menu.main.unequip-name", "menu.main.unequip-lore", ph), click -> {
+        if (plugin.catalog().settings().donateShopEnabled()) {
+            set(23, button(Material.GOLD_INGOT, "menu.main.donate-name", "menu.main.donate-lore", ph),
+                    click -> new DonateShopMenu(plugin, viewer, 0).open());
+        }
+        set(21, button(Material.BARRIER, "menu.main.unequip-name", "menu.main.unequip-lore", ph), click -> {
             if (plugin.display().unequip(viewer)) {
                 msg().send(viewer, "hat.unequipped");
             } else {

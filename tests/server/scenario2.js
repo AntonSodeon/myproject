@@ -12,7 +12,7 @@ const logSince = n => fs.readFileSync(path.join(SERVER, 'server.log'), 'utf8').s
   let a = await join('Tester1');
   await sleep(1000);
   const s = db('Tester1');
-  check('after restart: selected hat restored on head', a.inventory.slots[5]?.name === 'paper' && s.selected && s.selected === s.hats[0], [itemName(a.inventory.slots[5]), s.selected]);
+  check('after restart: selected hat restored on head', a.inventory.slots[5]?.name === 'carved_pumpkin' && s.selected && s.selected === s.hats[0], [itemName(a.inventory.slots[5]), s.selected]);
   check('after restart: balances & collection kept', s.tokens === 450 && s.keys.basic === 3 && s.hats.length === 4, s);
 
   // --- выход во время анимации (повтор исправленного сценария)
@@ -102,7 +102,7 @@ const logSince = n => fs.readFileSync(path.join(SERVER, 'server.log'), 'utf8').s
   // --- ресурс-пак: PLUGIN режим, отказ / принятие
   let cfg = fs.readFileSync(path.join(cfgDir, 'config.yml'), 'utf8');
   const cfgOriginal = cfg;
-  cfg = cfg.replace("url: ''", "url: 'http://127.0.0.1:8765/pack.zip'").replace("sha1: ''", "sha1: '6c49d711de3e86c76da007e2fd7ac36ba34385fb'");
+  cfg = cfg.replace("url: ''", "url: 'http://127.0.0.1:8765/pack.zip'").replace("sha1: ''", "sha1: 'fce683382eedc5ed62883f04b2c7e1fe88bcae91'");
   fs.writeFileSync(path.join(cfgDir, 'config.yml'), cfg);
   consoleCmd('hatcases reload'); await sleep(1000);
   a.quit(); b.quit(); await sleep(1000);

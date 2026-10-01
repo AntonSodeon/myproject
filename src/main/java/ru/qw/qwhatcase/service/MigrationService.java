@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import ru.qw.qwhatcase.QWHatCasePlugin;
 import ru.qw.qwhatcase.config.Hat;
+import ru.qw.qwhatcase.config.Settings;
 import ru.qw.qwhatcase.storage.Database;
 import ru.qw.qwhatcase.storage.LegacyImport;
 import ru.qw.qwhatcase.util.Placeholders;
@@ -165,7 +166,7 @@ public final class MigrationService {
             StringBuilder report = new StringBuilder("Миграция " + stamp + "\nРезервная копия: " + backupDir.getAbsolutePath() + "\n\n");
             List<Database.ImportStats> stats = new ArrayList<>();
             for (Source source : sources) {
-                LegacyParser.Plan plan = plan(source);
+                LegacyParser.Plan plan = planWithEnchants(source);
                 Database.ImportStats s = db.importLegacy(source.label(), plan.players(), sender.getName(),
                         backupDir.getAbsolutePath(), null);
                 stats.add(s);
@@ -216,15 +217,114 @@ public final class MigrationService {
         return file;
     }
 
+    /** Личные чары старого предмета: всё, что отличается от базовых характеристик шляпы. */
+    private Map<String, Integer> extras(ItemStack item) {
+        Map<String, Integer> base = plugin.catalog().settings().hatEnchantments();
+        Map<String, Integer> result = new LinkedHashMap<>();
+        HatItems.enchantKeys(item.getEnchantments()).forEach((key, level) -> {
+            if (!level.equals(base.get(key))) {
+                result.put(key, level);
+            }
+        });
+        return result;
+    }
+
+    /** Чары шляп из players.yml (ItemStack разбирается сервером). */
+    private Map<java.util.UUID, Map<String, Map<String, Integer>>> legacyEnchants(Source source) {
+        Map<java.util.UUID, Map<String, Map<String, Integer>>> result = new LinkedHashMap<>();
+        org.bukkit.configuration.file.YamlConfiguration yaml =
+                org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(source.file());
+        for (String uuidKey : yaml.getKeys(false)) {
+            java.util.UUID uuid;
+            try {
+                uuid = java.util.UUID.fromString(uuidKey);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+            org.bukkit.configuration.ConfigurationSection hats = yaml.getConfigurationSection(uuidKey + ".hats");
+            if (hats == null) {
+                continue;
+            }
+            for (String oldId : hats.getKeys(false)) {
+                Optional<Hat> hat = plugin.catalog().byLegacy(oldId);
+                ItemStack item;
+                try {
+                    item = hats.getItemStack(oldId);
+                } catch (RuntimeException e) {
+                    item = null;
+                }
+                if (hat.isEmpty() || item == null) {
+                    continue;
+                }
+                Map<String, Integer> extra = extras(item);
+                if (!extra.isEmpty()) {
+                    result.computeIfAbsent(uuid, k -> new LinkedHashMap<>()).put(hat.get().id(), extra);
+                }
+            }
+        }
+        return result;
+    }
+
+    private LegacyParser.Plan planWithEnchants(Source source) throws IOException {
+        LegacyParser.Plan plan = plan(source);
+        Map<java.util.UUID, Map<String, Map<String, Integer>>> enchants = legacyEnchants(source);
+        List<LegacyImport> players = new ArrayList<>();
+        for (LegacyImport p : plan.players()) {
+            players.add(new LegacyImport(p.uuid(), p.name(), p.hatIds(), p.unknown(), enchants.getOrDefault(p.uuid(), Map.of())));
+        }
+        return new LegacyParser.Plan(players, plan.hats(), plan.mapped(), plan.unknown(), plan.problems());
+    }
+
     /**
-     * Предметы старого плагина в инвентаре игрока. Если шляпа уже есть в новой коллекции,
-     * старый предмет (с бронёй +3 и чарами) убирается, а шляпа из слота шлема становится выбранной.
-     * Предметы шляп, которых нет в коллекции, НЕ трогаются и фиксируются в журнале.
+     * Предметы шляп старого плагина в инвентаре игрока (механика PTrap «импорт старых шляп»):
+     * IMPORT — шляпа и её чары добавляются в коллекцию, предмет убирается; шляпа из слота шлема
+     * становится надетой. CONVERT — убираются только предметы уже имеющихся шляп. IGNORE — ничего.
+     * Учитываются только предметы с меткой PTrap (ptrap:hat-id и её предшественники).
      */
     public void convertLegacyItems(Player player) {
-        if (!plugin.catalog().settings().convertLegacyItems()) {
+        Settings.LegacyItems mode = plugin.catalog().settings().legacyItems();
+        Profile profile = plugin.profiles().get(player);
+        if (mode == Settings.LegacyItems.IGNORE || profile == null) {
             return;
         }
+        Map<String, Map<String, Integer>> toImport = new LinkedHashMap<>();
+        for (ItemStack item : player.getInventory().getContents()) {
+            String legacy = HatItems.legacyId(item);
+            if (legacy == null) {
+                continue;
+            }
+            Optional<Hat> hat = plugin.catalog().byLegacy(legacy).or(() -> plugin.catalog().hat(legacy));
+            if (hat.isPresent() && !profile.owns(hat.get().id()) && mode == Settings.LegacyItems.IMPORT) {
+                toImport.putIfAbsent(hat.get().id(), extras(item));
+            }
+        }
+        if (toImport.isEmpty()) {
+            removeOwnedLegacy(player);
+            return;
+        }
+        java.util.UUID uuid = player.getUniqueId();
+        String name = player.getName();
+        plugin.storage().run(db -> {
+            for (Map.Entry<String, Map<String, Integer>> e : toImport.entrySet()) {
+                db.importHatItem(uuid, name, e.getKey(), e.getValue(), "legacy-item");
+            }
+            return db.load(uuid);
+        }, data -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            Profile current = plugin.profiles().get(player);
+            if (current != null) {
+                data.owned().forEach(current::addOwned);
+                toImport.keySet().forEach(id -> current.setEnchants(id, data.enchants().get(id)));
+            }
+            plugin.messages().send(player, "migrate.items-imported", Placeholders.of("count", toImport.size()));
+            removeOwnedLegacy(player);
+        }, error -> plugin.getLogger().warning("Не удалось импортировать старые шляпы игрока " + name));
+    }
+
+    /** Убирает старые предметы шляп, которые уже есть в коллекции; шляпа со шлема становится надетой. */
+    private void removeOwnedLegacy(Player player) {
         Profile profile = plugin.profiles().get(player);
         if (profile == null) {
             return;
@@ -239,7 +339,7 @@ public final class MigrationService {
             if (legacy == null) {
                 continue;
             }
-            Optional<Hat> hat = plugin.catalog().byLegacy(legacy);
+            Optional<Hat> hat = plugin.catalog().byLegacy(legacy).or(() -> plugin.catalog().hat(legacy));
             if (hat.isPresent() && profile.owns(hat.get().id())) {
                 inventory.setItem(slot, null);
                 converted.add(legacy + "->" + hat.get().id() + "@" + slot);
@@ -265,7 +365,7 @@ public final class MigrationService {
         }
         if (!kept.isEmpty() && warnedLegacy.add(player.getUniqueId())) {
             plugin.getLogger().warning("У игрока " + player.getName() + " есть предметы старого плагина без записи в коллекции: "
-                    + kept + ". Предметы не тронуты. Выполните /qwhatcase migrate или выдайте шляпы вручную.");
+                    + kept + ". Предметы не тронуты.");
         }
     }
 }

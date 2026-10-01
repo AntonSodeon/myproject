@@ -137,6 +137,21 @@ public final class ApiImpl implements QWHatCaseApi {
     }
 
     @Override
+    public CompletableFuture<Integer> revokeAll(UUID player, String source) {
+        return plugin.storage().submit(db -> {
+            int removed = db.revokeAll(player, source);
+            onMain(player, p -> {
+                p.clearOwned();
+                Player online = Bukkit.getPlayer(player);
+                if (online != null) {
+                    plugin.display().apply(online);
+                }
+            });
+            return removed;
+        });
+    }
+
+    @Override
     public CompletableFuture<Boolean> revokeHat(UUID player, String hatId, String source) {
         return plugin.storage().submit(db -> {
             boolean removed = db.revokeHat(player, hatId, source);

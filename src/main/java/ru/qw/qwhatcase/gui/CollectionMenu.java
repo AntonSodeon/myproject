@@ -86,9 +86,14 @@ public final class CollectionMenu extends Menu {
                     "category", hat.category().name(), "date", owned ? Format.date(at) : "-", "id", hat.id());
             String loreKey = isWorn ? "menu.collection.worn-lore" : owned ? "menu.collection.owned-lore" : "menu.collection.locked-lore";
             String name = owned ? hat.coloredName() : msg().raw("menu.collection.locked-name", Placeholders.of("hat", Text.strip(hat.name())));
-            set(i, HatItems.icon(hat, name, concat(hat.lore(), msg().lines(loreKey, ph)), isWorn), click -> {
+            HatItems.Stats stats = owned ? plugin.display().stats(profile, hat.id()) : plugin.display().baseStats();
+            set(i, HatItems.icon(hat, name, concat(hat.lore(), msg().lines(loreKey, ph)), isWorn, stats), click -> {
                 if (!owned) {
                     msg().send(viewer, "hat.locked");
+                    return;
+                }
+                if (click.isRightClick()) {
+                    new HatActionsMenu(plugin, viewer, hat).open();
                     return;
                 }
                 if (isWorn) {

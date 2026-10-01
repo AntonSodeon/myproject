@@ -39,11 +39,15 @@ public final class MenuListener implements Listener {
             return;
         }
         int raw = event.getRawSlot();
-        if (raw < 0 || raw >= event.getView().getTopInventory().getSize()) {
+        if (raw < 0) {
             return;
         }
         ClickType type = event.getClick();
         if (type != ClickType.LEFT && type != ClickType.RIGHT && type != ClickType.SHIFT_LEFT && type != ClickType.SHIFT_RIGHT) {
+            return;
+        }
+        boolean bottom = raw >= event.getView().getTopInventory().getSize();
+        if (bottom && !(event.getClickedInventory() instanceof org.bukkit.inventory.PlayerInventory)) {
             return;
         }
         long now = System.currentTimeMillis();
@@ -56,7 +60,11 @@ public final class MenuListener implements Listener {
         if (!menu.acceptsClicks()) {
             return;
         }
-        menu.handleClick(raw, type);
+        if (bottom) {
+            menu.handleBottomClick(event.getSlot(), event.getCurrentItem(), type);
+        } else {
+            menu.handleClick(raw, type);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

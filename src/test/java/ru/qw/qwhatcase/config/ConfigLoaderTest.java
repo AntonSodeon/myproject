@@ -28,7 +28,7 @@ class ConfigLoaderTest {
         for (int cmd = 90; cmd <= 370; cmd++) {
             Hat hat = catalog.byLegacy("hat_" + cmd).orElseThrow(() -> new AssertionError("нет сопоставления"));
             assertEquals(cmd, hat.customModelData(), "модель должна сохраниться для " + hat.id());
-            assertEquals("minecraft:carved_pumpkin", hat.itemModel());
+            assertEquals("CARVED_PUMPKIN", hat.material());
         }
         assertEquals("halo_shiny", catalog.byLegacy("hat_90").orElseThrow().id());
         assertTrue(catalog.byLegacy("hat_89").isEmpty());

@@ -269,4 +269,52 @@ class DatabaseTest {
         assertTrue(db.removePoint("world", 1, 64, -3, "admin"));
         assertTrue(db.points().isEmpty());
     }
+
+    @Test
+    void bookEnchantsAreStoredAndOverrideLevels() throws SQLException {
+        assertTrue(db.enchantHat(alice, "halo", java.util.Map.of("minecraft:sharpness", 5), "Alice").isEmpty(),
+                "нельзя зачаровать шляпу, которой нет в коллекции");
+        db.grantHat(alice, "Alice", "halo", "test", "test");
+        var first = db.enchantHat(alice, "halo", java.util.Map.of("minecraft:sharpness", 5, "minecraft:thorns", 3), "Alice");
+        assertEquals(java.util.Map.of("minecraft:sharpness", 5, "minecraft:thorns", 3), first.orElseThrow());
+        var second = db.enchantHat(alice, "halo", java.util.Map.of("minecraft:sharpness", 2), "Alice");
+        assertEquals(2, second.orElseThrow().get("minecraft:sharpness"), "уровень с книги заменяет прежний (как в PTrap)");
+        assertEquals(3, db.load(alice).enchants().get("halo").get("minecraft:thorns"));
+        db.setFaultHook(st -> {
+            if (st.equals("enchant.before-commit")) {
+                throw new SQLException("boom");
+            }
+        });
+        try {
+            db.enchantHat(alice, "halo", java.util.Map.of("minecraft:mending", 1), "Alice");
+        } catch (SQLException expected) {
+            // ok
+        }
+        db.setFaultHook(null);
+        assertFalse(db.load(alice).enchants().get("halo").containsKey("minecraft:mending"), "сбой — чары не сохранены");
+        assertTrue(db.revokeHat(alice, "halo", "admin"));
+        assertTrue(db.load(alice).enchants().isEmpty(), "удаление шляпы удаляет её чары");
+    }
+
+    @Test
+    void legacyItemImportAndRevokeAll() throws SQLException {
+        assertTrue(db.importHatItem(alice, "Alice", "halo", java.util.Map.of("minecraft:thorns", 3), "legacy-item"));
+        assertFalse(db.importHatItem(alice, "Alice", "halo", java.util.Map.of("minecraft:thorns", 1), "legacy-item"),
+                "повторный импорт не дублирует");
+        assertEquals(3, db.load(alice).enchants().get("halo").get("minecraft:thorns"), "чары не перезаписаны повторным импортом");
+        db.grantHat(alice, "Alice", "cap", "test", "test");
+        db.setSelectedHat(alice, "cap");
+        assertEquals(2, db.revokeAll(alice, "admin"));
+        PlayerData data = db.load(alice);
+        assertTrue(data.owned().isEmpty() && data.enchants().isEmpty() && data.selectedHat() == null);
+    }
+
+    @Test
+    void migrationCarriesEnchants() throws SQLException {
+        var players = List.of(new LegacyImport(alice, "Alice", List.of("halo"), List.of(),
+                java.util.Map.of("halo", java.util.Map.of("minecraft:thorns", 3))));
+        db.importLegacy("src", players, "console", null, null);
+        db.importLegacy("src", players, "console", null, null);
+        assertEquals(java.util.Map.of("minecraft:thorns", 3), db.load(alice).enchants().get("halo"));
+    }
 }

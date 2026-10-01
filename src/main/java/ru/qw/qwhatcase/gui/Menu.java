@@ -96,6 +96,13 @@ public abstract class Menu implements InventoryHolder {
         }
     }
 
+    /**
+     * Клик по слоту инвентаря игрока при открытом меню (событие уже отменено).
+     * @param slot индекс слота в инвентаре игрока
+     */
+    public void handleBottomClick(int slot, ItemStack item, ClickType type) {
+    }
+
     /** Меню анимации запрещает навигацию, пока лента крутится. */
     public boolean acceptsClicks() {
         return true;

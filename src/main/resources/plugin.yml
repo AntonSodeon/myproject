@@ -8,7 +8,7 @@ softdepend: [PTrap]
 commands:
   hats:
     description: Шляпки — главное меню, коллекция, надевание
-    usage: /hats [collection|equip <id>|unequip|shop|pack]
+    usage: /hats [collection|menu|equip <id>|unequip|shop|pack|grant]
     aliases: [hat]
   cases:
     description: Кейсы со шляпками
@@ -56,6 +56,11 @@ permissions:
       qwhatcase.admin.reload: true
       qwhatcase.admin.migrate: true
       qwhatcase.admin.simulate: true
+  qwhats.admin:
+    description: Старое право PTrap — даёт все административные права QWHatCase
+    default: op
+    children:
+      qwhatcase.admin: true
   qwhatcase.admin.keys:
     default: op
   qwhatcase.admin.hats:

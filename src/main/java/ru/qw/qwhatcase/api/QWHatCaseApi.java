@@ -40,4 +40,7 @@ public interface QWHatCaseApi {
     CompletableFuture<Boolean> grantHat(UUID player, String hatId, String source);
 
     CompletableFuture<Boolean> revokeHat(UUID player, String hatId, String source);
+
+    /** Полностью очистить коллекцию игрока. @return сколько шляп удалено */
+    CompletableFuture<Integer> revokeAll(UUID player, String source);
 }
