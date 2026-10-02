@@ -50,5 +50,5 @@ classes stay in `ru.monolith.arsenal.compat.valkyrienskies`. Design, threading r
 Operator diagnostics (permission level 2): `/monolith_arsenal physics backend | list | create_test <pos> | status <id> |
 info <id> | impulse <id> <x y z> | angular_impulse <id> <x y z> | force <id> <x y z> <seconds> |
 torque <id> <x y z> <seconds> | continuous <id> <channel> <force> <torque> | clear_continuous <id> <channel> |
-remove <id>`, plus `create_plain_vs <pos> <marker> <attachment>` and `vs_position <id>` for reproducing
+remove <id>`, plus `create_plain_vs <pos> <marker> <attachment>`, `vs_position <id>` and `vs_yard <id>` for reproducing
 Valkyrien Skies behaviour without our code.

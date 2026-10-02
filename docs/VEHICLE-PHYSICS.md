@@ -12,7 +12,8 @@
   * `physics/` — VS-independent API: `VehicleBody`, `VehiclePhysicsBackend`, `BodyCreation`, and diagnostic commands.
   * `compat/valkyrienskies/` — the adapter (`VsVehicleBackend`, `VsVehicleBody`, `VehicleControlAttachment`,
     `PhysicsCommand`).
-  * One compatibility patch for VS, applied as a mixin in our mod (`ValkyrienSkiesConfigBridge`). The VS jar itself is not modified.
+  * Two fixes for bugs of the VS port, applied as mixins in our mod (the VS jar itself is not modified):
+    the config bridge (`ValkyrienSkiesConfigBridge`) and the shipyard chunk save fix (`ShipyardChunkSaveMixin`).
 
 ## Bodies
 
@@ -62,18 +63,35 @@ It registers the load listeners **before** the configs, because STARTUP configs 
 It does nothing if the v4 API exists, and it only logs a warning if FCAP is missing.
 Verified: `physicsSpeed = 0.5` halves the fall speed (−13.24 → −6.41 m/s after 1.6 s).
 
-## Known limitations (VS port behaviour, reproduced without our code)
+## VS fix: shipyard chunks lost on save (ships fell through terrain after a reload)
 
-1. **Restored ships can fall through terrain.** Observed every time after reopening a singleplayer world, and
-   in some (not all) dedicated-server restarts tested without players (keep-active). A plain VS ship assembled by VS with none of
-   our code behaves the same way. It was **not** observed on a dedicated server restart where players then
-   connected: both our body and the plain VS ship stayed on the ground (release test R12b). Saved data and our
-   controller are restored in every case (an impulse right after loading is applied exactly once). We could not
-   fix this inside our adapter: holding the body static after load and re-sending blocks both failed, and the
-   port's sources for this build are not published. Until VS fixes it, saved vehicles in singleplayer are unreliable.
-2. Without players nearby (and without `/vs set-keep-active`), ships are frozen. On a dedicated server without
+Symptom: after reopening a singleplayer world or restarting a server, restored ships fell through the ground.
+Our bodies and plain VS ships were affected alike.
+
+Cause: the blocks of a ship live in "shipyard" chunks. The port's `MixinChunkMapScheduleUnload`
+(`vs$bulkEvictShipyardAtHead`) drops shipyard chunks whose tickets have expired straight from the chunk map,
+without the save that vanilla unloading does. Right after assembly the shipyard chunk briefly has no VS ticket
+(the temporary loading ticket expires before VS adds its own), so the chunk with the freshly placed blocks could
+be thrown away. VS then loaded the chunk again from disk, empty. In memory the ship still worked, because physics
+had already received its blocks, but the world saved an empty shipyard. After a reload the ship had mass and no
+collision shape, so it fell. It was a race: in tests, 0 to 10 of 2–11 freshly built ships lost their blocks, depending on timing.
+
+How it was found: per-tick probes showed that terrain and shipyard data reached physics before the fall. Holding
+the ships static and re-sending terrain changed nothing. The saved region files had the shipyard chunks of the
+falling ships empty, and the chunk in memory lost its blocks within 0.3 s of assembly.
+
+Fix: `ShipyardChunkSaveMixin` (priority 500, so it runs before the VS eviction) saves a shipyard chunk with
+unsaved changes right before it is evicted or unloaded. Nothing else changes: VS still evicts the chunk.
+Results: 0 of 12 ships lost blocks in 3 runs (before the fix: blocks were lost in 9 of 10 runs, 1 to 10 ships per run); 0 of 11 ships fell after a
+restart (before: 10 of 11); the singleplayer reload test and release test R12b now assert that our body and a
+plain VS ship stay on the ground. Worlds saved **before** this fix still contain empty shipyard chunks, and
+ships in them cannot be repaired; rebuild such ships.
+
+## Known limitations
+
+1. Without players nearby (and without `/vs set-keep-active`), ships are frozen. On a dedicated server without
    players, tests use VS's keep-active command and turn it off afterwards. The adapter never enables it on its own.
-3. `physicsTicksPerGameTick` in `valkyrienskies-core-server.toml` has no effect in this port: physics runs at about 60 steps/s.
-4. The console shows VS's own `NoClassDefFoundError … NeoForgeConfigRegistry` warning at startup (logged by VS
+2. `physicsTicksPerGameTick` in `valkyrienskies-core-server.toml` has no effect in this port: physics runs at about 60 steps/s.
+3. The console shows VS's own `NoClassDefFoundError … NeoForgeConfigRegistry` warning at startup (logged by VS
    before our bridge runs), plus harmless `vs_eureka` recipe errors (recipes for an addon that is not installed).
-5. `isSimulated()` is derived from chunk state, not from VS internals. A future VS build may need this rule adjusted.
+4. `isSimulated()` is derived from chunk state, not from VS internals. A future VS build may need this rule adjusted.

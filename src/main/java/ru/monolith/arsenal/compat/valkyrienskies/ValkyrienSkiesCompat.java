@@ -43,6 +43,43 @@ public final class ValkyrienSkiesCompat {
         return ship == null ? "not loaded" : ship.getTransform().getPositionInWorld().toString();
     }
 
+    /** Diagnostics: world Y of any loaded VS ship, NaN if not loaded. */
+    public static double vsShipY(net.minecraft.server.world.ServerWorld world, long id) {
+        var ship = ValkyrienSkies.api().getServerShipWorld(world.getServer()).getLoadedShips().getById(id);
+        return ship == null ? Double.NaN : ship.getTransform().getPositionInWorld().y();
+    }
+
+    /** Diagnostics: save-relevant state of the shipyard chunks holding a ship's blocks. */
+    public static String vsYardState(net.minecraft.server.world.ServerWorld world, long id) {
+        var ship = ValkyrienSkies.api().getServerShipWorld(world.getServer()).getLoadedShips().getById(id);
+        if (ship == null) {
+            return "not loaded";
+        }
+        StringBuilder out = new StringBuilder();
+        ship.getActiveChunksSet().forEach((x, z) -> {
+            var holder = world.getChunkManager().chunkLoadingManager.getCurrentChunkHolder(net.minecraft.util.math.ChunkPos.toLong(x, z));
+            if (holder == null) {
+                out.append(String.format("[%d,%d no-holder]", x, z));
+                return;
+            }
+            var chunk = holder.getLatest();
+            int solid = 0;
+            if (chunk != null) {
+                for (var section : chunk.getSectionArray()) {
+                    if (!section.isEmpty()) {
+                        for (int i = 0; i < 4096; i++) {
+                            solid += section.getBlockState(i & 15, (i >> 8) & 15, (i >> 4) & 15).isAir() ? 0 : 1;
+                        }
+                    }
+                }
+            }
+            var viaWorld = world.getChunkManager().getWorldChunk(x, z);
+            out.append(String.format("[%d,%d lvl=%d acc=%s dirty=%s solid=%d sameAsWorld=%s]", x, z, holder.getLevel(), holder.isAccessible(),
+                    chunk == null ? "null" : chunk.needsSaving(), solid, viaWorld == chunk));
+        });
+        return out.toString();
+    }
+
     public static VehiclePhysicsBackend createBackend() {
         // Saved with each ship (Jackson); must be registered before ships load.
         ValkyrienSkies.api().registerAttachment(VehicleControlAttachment.class);

@@ -4,6 +4,7 @@
   "package": "ru.monolith.arsenal.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ShipyardChunkSaveMixin",
     "ValkyrienSkiesModFabricMixin"
   ],
   "injectors": {

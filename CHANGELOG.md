@@ -20,9 +20,11 @@ Real Valkyrien Skies integration for future military vehicles.
 * **Removed:** Monolith Skies (`monolith_skies`) and everything it added.
 * Unchanged: items, creative tab, localisation, test weapon and its pose, `animated_test`; Fabric API, GeckoLib and
   Player Animation Library stay nested in the jar.
-* Known VS port limitation: bodies restored from a save can fall through terrain after a singleplayer reload or a
-  player-less server restart (plain VS ships behave the same; not observed on a dedicated server with players).
-  Details are in `docs/VEHICLE-PHYSICS.md`.
+* Fix for the VS port: ships fell through terrain after a world reload or server restart. The port evicted
+  shipyard chunks (the chunks holding a ship's blocks) without saving them, so ships could be saved without their
+  blocks. A mixin in this mod now saves such chunks before VS evicts them; the VS jar is unchanged. Ships saved
+  without blocks by an earlier build cannot be repaired. Details are in `docs/VEHICLE-PHYSICS.md`.
+* Diagnostics: `/monolith_arsenal physics vs_yard <id>` shows the save state of a ship's shipyard chunks.
 
 ## 0.1.12
 

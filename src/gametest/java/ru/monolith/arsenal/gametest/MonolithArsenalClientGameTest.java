@@ -61,20 +61,20 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
             }
             boolean present = reopened.getServer().computeOnServer(server -> VehiclePhysics.find(server.getOverworld(), id).isPresent());
             check(present, "the physics body must be saved with the world");
-            // Controller restored: an impulse right after loading is applied exactly once (horizontal, so it does
-            // not matter that the body may already be falling, see the known defect below).
+            // Controller restored: an impulse right after loading is applied exactly once.
             double m = reopened.getServer().computeOnServer(server -> body(server, id).mass());
-            double v0 = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().x);
-            reopened.getServer().runOnServer(server -> body(server, id).applyImpulse(new Vec3d(m * 6.0, 0.0, 0.0)));
-            int w = 0;
-            while (reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().x) - v0 < 1.0 && w < 60) {
+            double yRest = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
+            reopened.getServer().runOnServer(server -> body(server, id).applyImpulse(new Vec3d(0.0, m * 6.0, 0.0)));
+            double peak = yRest;
+            for (int i = 0; i < 40; i++) {
                 context.waitTicks(1);
-                w++;
+                peak = Math.max(peak, reopened.getServer().computeOnServer(server -> body(server, id).position().y));
             }
-            context.waitTicks(2);
-            double dv = reopened.getServer().computeOnServer(server -> body(server, id).linearVelocity().x) - v0;
-            check(dv > 5.5 && dv < 6.5, "impulse after world reload is applied exactly once: dvx=" + dv + " (expected 6.0, after " + w + " ticks)");
-
+            double rise = peak - yRest;
+            // v = 6 m/s up gives v^2/2g = 1.8 m; applied twice it would be ~7 m.
+            check(rise > 1.0 && rise < 3.0, "impulse after world reload is applied exactly once: rise=" + rise + " (expected ~1.8); "
+                    + reopened.getServer().computeOnServer(server -> body(server, id).diagnostics()));
+            context.waitTicks(40);
             double y0 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
             for (int i = 0; i < 4; i++) {
                 LOGGER.info("[gametest] reopened t={}s: plain VS ship at {}; our body y={} {}", i,
@@ -85,11 +85,12 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
                 context.waitTicks(20);
             }
             double y1 = reopened.getServer().computeOnServer(server -> body(server, id).position().y);
-            // Known VS port defect (2.4.205+0d0017dd8a): after a world reload ships fall through terrain. The plain
-            // VS ship above has none of our code and behaves the same, so this is recorded, not asserted.
-            LOGGER.info("[gametest] KNOWN-VS-DEFECT check: restored body y {} -> {} (stays on ground: {}); plain VS ship now at {}",
-                    y0, y1, Math.abs(y1 - y0) < 0.5 && y1 > -61.0, reopened.getServer().computeOnServer(server ->
-                            ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(server.getOverworld(), plainId)));
+            double plainY1 = reopened.getServer().computeOnServer(server ->
+                    ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipY(server.getOverworld(), plainId));
+            LOGGER.info("[gametest] after reload: our body y {} -> {}; plain VS ship y {} -> {}", y0, y1, plainY, plainY1);
+            // Before the shipyard save fix (ShipyardChunkSaveMixin) restored ships lost their blocks and fell through terrain.
+            check(Math.abs(y1 - y0) < 0.5 && y1 > -61.0, "restored body must stay on the ground: y " + y0 + " -> " + y1);
+            check(Math.abs(plainY1 - plainY) < 0.5, "restored plain VS ship must stay on the ground: y " + plainY + " -> " + plainY1);
             context.waitTicks(80);
             context.takeScreenshot("12_after_reload");
             boolean removed = reopened.getServer().computeOnServer(server -> VehiclePhysics.backend().remove(server.getOverworld(), id));
@@ -281,11 +282,14 @@ public final class MonolithArsenalClientGameTest implements FabricClientGameTest
         plainId = server.computeOnServer(s -> ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat
                 .createPlainVsShip(s.getOverworld(), new BlockPos(16, -50, -10), false, false));
         context.waitTicks(100);
+        plainY = server.computeOnServer(s -> ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipY(s.getOverworld(), plainId));
         LOGGER.info("[gametest] plain VS ship {} before reload at {}", plainId,
                 server.computeOnServer(s -> ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsShipPosition(s.getOverworld(), plainId)));
     }
 
     private static long plainId;
+
+    private static double plainY;
 
     private static long bodyId;
 

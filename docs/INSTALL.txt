@@ -13,7 +13,7 @@ mods/
 └── ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar     <- оригинальный Valkyrien Skies (неофициальный порт), НЕ изменён
 
 monolith-arsenal-0.1.13.jar
-  SHA-256 4014a67f5e3e9103bb30b3846c46ca1599e44e4bfd8a4dfc2556ee0dceec8f18
+  SHA-256 bab8edb98c89335dce4bf4cdc7ec5ae13dcdf2211ff28ff9e1b2830fe50b8325
   Внутри (Jar-in-Jar): Fabric API 0.141.6+1.21.11, GeckoLib 5.4.5, Player Animation Library 1.1.7+mc.1.21.11.
 
 ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar  (mod id valkyrienskies, версия 2.4.205+0d0017dd8a, автор порта LumixTeam)

@@ -57,6 +57,11 @@ public final class PhysicsCommands {
                             context.getSource().sendFeedback(() -> Text.literal("VS ship " + id + " at " + pos), false);
                             return 1;
                         }))
+                        .then(withId("vs_yard", (context, id) -> {
+                            String state = ru.monolith.arsenal.compat.valkyrienskies.ValkyrienSkiesCompat.vsYardState(context.getSource().getWorld(), id);
+                            context.getSource().sendFeedback(() -> Text.literal("VS yard " + id + " " + state), false);
+                            return 1;
+                        }))
                         .then(vectorCommand("impulse", false, (body, v, s) -> body.applyImpulse(v)))
                         .then(vectorCommand("angular_impulse", false, (body, v, s) -> body.applyAngularImpulse(v)))
                         .then(vectorCommand("force", true, VehicleBody::applyForce))
