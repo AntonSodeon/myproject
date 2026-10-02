@@ -64,12 +64,13 @@ Verified: `physicsSpeed = 0.5` halves the fall speed (−13.24 → −6.41 m/s a
 
 ## Known limitations (VS port behaviour, reproduced without our code)
 
-1. **After a world or server reload, ships fall through terrain.** A plain VS ship assembled by VS with none of
-   our code behaves the same way, with a player standing next to it. Saved data and our controller are restored
-   (an impulse right after loading is applied exactly once), but a restored body drops through the ground. We
-   could not fix this inside our adapter. Holding the body static after load and re-sending blocks both failed.
-   The port's sources for this build are not published, so there is no reproducible way to patch it. This
-   blocks saved vehicles until VS is fixed.
+1. **Restored ships can fall through terrain.** Observed every time after reopening a singleplayer world, and
+   in some (not all) dedicated-server restarts tested without players (keep-active). A plain VS ship assembled by VS with none of
+   our code behaves the same way. It was **not** observed on a dedicated server restart where players then
+   connected: both our body and the plain VS ship stayed on the ground (release test R12b). Saved data and our
+   controller are restored in every case (an impulse right after loading is applied exactly once). We could not
+   fix this inside our adapter: holding the body static after load and re-sending blocks both failed, and the
+   port's sources for this build are not published. Until VS fixes it, saved vehicles in singleplayer are unreliable.
 2. Without players nearby (and without `/vs set-keep-active`), ships are frozen. On a dedicated server without
    players, tests use VS's keep-active command and turn it off afterwards. The adapter never enables it on its own.
 3. `physicsTicksPerGameTick` in `valkyrienskies-core-server.toml` has no effect in this port: physics runs at about 60 steps/s.

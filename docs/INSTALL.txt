@@ -1,0 +1,60 @@
+MONOLITH: ARSENAL 0.1.13 — установка
+=====================================
+
+Требования
+----------
+* Minecraft Java Edition 1.21.11, Java 21.
+* Fabric Loader 0.19.2 или новее (официальный установщик https://fabricmc.net/use/installer/).
+
+Папка mods — ДВА файла
+----------------------
+mods/
+├── monolith-arsenal-0.1.13.jar                    <- этот мод
+└── ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar     <- оригинальный Valkyrien Skies (неофициальный порт), НЕ изменён
+
+monolith-arsenal-0.1.13.jar
+  SHA-256 4014a67f5e3e9103bb30b3846c46ca1599e44e4bfd8a4dfc2556ee0dceec8f18
+  Внутри (Jar-in-Jar): Fabric API 0.141.6+1.21.11, GeckoLib 5.4.5, Player Animation Library 1.1.7+mc.1.21.11.
+
+ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar  (mod id valkyrienskies, версия 2.4.205+0d0017dd8a, автор порта LumixTeam)
+  Скачать: https://www.curseforge.com/minecraft/mc-mods/vs-unofficial-port/files/8724931
+  Размер 32 936 032 байт
+  SHA-256 30899ecc694c752e89090b40b7c8394c1dc6e4d9e65ef1377e205a6100c023bf
+  Тот же файл (байт в байт) есть на Modrinth (проект valkyrien-skies-unnof-port) и в cursemaven
+  (curse.maven:vs-unofficial-port-1556051:8724931). Проверьте контрольную сумму:
+    Windows:  certutil -hashfile ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar SHA256
+    Linux:    sha256sum ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar
+  VS сам несёт внутри Fabric Language Kotlin, Forge Config API Port, MixinExtras и classmate.
+  Architectury API и Cloth Config НЕ нужны.
+
+Сервер: те же два файла в mods сервера. Клиентам тоже нужны оба файла.
+
+Обновление с 0.1.12 — ВНИМАНИЕ
+------------------------------
+Monolith Skies из 0.1.12 удалён. Автоматической миграции кораблей нет: корабль monolith_skies, не
+разобранный ДО обновления, будет удалён вместе с блоками и содержимым сундуков.
+Порядок: резервная копия мира -> разобрать корабли в 0.1.12 -> проверить -> поставить 0.1.13.
+Подробно: MIGRATION-from-0.1.12.md.
+
+Порядок установки
+-----------------
+1. Fabric Loader 0.19.2+ для 1.21.11.
+2. Удалите из mods monolith-arsenal-0.1.12.jar и более старые версии.
+3. Положите в mods оба файла, указанных выше.
+4. Запустите профиль Fabric 1.21.11 на Java 21.
+
+Нормальные сообщения в логе (не ошибки этого мода)
+--------------------------------------------------
+* "NoClassDefFoundError ... NeoForgeConfigRegistry" — VS пишет это до того, как наш мод подключает его конфиги
+  через новый API; затем в логе должно быть "Applied Valkyrien Skies config valkyrienskies-...toml".
+* "Config recipe 'vs_eureka:...' failed to build" — рецепты аддона Eureka, который не установлен.
+
+Проверка
+--------
+/monolith_arsenal physics backend                 -> Valkyrien Skies ...
+/monolith_arsenal physics create_test ~ ~5 ~      -> PENDING, затем READY; тело падает и встаёт на землю
+/monolith_arsenal physics info <id>               -> позиция, скорость, масса (mass=M)
+/monolith_arsenal physics impulse <id> 0 <5*M> 0  -> тело подпрыгивает примерно на 1,3 м (скорость 5 м/с), один раз
+/monolith_arsenal physics remove <id>             -> тело и его блоки удалены
+/give @s monolith_arsenal:test_weapon, F5          -> поза оружия
+/summon monolith_arsenal:animated_test             -> анимированная модель

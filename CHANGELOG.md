@@ -21,8 +21,10 @@ Real Valkyrien Skies integration for future military vehicles. Monolith Skies is
   See `docs/MIGRATION-from-0.1.12.md` **before** opening 0.1.12 worlds that contain such ships.
 * Unchanged: items, creative tab, localisation, test weapon and its pose, `animated_test`; Fabric API, GeckoLib and
   Player Animation Library stay nested in the jar.
-* Known VS port limitation: bodies restored from a save fall through terrain (plain VS ships behave the same).
+* Known VS port limitation: bodies restored from a save can fall through terrain after a singleplayer reload or a
+  player-less server restart (plain VS ships behave the same; not observed on a dedicated server with players).
   Details are in `docs/VEHICLE-PHYSICS.md`.
+* No automatic migration of Monolith Skies ships: disassemble them in 0.1.12 first, otherwise they are deleted.
 
 ## 0.1.12
 

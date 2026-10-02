@@ -7,7 +7,7 @@ Military content: a test weapon with a Player Animation Library pose, a GeckoLib
 
 ## Installation (players)
 
-See `INSTALL.txt` in the release archive. In short, the `mods` folder needs **two files**:
+See [docs/INSTALL.txt](docs/INSTALL.txt) (also in the release archive). Test results: [docs/TEST-REPORT-0.1.13.md](docs/TEST-REPORT-0.1.13.md). In short, the `mods` folder needs **two files**:
 
 | File | Source |
 |---|---|
