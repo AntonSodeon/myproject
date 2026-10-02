@@ -14,7 +14,7 @@ See [docs/INSTALL.txt](docs/INSTALL.txt) (also in the release archive). Test res
 | `monolith-arsenal-0.1.13.jar` | this project (Fabric API, GeckoLib and Player Animation Library are nested inside) |
 | `ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar` | [CurseForge, file 8724931](https://www.curseforge.com/minecraft/mc-mods/vs-unofficial-port/files/8724931) — the original, unmodified jar |
 
-Fabric Loader 0.19.2+ is installed separately. Upgrading from 0.1.12? Read [docs/MIGRATION-from-0.1.12.md](docs/MIGRATION-from-0.1.12.md) first.
+Fabric Loader 0.19.2+ is installed separately.
 
 ## Building
 

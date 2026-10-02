@@ -2,7 +2,7 @@
 
 ## 0.1.13
 
-Real Valkyrien Skies integration for future military vehicles. Monolith Skies is removed.
+Real Valkyrien Skies integration for future military vehicles.
 
 * **Valkyrien Skies is the physics backend**: the unofficial Fabric port for 1.21.11 by LumixTeam
   (`ValkyrienSkies-Fabric-MC1.21.11-v3.1.1.jar`, mod id `valkyrienskies` 2.4.205+0d0017dd8a, CurseForge file 8724931),
@@ -17,14 +17,12 @@ Real Valkyrien Skies integration for future military vehicles. Monolith Skies is
   silently ran on defaults. The configs are now registered through FCAP v5 by a mixin in this mod; the VS jar is
   unchanged. Verified by changing `physicsSpeed`.
 * Diagnostics: `/monolith_arsenal physics …` (permission level 2).
-* **Removed:** Monolith Skies (`monolith_skies`), its ship assembler item and the `monolith_skies:ship` entity.
-  See `docs/MIGRATION-from-0.1.12.md` **before** opening 0.1.12 worlds that contain such ships.
+* **Removed:** Monolith Skies (`monolith_skies`) and everything it added.
 * Unchanged: items, creative tab, localisation, test weapon and its pose, `animated_test`; Fabric API, GeckoLib and
   Player Animation Library stay nested in the jar.
 * Known VS port limitation: bodies restored from a save can fall through terrain after a singleplayer reload or a
   player-less server restart (plain VS ships behave the same; not observed on a dedicated server with players).
   Details are in `docs/VEHICLE-PHYSICS.md`.
-* No automatic migration of Monolith Skies ships: disassemble them in 0.1.12 first, otherwise they are deleted.
 
 ## 0.1.12
 
@@ -36,10 +34,7 @@ Dependency restoration after the libraries were stripped from the uploaded proje
 * Dependencies from official Maven repositories: Fabric API 0.141.6+1.21.11, GeckoLib 5.4.5,
   Player Animation Library 1.1.7+mc.1.21.11. All of them are nested into the mod jar (Jar-in-Jar):
   the release is a single self-contained file.
-* **Valkyrien Skies replaced by Monolith Skies 0.1.0** (our own module, nested via Jar-in-Jar).
-  Official Valkyrien Skies only exists up to Minecraft 1.21.1. The `2.4.205` version required by 0.1.11 is an
-  unofficial third-party port. Monolith Skies provides block ships with gravity, buoyancy, collisions,
-  walkable decks, assembly and disassembly, persistence and an API.
+* Valkyrien Skies temporarily replaced by an own module (Monolith Skies, removed again in 0.1.13).
 * `ValkyrienSkiesCompat` no longer needs Valkyrien Skies at compile time: it detects an installed copy at runtime.
 * Architectury API is no longer required (it was needed only by the Valkyrien Skies port).
 * Added the missing `items/debug_tool.json` item model definition (before this fix, the Debug Tool rendered as a missing-texture cube).
